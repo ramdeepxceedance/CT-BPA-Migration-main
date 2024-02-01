@@ -1,0 +1,162 @@
+{
+	"name": "df_stage_location",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_location",
+						"type": "DatasetReference"
+					},
+					"name": "locationStagingJoinStgingPolicy"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_address",
+						"type": "DatasetReference"
+					},
+					"name": "addressTarget"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "stgPolicy"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_location",
+						"type": "DatasetReference"
+					},
+					"name": "locationTarget"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "deriveLocationJson"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "addAddressJson"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "renamePolicyIdCol"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     policyPrefix as string ('CFA')",
+				"}",
+				"source(output(",
+				"          LOCATION_ID as long,",
+				"          POLICY_ID as long,",
+				"          LOCATION_EFF_DATE as timestamp,",
+				"          LOCATION_EXP_DATE as timestamp,",
+				"          GEN_ADDRESS_UNIQ_ID as long,",
+				"          POLICY_NUMBER as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: (\"select pl.LOCATION_ID,pl.POLICY_ID,pl.LOCATION_EFF_DATE,PL.LOCATION_EXP_DATE,PL.GEN_ADDRESS_UNIQ_ID,p.POLICY_NUMBER,p.ENTITY_TYPE from POL_LOCATION  pl join POL_POLICY p on pl.POLICY_ID = p.POLICY_ID AND p.ENTITY_TYPE ='{$policyPrefix}'\"),",
+				"     format: 'query') ~> locationStagingJoinStgingPolicy",
+				"source(output(",
+				"          address_id as integer,",
+				"          json_data as string,",
+				"          extendedattributes as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from address',",
+				"     format: 'query') ~> addressTarget",
+				"source(output(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> stgPolicy",
+				"locationStagingJoinStgingPolicy select(mapColumn(",
+				"          location_id = LOCATION_ID,",
+				"          policy_id = POLICY_ID,",
+				"          LOCATION_EFF_DATE,",
+				"          LOCATION_EXP_DATE,",
+				"          address_id = GEN_ADDRESS_UNIQ_ID,",
+				"          POLICY_NUMBER",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"derivedColumn1 derive(derived_json_data = toString(@(typeCode=typeCode,\r",
+				"          address=address_json_data,\r",
+				"          earthquakeZone=false(),\r",
+				"          effectiveDate=toString(toDate(toString(LOCATION_EFF_DATE))),\r",
+				"          expirationDate=toString(toDate(toString(LOCATION_EXP_DATE))),\r",
+				"          isCancelled=false(),\r",
+				"          businessKey=toString(location_id)))) ~> deriveLocationJson",
+				"select1, select2 join(select1@address_id == select2@address_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"addressTarget select(mapColumn(",
+				"          address_id,",
+				"          address_json_data = json_data",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"deriveLocationJson derive(json_data = replace(replace(unescape(derived_json_data, 'json'), '\"{', '{'), '}\"', '}')) ~> addAddressJson",
+				"join1, renamePolicyIdCol lookup(select1@POLICY_NUMBER == stgPolicy@policy_number,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 filter(!isNull(stgPolicy@policy_number)) ~> filter1",
+				"stgPolicy derive(targetPolicyId = policy_id) ~> renamePolicyIdCol",
+				"filter1 derive(policy_id = targetPolicyId,",
+				"          typeCode = case($policyPrefix == 'CFA', 'PRIMARY_LOCATION', 'aquaCulture')) ~> derivedColumn1",
+				"addAddressJson sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          location_id as integer,",
+				"          policy_id as integer,",
+				"          address_id as integer,",
+				"          json_data as string,",
+				"          extendedattributes as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> locationTarget"
+			]
+		}
+	}
+}

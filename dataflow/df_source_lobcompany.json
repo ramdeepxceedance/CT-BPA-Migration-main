@@ -1,0 +1,287 @@
+{
+	"name": "df_source_lobcompany",
+	"properties": {
+		"folder": {
+			"name": "Source Stage Data Flows/referenceDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_company",
+						"type": "DatasetReference"
+					},
+					"name": "companySource"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_lob",
+						"type": "DatasetReference"
+					},
+					"name": "lobSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_company",
+						"type": "DatasetReference"
+					},
+					"name": "compnayStatgingLookup"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_lob",
+						"type": "DatasetReference"
+					},
+					"name": "lobStagingLookup"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_company",
+						"type": "DatasetReference"
+					},
+					"name": "companyStaging"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_lob",
+						"type": "DatasetReference"
+					},
+					"name": "lobStaging"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flowlet3",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet4",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "surrogateKey2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "select5"
+				},
+				{
+					"name": "exists1"
+				},
+				{
+					"name": "select6"
+				},
+				{
+					"name": "exists2"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     DF_batch as integer (1),",
+				"     DF_lob_max_id as integer (1),",
+				"     DF_company_max_id as integer (1)",
+				"}",
+				"source(output(",
+				"          ID as integer,",
+				"          WINSCompanyID as string,",
+				"          Name as string,",
+				"          NAICNumber as string,",
+				"          NAICGroupCode as string,",
+				"          NCCICode as string,",
+				"          ISOCode as string,",
+				"          FEIN as string,",
+				"          AddressLine1 as string,",
+				"          AddressLine2 as string,",
+				"          City as string,",
+				"          AlphaStateCode as string,",
+				"          ZipCode as string,",
+				"          CreateTime as timestamp,",
+				"          CreatedBy as string,",
+				"          UpdateTime as timestamp,",
+				"          UpdatedBy as string,",
+				"          AgentUploadFlag as string,",
+				"          ARICGroupCode as string,",
+				"          CompanyGroup as string,",
+				"          ARICDirectAssumed as string,",
+				"          CompanyAbbreviation as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> companySource",
+				"source(output(",
+				"          ARICGroupCode as string,",
+				"          ARICLineOfBusinessID as string,",
+				"          ARICGroupLineDescription as string,",
+				"          ARICMajorProductCode as string,",
+				"          ProductCode as string,",
+				"          INFCATPProduct as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> lobSource",
+				"source(output(",
+				"          COMPANY_ID as long,",
+				"          COMPANY_VID as long,",
+				"          COMPANY_CODE as string,",
+				"          COMPANY_NAME as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          CORPORATE_NAME as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> compnayStatgingLookup",
+				"source(output(",
+				"          LOB_ID as long,",
+				"          LOB_CODE as string,",
+				"          LOB_NAME as string,",
+				"          LOB_DESCRIPTION as string,",
+				"          LOB_IS_VALID_YN as string,",
+				"          LOB_VALID_START_DATE as timestamp,",
+				"          LOB_VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> lobStagingLookup",
+				"derivedColumn2 compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet3@(output1)",
+				"derivedColumn3 compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet4@(output1)",
+				"companySource select(mapColumn(",
+				"          COMPANY_CODE = WINSCompanyID,",
+				"          COMPANY_NAME = Name",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"exists1 keyGenerate(output(skey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"surrogateKey1 derive(COMPANY_ID = skey + $DF_company_max_id,",
+				"          COMPANY_VID = 1) ~> derivedColumn2",
+				"lobSource select(mapColumn(",
+				"          LOB_CODE = ARICLineOfBusinessID,",
+				"          LOB_DESCRIPTION = ARICGroupLineDescription",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"exists2 keyGenerate(output(skey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey2",
+				"surrogateKey2 derive(LOB_ID = skey + $DF_lob_max_id) ~> derivedColumn3",
+				"compnayStatgingLookup select(mapColumn(",
+				"          COMPANY_CODE",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select5",
+				"select3, select5 exists(select3@COMPANY_CODE == select5@COMPANY_CODE,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> exists1",
+				"lobStagingLookup select(mapColumn(",
+				"          LOB_CODE",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select6",
+				"select4, select6 exists(select4@LOB_CODE == select6@LOB_CODE,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> exists2",
+				"flowlet3@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          COMPANY_ID as long,",
+				"          COMPANY_VID as long,",
+				"          COMPANY_CODE as string,",
+				"          COMPANY_NAME as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          CORPORATE_NAME as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1) ~> companyStaging",
+				"flowlet4@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          LOB_ID as long,",
+				"          LOB_CODE as string,",
+				"          LOB_NAME as string,",
+				"          LOB_DESCRIPTION as string,",
+				"          LOB_IS_VALID_YN as string,",
+				"          LOB_VALID_START_DATE as timestamp,",
+				"          LOB_VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 2) ~> lobStaging"
+			]
+		}
+	}
+}

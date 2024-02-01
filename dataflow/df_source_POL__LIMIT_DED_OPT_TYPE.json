@@ -1,0 +1,103 @@
+{
+	"name": "df_source_POL__LIMIT_DED_OPT_TYPE",
+	"properties": {
+		"folder": {
+			"name": "Source Stage Data Flows/txnDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_ECMDataDictionary",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_POLLIMITDEDOPTTYPE",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flowlet1",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "surrogateKey1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          amountType as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select [Column] as amountType from ECMDataDictionary where TableName = \\'PolicyCoveragePremium_P\\' and( [Column] =\\'limit1\\'or [Column] =\\'limit2\\')\\nunion\\nselect [Column] from ECMDataDictionary where TableName = \\'PolicyDeductible_P\\' and( [Column] =\\'DeductibleAmount1Type\\'or [Column] =\\'DeductibleAmount2Type\\')',",
+				"     format: 'query') ~> source1",
+				"derivedColumn1 compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet1@(output1)",
+				"surrogateKey1 derive(POLICY_YN = 'N',",
+				"          LIMIT_DED_OPT_TYPE = case(startsWith(amountType, 'DeductibleAmount'), 'Deductible',",
+				"case(startsWith(amountType, 'limit'), 'limit','limit')),",
+				"          LDO_NAME = case(startsWith(amountType, 'DeductibleAmount1Type'), 'DeductibleAmount1Type',",
+				"case(startsWith(amountType, 'DeductibleAmount2Type'), 'DeductibleAmount2Type',",
+				"case(startsWith(amountType, 'Limit1'), 'Limit1','Limit2'))),",
+				"          COVERAGE_YN = 'Y') ~> derivedColumn1",
+				"source1 keyGenerate(output(LIMIT_DED_OPT_TYPE_ID as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"flowlet1@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          LIMIT_DED_OPT_TYPE_ID as long,",
+				"          POLICY_YN as string,",
+				"          LIMIT_DED_OPT_TYPE as string,",
+				"          LDO_NAME as string,",
+				"          LOCATION_YN as string,",
+				"          RISK_YN as string,",
+				"          SECTION_YN as string,",
+				"          COVERAGE_YN as string,",
+				"          GRAIN_CD as string,",
+				"          IS_KEY_LDO_YN as string,",
+				"          LDO_COLUMN_NAME as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

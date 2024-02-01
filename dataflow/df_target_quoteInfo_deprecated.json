@@ -1,0 +1,236 @@
+{
+	"name": "df_target_quoteInfo_deprecated",
+	"properties": {
+		"folder": {
+			"name": "utility"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "policyTarget"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policytracker",
+						"type": "DatasetReference"
+					},
+					"name": "policyTrackerTarget"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_target_quoteInfo",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "retrieveQuoteInfoAPI",
+					"linkedService": {
+						"referenceName": "RestService2",
+						"type": "LinkedServiceReference"
+					}
+				},
+				{
+					"name": "searchQuoteAPI",
+					"linkedService": {
+						"referenceName": "RestService2",
+						"type": "LinkedServiceReference"
+					}
+				},
+				{
+					"name": "searchPolicyAPI",
+					"linkedService": {
+						"referenceName": "RestService2",
+						"type": "LinkedServiceReference"
+					}
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "select6"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "derivedColumn8"
+				},
+				{
+					"name": "derivedColumn9"
+				},
+				{
+					"name": "select13"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "searchParamsRenewalOf"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     policyPrefix as string,",
+				"     policies as string[]",
+				"}",
+				"source(output(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: (\"select * from policy \"+iif(size($policies) >0&& size($policies) ==1&&$policies[1] =='','','where policy_number in ('+dropLeft(toString(reduce($policies, \"'\", #acc + \",'\" + #item +\"'\", #result)), 2)+')')),",
+				"     format: 'query') ~> policyTarget",
+				"source(output(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          bpa_tracking_number as string,",
+				"          bpa_tenant_id as string,",
+				"          bpa_username as string,",
+				"          status as string,",
+				"          created_at as timestamp,",
+				"          updated_at as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from policy_tracker where status = \\'200\\'',",
+				"     format: 'query') ~> policyTrackerTarget",
+				"derivedColumn8 call(mapColumn(",
+				"          policy_policy_number,",
+				"          policy_reference,",
+				"          quote_number,",
+				"          queryParams",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     output(",
+				"          retrieveQuoteResponse as (quote as string)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     format: 'rest',",
+				"     store: 'restservice',",
+				"     timeout: 30,",
+				"     requestInterval: 0,",
+				"     httpMethod: 'GET',",
+				"     rowRelativeUrl: 'queryParams',",
+				"     entity: ('/policyadmin-api/retrieveQuoteInformation/v1/quote/'),",
+				"     bodyColumnName: 'retrieveQuoteResponse',",
+				"     requestFormat: ['type' -> 'json'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> retrieveQuoteInfoAPI",
+				"derivedColumn9 call(mapColumn(",
+				"          searchParams",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     output(",
+				"          searchQuoteResponse as (quote as (quoteNumber as string)[])",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     format: 'rest',",
+				"     store: 'restservice',",
+				"     timeout: 30,",
+				"     requestInterval: 0,",
+				"     httpMethod: 'POST',",
+				"     entity: (\"/policyadmin-api/searchQuote/v1/quote\"),",
+				"     bodyColumnName: 'searchQuoteResponse',",
+				"     requestFormat: ['type' -> 'json'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> searchQuoteAPI",
+				"searchParamsRenewalOf call(mapColumn(",
+				"          searchParams",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     output(",
+				"          headers as [string,string],",
+				"          searchPolicyResponse as (policy as (referenceNumber as string)[]),",
+				"          status as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     format: 'rest',",
+				"     store: 'restservice',",
+				"     timeout: 30,",
+				"     requestInterval: 0,",
+				"     httpMethod: 'POST',",
+				"     entity: ('/policyadmin-api/searchPolicyInformation/v1/policy'),",
+				"     headerColumnName: 'headers',",
+				"     bodyColumnName: 'searchPolicyResponse',",
+				"     statusColumnName: 'status',",
+				"     addResponseCode: true,",
+				"     requestFormat: ['type' -> 'json'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> searchPolicyAPI",
+				"policyTrackerTarget select(mapColumn(",
+				"          tracker_policy_number = policy_number",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"policyTarget select(mapColumn(",
+				"          policy_id,",
+				"          policy_policy_number = policy_number",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"retrieveQuoteInfoAPI select(mapColumn(",
+				"          policy_number = policy_policy_number,",
+				"          policy_reference,",
+				"          quote_number,",
+				"          quote = retrieveQuoteResponse.quote,",
+				"          policy_id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select6",
+				"select4, select1 join(policy_policy_number == tracker_policy_number,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"searchQuoteAPI derive(quote_number = searchQuoteResponse.quote[1].quoteNumber,",
+				"          queryParams = searchQuoteResponse.quote[1].quoteNumber+'?identifierType=number') ~> derivedColumn8",
+				"searchPolicyAPI derive(policy_reference = searchPolicyResponse.policy[1].referenceNumber,",
+				"          searchParams = 'referenceNumber:*' + searchPolicyResponse.policy[1].referenceNumber +'*') ~> derivedColumn9",
+				"join2 select(mapColumn(",
+				"          policy_policy_number,",
+				"          policy_id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select13",
+				"select6 alterRow(upsertIf(!isNull(policy_number)&&!isNull(quote_number))) ~> AlterRow1",
+				"select13 derive(searchParams = 'renewalOf:'+policy_policy_number) ~> searchParamsRenewalOf",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          policy_number as string,",
+				"          policy_id as integer,",
+				"          policy_reference as string,",
+				"          quote_number as string,",
+				"          quote as string,",
+				"          status as string,",
+				"          response as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['policy_number'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

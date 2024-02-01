@@ -1,0 +1,217 @@
+{
+	"name": "df_source_policy_section",
+	"properties": {
+		"folder": {
+			"name": "Source Stage Data Flows/txnDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_polSection",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_lob",
+						"type": "DatasetReference"
+					},
+					"name": "lobStg"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_sub_LOB",
+						"type": "DatasetReference"
+					},
+					"name": "subLobStg"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_polSection",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flowlet1",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "lobLookup"
+				},
+				{
+					"name": "subLobCode"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          POLICY_ID as long,",
+				"          POLICY_OVID as long,",
+				"          COVERAGE_ID as long,",
+				"          COVERAGE_OVID as long,",
+				"          LOCATION_ID as long,",
+				"          LOCATION_OVID as long,",
+				"          COVERAGE_CODE as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select pp.POLICY_ID,pp.POLICY_VID as POLICY_OVID,pc.COVERAGE_ID,pc.COVERAGE_VID as COVERAGE_OVID,pl.LOCATION_ID,pl.LOCATION_VID as LOCATION_OVID,pc.COVERAGE_CODE from POL_POLICY pp \\njoin POL_COVERAGE pc\\non pp.POLICY_ID = pc.POLICY_ID\\njoin POL_LOCATION pl\\non pl.POLICY_ID=pp.POLICY_ID',",
+				"     format: 'query') ~> source1",
+				"source(output(",
+				"          SECTION_ID as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select MAX(SECTION_ID)  as SECTION_ID from dbo.POL_SECTION',",
+				"     format: 'query') ~> source2",
+				"source(output(",
+				"          LOB_ID as long,",
+				"          LOB_CODE as string,",
+				"          LOB_NAME as string,",
+				"          LOB_DESCRIPTION as string,",
+				"          LOB_IS_VALID_YN as string,",
+				"          LOB_VALID_START_DATE as timestamp,",
+				"          LOB_VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> lobStg",
+				"source(output(",
+				"          SUB_LOB_ID as long,",
+				"          SUB_LOB_CODE as string,",
+				"          SUB_LOB_NAME as string,",
+				"          SUB_LOB_DESCRIPTION as string,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> subLobStg",
+				"select1 compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet1@(output1)",
+				"surrogateKey1 derive(SECTION_ID = pkey + sink2#outputs()[1].SECTION_ID,",
+				"          SECTION_VID = 1,",
+				"          LOB_CODE = split(COVERAGE_CODE, '-')[3],",
+				"          SUB_LOB_CODE = split(COVERAGE_CODE, '-')[4],",
+				"          PRIMARY_POLICY_STATE = split(COVERAGE_CODE, '-')[2]) ~> derivedColumn1",
+				"source2 derive(SECTION_ID = iifNull(SECTION_ID, 0, SECTION_ID)) ~> derivedColumn2",
+				"source1 keyGenerate(output(pkey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"derivedColumn1, lobStg lookup(derivedColumn1@LOB_CODE == lobStg@LOB_CODE,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lobLookup",
+				"lobLookup, subLobStg lookup(derivedColumn1@SUB_LOB_CODE == subLobStg@SUB_LOB_CODE,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> subLobCode",
+				"subLobCode select(mapColumn(",
+				"          POLICY_ID,",
+				"          POLICY_OVID,",
+				"          COVERAGE_ID,",
+				"          COVERAGE_OVID,",
+				"          LOCATION_ID,",
+				"          LOCATION_OVID,",
+				"          SECTION_ID,",
+				"          SECTION_VID,",
+				"          LOB_ID,",
+				"          SUB_LOB_ID,",
+				"          PRIMARY_POLICY_STATE",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"flowlet1@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          SECTION_ID as long,",
+				"          SECTION_VID as long,",
+				"          POLICY_ID as long,",
+				"          POLICY_OVID as long,",
+				"          COVERAGE_ID as long,",
+				"          COVERAGE_OVID as long,",
+				"          LOCATION_ID as long,",
+				"          LOCATION_OVID as long,",
+				"          LOB_ID as long,",
+				"          SUB_LOB_ID as long,",
+				"          RATE_SET_DATE as timestamp,",
+				"          PRIMARY_POLICY_STATE as string,",
+				"          BATCH_ID as long,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          DATA_HASH as binary,",
+				"          SOURCE_KEY as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1",
+				"derivedColumn2 sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> sink2"
+			]
+		}
+	}
+}

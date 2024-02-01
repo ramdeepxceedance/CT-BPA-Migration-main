@@ -1,0 +1,155 @@
+{
+	"name": "df_stage_agency",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows/referenceDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_agency",
+						"type": "DatasetReference"
+					},
+					"name": "agencyStaging"
+				},
+				{
+					"dataset": {
+						"referenceName": "joinTableStageSQL",
+						"type": "DatasetReference"
+					},
+					"name": "policyPartyRoleBridge"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_agency",
+						"type": "DatasetReference"
+					},
+					"name": "agencyTargetLookup"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_agency",
+						"type": "DatasetReference"
+					},
+					"name": "agencyTarget"
+				}
+			],
+			"transformations": [
+				{
+					"name": "deriveJson"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "exists2"
+				},
+				{
+					"name": "lookup1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          AGENCY_ID as long,",
+				"          AGENCY_VID as long,",
+				"          AGENCY_GEN_ADDRESS_ID as long,",
+				"          AGENCY_CODE as string,",
+				"          AGENCY_NAME as string,",
+				"          AGENCY_STATUS as string,",
+				"          AGENCY_CATEGORY as string,",
+				"          DIRECT_BILL_FLAG_YN as string,",
+				"          TELEPHONE as string,",
+				"          FAX as string,",
+				"          EMAIL_ID as string,",
+				"          WEBSITE as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          ENTITY_TYPE as string,",
+				"          ENTITY_PARENT_ID as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> agencyStaging",
+				"source(output(",
+				"          PARTY_ID as long,",
+				"          ROLE_CODE as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select distinct prb.PARTY_ID, pr.ROLE_CODE from POL_POLICY_PARTY_ROLE_BRIDGE as prb join POL_PARTY_ROLE as pr on prb.ROLE_ID = pr.ROLE_ID where pr.role_code in (\\'PRODUCER\\', \\'AGENCY\\') \\n',",
+				"     format: 'query') ~> policyPartyRoleBridge",
+				"source(output(",
+				"          agency_id as integer,",
+				"          json_data as string,",
+				"          bpa_party_code as string,",
+				"          bpa_party_id as string,",
+				"          party_name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> agencyTargetLookup",
+				"lookup1 derive(json_data = toString(@(languageCode=array(\"EN\"),",
+				"          name=@(fullName=AGENCY_NAME),",
+				"          organization=@(fullName=AGENCY_NAME,",
+				"          languageCode=array(\"EN\")),",
+				"          partyRole=array(",
+				"        @(",
+				"               agencyType=\"wholesale\",",
+				"            effectiveDate= toString(currentDate()),",
+				"            roleType= \"agency\"",
+				"        )",
+				"    ),",
+				"          partyStatus=\"active\",",
+				"          partyTypeCode=\"organization\",",
+				"          partyIdentity=array(@(createdDate=currentTimestamp(), modifiedDate=currentTimestamp(), isActive=true(), typeCode='AGCO', value=AGENCY_CODE))",
+				"          ))) ~> deriveJson",
+				"agencyTargetLookup filter(isNull(bpa_party_code)) ~> filter1",
+				"deriveJson alterRow(upsertIf(!isNull(agencyStaging@AGENCY_ID))) ~> AlterRow1",
+				"agencyStaging, policyPartyRoleBridge exists(AGENCY_ID == PARTY_ID,",
+				"     negate:false,",
+				"     broadcast: 'auto')~> exists2",
+				"exists2, filter1 lookup(agencyStaging@AGENCY_ID == agencyTargetLookup@agency_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          agency_id as integer,",
+				"          json_data as string,",
+				"          bpa_party_code as string,",
+				"          bpa_party_id as string,",
+				"          party_name as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:true,",
+				"     upsertable:true,",
+				"     keys:['agency_id'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          agency_id = agencyStaging@AGENCY_ID,",
+				"          json_data",
+				"     )) ~> agencyTarget"
+			]
+		}
+	}
+}

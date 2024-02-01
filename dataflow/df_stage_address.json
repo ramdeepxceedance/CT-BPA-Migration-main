@@ -1,0 +1,84 @@
+{
+	"name": "df_stage_address",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows/referenceDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_genAddress",
+						"type": "DatasetReference"
+					},
+					"name": "addressStaging"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_address",
+						"type": "DatasetReference"
+					},
+					"name": "addressTarget"
+				}
+			],
+			"transformations": [
+				{
+					"name": "deriveJson"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          GEN_ADDRESS_UNIQ_ID as long,",
+				"          ADDRESS_STREET1 as string,",
+				"          ADDRESS_STREET2 as string,",
+				"          COUNTY_CODE as string,",
+				"          COUNTY as string,",
+				"          ADDRESS_CITY as string,",
+				"          ADD_DESCRIPTION as string,",
+				"          STATE_PROVINCE_CODE as string,",
+				"          POSTAL_CODE as string,",
+				"          POSTAL_CODE_EXT as string,",
+				"          COUNTRY_CODE as string,",
+				"          SOURCE_INSERTED_ON as timestamp,",
+				"          SOURCE_UPDATED_ON as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> addressStaging",
+				"addressStaging derive(json_data = toString(@(line1=trim(ADDRESS_STREET1),",
+				"          line2=trim(ADDRESS_STREET2),",
+				"          city=trim(ADDRESS_CITY),",
+				"          stateOrProvinceCode=STATE_PROVINCE_CODE,",
+				"          postalCode=POSTAL_CODE,",
+				"          countryCode=COUNTRY_CODE,",
+				"          isPrimaryAddress=true(),",
+				"          countyCode=COUNTY_CODE,",
+				"          countyName=trim(COUNTY)))) ~> deriveJson",
+				"deriveJson sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          address_id as integer,",
+				"          json_data as string,",
+				"          extendedattributes as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          address_id = GEN_ADDRESS_UNIQ_ID,",
+				"          json_data",
+				"     )) ~> addressTarget"
+			]
+		}
+	}
+}

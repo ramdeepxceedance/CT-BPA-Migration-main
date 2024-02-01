@@ -1,0 +1,196 @@
+{
+	"name": "fl_rater_api_requests",
+	"properties": {
+		"folder": {
+			"name": "utility/flowlet"
+		},
+		"type": "Flowlet",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "calculatePremiumAPI",
+					"linkedService": {
+						"referenceName": "RestService2",
+						"type": "LinkedServiceReference"
+					}
+				},
+				{
+					"name": "retrieveQuoteInfoAPI",
+					"linkedService": {
+						"referenceName": "RestService2",
+						"type": "LinkedServiceReference"
+					}
+				},
+				{
+					"name": "retrievePolicyInfoAPI",
+					"linkedService": {
+						"referenceName": "RestService2",
+						"type": "LinkedServiceReference"
+					}
+				},
+				{
+					"name": "searchQuoteAPI",
+					"linkedService": {
+						"referenceName": "RestService2",
+						"type": "LinkedServiceReference"
+					}
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select6"
+				},
+				{
+					"name": "flatten1"
+				},
+				{
+					"name": "select7"
+				},
+				{
+					"name": "derivedColumn7"
+				},
+				{
+					"name": "derivedColumn8"
+				},
+				{
+					"name": "policyTarget"
+				},
+				{
+					"name": "output1"
+				}
+			],
+			"scriptLines": [
+				"input(output(",
+				"          policy_policy_number as string,",
+				"          tracker_policy_number as string,",
+				"          ref_pol as string",
+				"     ),",
+				"     order: 0,",
+				"     allowSchemaDrift: true) ~> policyTarget",
+				"derivedColumn1 call(mapColumn(",
+				"          quote_number,",
+				"          quote = retrieveQuoteResponse.quote,",
+				"          messageInformation",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     output(",
+				"          raterResponse as (messageInformation as (businessPurposeTypeCode as string, messageStatus as (statusCode as string, statusDescription as string, successStatusCode as string), trackingNumber as string, userInfo as (userName as string), userJourneyType as string), riskDetail as (agent as (agencyCode as string, agencyTier as string, agencyType as string, id as string, isCancelled as string, maintenanceAgency as string, number as string, parentEntityId as string, parentEntityTypeName as string, partyCode as string, partyIdentifiers as string[], partyName as string, typeCode as string), amountItem as string[], businessPurposeType as string, businessPurposeTypeCode as string, carrierProcessingType as string, claim as string[], clientParticipant as (effectiveDate as string, expirationDate as string, extendedAttributes as (name as string)[], id as string, isCancelled as string, originalPartyName as string, parentEntityId as string, parentEntityTypeName as string, partyCode as string, partyName as string, professionalRole as string, questionAnswer as string[], roleCode as string, subRoleCode as string)[], companyProductCode as string, coverage as string[], coverageGroup as string[], createdBy as string, createdDate as string, currencyCode as string, desiredEffectiveDate as string, endorsement as (amountItem as (appliesToCode as string, currencyCode as string, editableOnTransaction as string, levelCode as string, originalAmount as string, pricedAmount as string, typeCode as string, valueType as string), clauses as string[], coverageCode as string, editionNumber as string, effectiveDate as string, endorsedPolicyReference as string, endorsementCode as string, endorsementNumber as string, endorsementType as string, expirationDate as string, extendedAttributes as string[], formCode as string, id as string, insurableObjectId as string, isCancelled as string, questionAnswer as string[], reasonCodes as string[], sectionCode as string, sourcePolicyReference as string)[], extendedAttributes as (name as string, value as string)[], firmRatingTrackingNumber as string, forms as string[], groupCode as string, id as string, initialRequestDate as string, iterationNumber as string, lineofBusinessCode as string, location as string[], majorVersion as string, mgaParticipant as string[], minorVersion as string, operatingCompanyCode as string, originalBusinessPurposeType as string, originalBusinessPurposeTypeCode as string, parentEntityId as string, parentEntityTypeName as string, policyEffectiveDate as string, policyExpirationDate as string, policyStage as string, policyStatus as string, policyStatusCodeDisplayName as string, policyTerm as string, preparedDate as string, priorPolicy as string[], productVersion as string, questionAnswer as (answerCode as string, extendedAttributes as string[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, questionCode as string, questionText as string, value as string)[], quoteNumber as string, ratedIndicator as string, reasons as string[], referenceNumber as string, sanctionCheckInfo as string[], section as (amountItem as (appliesToCode as string, currencyCode as string, description as string, editableOnTransaction as string, isAggregate as string, isMtaImpacted as string, isRefundable as string, levelCode as string, maxValue as string, minValue as string, originalAmount as string, pricedAmount as string, pricedValue as string, sequenceNumber as string, subTypeCode as string, typeCode as string, value as string, valueType as string)[], carrierParticipant as string[], commissionAmountBasis as string, coverTypeCode as string, coverage as (amountItem as string[], appliesToCode as string, appliesToLevel as string, deductible as (currencyCode as string, id as string, name as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string, value as string, valueType as string)[], effectiveDate as string, expirationDate as string, extendedAttributes as string[], fullPremium as string, id as string, isCancelled as string, limit as (currencyCode as string, id as string, name as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string, value as string, valueType as string)[], option as string[], parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, tax as string[], typeCode as string)[], coverageGroup as string[], declinedIndicator as string, effectiveDate as string, expirationDate as string, extendedAttributes as string[], feeAmountBasis as string, id as string, insurableObject as (businessKey as string, extendedAttributes as (name as string, value as string)[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string)[], insurableObjectParticipant as (effectiveDate as string, expirationDate as string, extendedAttributes as string[], id as string, insurableObjectId as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string)[], isCancelled as string, isSharedCarrier as string, lineOfBusinessCode as string, location as string[], mappedLocations as string[], parentEntityId as string, parentEntityTypeName as string, premiumAmountBasis as string, pricedIndicator as string, pricingFactor as string[], primaryRatingState as string, questionAnswer as (answerCode as string, appliesToCode as string, extendedAttributes as string[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, questionCode as string, questionText as string, value as string)[], sectionItem as string[], sequenceNumber as string, subjectivity as string[], tax as string[], taxAmountBasis as string, taxJurisdiction as string[], triaRate as string, underwritingYear as string)[], sectionWiseLocationAllocation as string, sequenceNumber as string, statusCode as string, statusCodeDisplayName as string, submissionCreatedBy as string, submissionCreationDate as string, tax as string[], trackingNumber as string, typeCode as string, underlyingPolicies as string[], underwriterDecisionInfo as string[], validUntilDate as string))",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     format: 'rest',",
+				"     store: 'restservice',",
+				"     timeout: 30,",
+				"     requestInterval: 0,",
+				"     httpMethod: 'POST',",
+				"     rowRelativeUrl: 'quote_number',",
+				"     entity: ('/policyadmin-api/calculateRatedValues/v1/quote/'),",
+				"     bodyColumnName: 'raterResponse',",
+				"     requestFormat: ['type' -> 'json'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> calculatePremiumAPI",
+				"derivedColumn8 call(mapColumn(",
+				"          policy_policy_number,",
+				"          tracker_policy_number,",
+				"          retrievePolicyInfoResponse,",
+				"          policy_reference,",
+				"          searchParams,",
+				"          searchQuoteResponse,",
+				"          quote_number,",
+				"          queryParams,",
+				"          ref_pol",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     output(",
+				"          retrieveQuoteResponse as (quote as (agent as (agencyCode as string, agencyTier as string, agencyType as string, id as string, isCancelled as string, maintenanceAgency as string, number as string, parentEntityId as string, parentEntityTypeName as string, partyCode as string, partyIdentifiers as (id as string, partyCode as string, identifierType as string, identifierValue as string)[], partyName as string, typeCode as string), amountItem as string[], businessPurposeType as string, businessPurposeTypeCode as string, carrierProcessingType as string, claim as string[], clientParticipant as (effectiveDate as string, expirationDate as string, extendedAttributes as (name as string, value as string)[], id as string, isCancelled as string, originalPartyName as string, parentEntityId as string, parentEntityTypeName as string, partyCode as string, partyName as string, professionalRole as string, questionAnswer as string[], roleCode as string, subRoleCode as string)[], companyProductCode as string, coverage as string[], coverageGroup as string[], createdBy as string, createdDate as string, currencyCode as string, desiredEffectiveDate as string, endorsement as (clauses as string[], coverageCode as string, editionNumber as string, effectiveDate as string, endorsedPolicyReference as string, endorsementCode as string, endorsementNumber as string, endorsementType as string, expirationDate as string, extendedAttributes as (name as string, value as string)[], formCode as string, id as string, insurableObjectId as string, isCancelled as string, questionAnswer as string[], reasonCodes as string[], sectionCode as string, sourcePolicyReference as string)[], extendedAttributes as (name as string, value as string)[], forms as string[], groupCode as string, id as string, initialRequestDate as string, iterationNumber as string, lineofBusinessCode as string, location as (address as (line1 as string, line2 as string, city as string, postalCode as string, isPrimaryAddress as string, countyName as string), id as string, typeCode as string, parentEntityId as string, parentEntityTypeName as string, earthquakeZone as string, effectiveDate as string, expirationDate as string, isCancelled as string, tax as string[], amountItem as string[], extendedAttributes as (name as string, value as string)[], insurableObject as string[], businessKey as string)[], majorVersion as string, mgaParticipant as string[], minorVersion as string, operatingCompanyCode as string, originalBusinessPurposeType as string, originalBusinessPurposeTypeCode as string, parentEntityId as string, parentEntityTypeName as string, policyEffectiveDate as string, policyExpirationDate as string, policyStage as string, policyStatus as string, policyStatusCodeDisplayName as string, policyTerm as string, preparedDate as string, priorPolicy as string[], productVersion as string, questionAnswer as (answerCode as string, extendedAttributes as (name as string, value as string)[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, questionCode as string, questionText as string, value as string)[], quoteNumber as string, ratedIndicator as string, reasons as string[], referenceNumber as string, sanctionCheckInfo as string[], section as (amountItem as string[], carrierParticipant as string[], coverTypeCode as string, coverage as (amountItem as string[], appliesToCode as string, appliesToLevel as string, deductible as (currencyCode as string, id as string, name as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string, value as string, valueType as string)[], effectiveDate as string, expirationDate as string, extendedAttributes as (name as string, value as string)[], fullPremium as string, id as string, isCancelled as string, limit as (currencyCode as string, id as string, name as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string, value as string, valueType as string)[], option as string[], parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, tax as string[], typeCode as string)[], coverageGroup as string[], declinedIndicator as string, effectiveDate as string, expirationDate as string, extendedAttributes as (name as string, value as string)[], id as string, insurableObject as (businessKey as string, extendedAttributes as (name as string, value as string)[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string)[], insurableObjectParticipant as (effectiveDate as string, expirationDate as string, extendedAttributes as (name as string, value as string)[], id as string, insurableObjectId as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string)[], isCancelled as string, isSharedCarrier as string, lineOfBusinessCode as string, location as (address as (line1 as string, line2 as string, city as string, postalCode as string, isPrimaryAddress as string, countyName as string), id as string, typeCode as string, parentEntityId as string, parentEntityTypeName as string, earthquakeZone as string, effectiveDate as string, expirationDate as string, isCancelled as string, tax as string[], amountItem as string[], extendedAttributes as (name as string, value as string)[], insurableObject as string[], businessKey as string)[], mappedLocations as string[], parentEntityId as string, parentEntityTypeName as string, premiumAmountBasis as string, pricedIndicator as string, pricingFactor as string[], primaryRatingState as string, questionAnswer as (answerCode as string, appliesToCode as string, extendedAttributes as (name as string, value as string)[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, questionCode as string, questionText as string, value as string)[], sectionItem as string[], sequenceNumber as string, subjectivity as string[], tax as string[], taxAmountBasis as string, taxJurisdiction as string[], triaRate as string, underwritingYear as string)[], sectionWiseLocationAllocation as string, sequenceNumber as string, statusCode as string, statusCodeDisplayName as string, submissionCreatedBy as string, submissionCreationDate as string, tax as string[], trackingNumber as string, typeCode as string, underlyingPolicies as string[], underwriterDecisionInfo as string[], validUntilDate as string))",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     format: 'rest',",
+				"     store: 'restservice',",
+				"     timeout: 30,",
+				"     requestInterval: 0,",
+				"     httpMethod: 'GET',",
+				"     rowRelativeUrl: 'queryParams',",
+				"     entity: ('/policyadmin-api/retrieveQuoteInformation/v1/quote/'),",
+				"     bodyColumnName: 'retrieveQuoteResponse',",
+				"     requestFormat: ['type' -> 'json'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> retrieveQuoteInfoAPI",
+				"policyTarget call(mapColumn(",
+				"          policy_policy_number,",
+				"          tracker_policy_number,",
+				"          ref_pol",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     output(",
+				"          retrievePolicyInfoResponse as (policy as (referenceNumber as string))",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     format: 'rest',",
+				"     store: 'restservice',",
+				"     timeout: 30,",
+				"     requestInterval: 0,",
+				"     httpMethod: 'GET',",
+				"     rowRelativeUrl: 'ref_pol',",
+				"     entity: ('/policyadmin-api/retrievePolicyInformation/v1/policy/'),",
+				"     bodyColumnName: 'retrievePolicyInfoResponse',",
+				"     requestFormat: ['type' -> 'json'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> retrievePolicyInfoAPI",
+				"derivedColumn7 call(mapColumn(",
+				"          searchParams",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     output(",
+				"          searchQuoteResponse as (quote as (quoteNumber as string)[])",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     format: 'rest',",
+				"     store: 'restservice',",
+				"     timeout: 30,",
+				"     requestInterval: 0,",
+				"     httpMethod: 'POST',",
+				"     entity: (\"/policyadmin-api/searchQuote/v1/quote\"),",
+				"     bodyColumnName: 'searchQuoteResponse',",
+				"     requestFormat: ['type' -> 'json'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> searchQuoteAPI",
+				"select6 derive(messageInformation = @(sender='viswa',",
+				"          userInfo=@(userName='viswa'),",
+				"          businessPurposeTypeCode='NBS',",
+				"          trackingNumber=uuid(),",
+				"          formKey='Policy Detail')) ~> derivedColumn1",
+				"retrieveQuoteInfoAPI select(mapColumn(",
+				"          policy_policy_number,",
+				"          policy_reference,",
+				"          quote_number,",
+				"          retrieveQuoteResponse",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select6",
+				"select7 foldDown(unroll(sections.amountItem),",
+				"     mapColumn(",
+				"          amountItem = sections.amountItem,",
+				"          policy = policy_policy_number",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"calculatePremiumAPI select(mapColumn(",
+				"          policy_policy_number,",
+				"          policy_reference,",
+				"          quote_number,",
+				"          sections = raterResponse.riskDetail.section",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select7",
+				"retrievePolicyInfoAPI derive(policy_reference = retrievePolicyInfoResponse.policy.referenceNumber,",
+				"          searchParams = 'referenceNumber:*' + retrievePolicyInfoResponse.policy.referenceNumber +'*') ~> derivedColumn7",
+				"searchQuoteAPI derive(quote_number = searchQuoteResponse.quote[1].quoteNumber,",
+				"          queryParams = searchQuoteResponse.quote[1].quoteNumber+'?identifierType=number') ~> derivedColumn8",
+				"flatten1 output() ~> output1"
+			]
+		}
+	}
+}

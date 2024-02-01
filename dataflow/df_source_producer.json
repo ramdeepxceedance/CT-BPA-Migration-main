@@ -1,0 +1,170 @@
+{
+	"name": "df_source_producer",
+	"properties": {
+		"folder": {
+			"name": "Source Stage Data Flows/referenceDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_producer",
+						"type": "DatasetReference"
+					},
+					"name": "producerSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_agency",
+						"type": "DatasetReference"
+					},
+					"name": "agencyStagingLookup"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_agency",
+						"type": "DatasetReference"
+					},
+					"name": "agencyStaging"
+				}
+			],
+			"transformations": [
+				{
+					"name": "metadataflowlet",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "deriveOtherRequiredColumns"
+				},
+				{
+					"name": "producerSurrogateKey"
+				},
+				{
+					"name": "selectRequiredProducerColumns"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "groupByProducerName"
+				},
+				{
+					"name": "deriveProducerName"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     DF_max_id as integer (1)",
+				"}",
+				"source(output(",
+				"          SubProducerCode as string,",
+				"          SubProducerName as string,",
+				"          FergusonSubProducerFlag as string,",
+				"          GroupCode as string,",
+				"          SubProducerType as string,",
+				"          SubproducerState as string,",
+				"          DistributionTypeCode as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> producerSource",
+				"source(output(",
+				"          AGENCY_ID as long,",
+				"          AGENCY_VID as long,",
+				"          AGENCY_GEN_ADDRESS_ID as long,",
+				"          AGENCY_CODE as string,",
+				"          AGENCY_NAME as string,",
+				"          AGENCY_STATUS as string,",
+				"          AGENCY_CATEGORY as string,",
+				"          DIRECT_BILL_FLAG_YN as string,",
+				"          TELEPHONE as string,",
+				"          FAX as string,",
+				"          EMAIL_ID as string,",
+				"          WEBSITE as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          ENTITY_TYPE as string,",
+				"          ENTITY_PARENT_ID as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> agencyStagingLookup",
+				"deriveOtherRequiredColumns compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> metadataflowlet@(output1)",
+				"producerSurrogateKey derive(ENTITY_TYPE = \"PRODUCER\",",
+				"          AGENCY_ID = skey + $DF_max_id,",
+				"          AGENCY_VID = 1) ~> deriveOtherRequiredColumns",
+				"groupByProducerName keyGenerate(output(skey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> producerSurrogateKey",
+				"producerSource select(mapColumn(",
+				"          AGENCY_CODE = SubProducerCode,",
+				"          GIVEN_AGENCY_NAME = SubProducerName,",
+				"          AGENCY_CATEGORY = SubProducerType",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredProducerColumns",
+				"agencyStagingLookup select(mapColumn(",
+				"          AGENCY_CODE",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"deriveProducerName aggregate(groupBy(AGENCY_NAME),",
+				"     each(match(name!='AGENCY_NAME'), $$ = first($$))) ~> groupByProducerName",
+				"selectRequiredProducerColumns derive(AGENCY_NAME = trim(GIVEN_AGENCY_NAME)) ~> deriveProducerName",
+				"metadataflowlet@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          AGENCY_ID as long,",
+				"          AGENCY_VID as long,",
+				"          AGENCY_GEN_ADDRESS_ID as long,",
+				"          AGENCY_CODE as string,",
+				"          AGENCY_NAME as string,",
+				"          AGENCY_STATUS as string,",
+				"          AGENCY_CATEGORY as string,",
+				"          DIRECT_BILL_FLAG_YN as string,",
+				"          TELEPHONE as string,",
+				"          FAX as string,",
+				"          EMAIL_ID as string,",
+				"          WEBSITE as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          ENTITY_TYPE as string,",
+				"          ENTITY_PARENT_ID as long",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> agencyStaging"
+			]
+		}
+	}
+}

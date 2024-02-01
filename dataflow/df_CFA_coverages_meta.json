@@ -1,0 +1,118 @@
+{
+	"name": "df_CFA_coverages_meta",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows/cfa"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "dsCFA",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ECMBPA_COV_MAP",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ECMBPA_COV_MAP",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "surrogateKey1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          SI_NO as string,",
+				"          id as string,",
+				"          COVERAGE_CODE as string,",
+				"          COV_SEQ as string,",
+				"          COVERAGE_CODE_DES as string,",
+				"          COVERAGES as string,",
+				"          BPA_COVERAGE_CODES as string,",
+				"          BPA_SECTION_CODE as string,",
+				"          BPA_SEC_NAME as string,",
+				"          BPA_COVERAGES as string,",
+				"          {BPA Coverage Groups} as string,",
+				"          {BPA Coverage Type} as string,",
+				"          BPA_PRODUCT_CODE as string,",
+				"          SOURCE_PRODUCT_CODE as string,",
+				"          coverage_level as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source(output(",
+				"          id as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select coalesce(MAX(id),0) as id from public.ecm_bpa_cov_mapping',",
+				"     format: 'query') ~> source2",
+				"surrogateKey1 derive(id = sink2#outputs()[1].id+pkey,",
+				"          SI_NO = sink2#outputs()[1].id+pkey,",
+				"          bpa_coverage_type = {BPA Coverage Type},",
+				"          bpa_coverage_group = {BPA Coverage Groups},",
+				"          bpa_coverage_level = coverage_level) ~> derivedColumn1",
+				"source1 keyGenerate(output(pkey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          COV_SEQ as string,",
+				"          BPA_SECTION_CODE as string,",
+				"          COVERAGE_CODE as string,",
+				"          COVERAGE_CODE_DES as string,",
+				"          BPA_COVERAGE_CODES as string,",
+				"          BPA_COVERAGES as string,",
+				"          COVERAGES as string,",
+				"          BPA_PRODUCT_CODE as string,",
+				"          SI_NO as string,",
+				"          id as long,",
+				"          BPA_SEC_NAME as string,",
+				"          SOURCE_PRODUCT_CODE as string,",
+				"          bpa_coverage_group as string,",
+				"          bpa_coverage_level as string,",
+				"          bpa_coverage_type as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1",
+				"source2 sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> sink2"
+			]
+		}
+	}
+}

@@ -1,0 +1,245 @@
+{
+	"name": "df_stage_risk_details_cfa",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows/cfa"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "riskDetailsStaging"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_risk",
+						"type": "DatasetReference"
+					},
+					"name": "targetRisk"
+				},
+				{
+					"dataset": {
+						"referenceName": "StgRefLookUp",
+						"type": "DatasetReference"
+					},
+					"name": "sourceRefLookUp"
+				},
+				{
+					"dataset": {
+						"referenceName": "StgLookUpType",
+						"type": "DatasetReference"
+					},
+					"name": "sourceRefLookUpType"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_riskDetail",
+						"type": "DatasetReference"
+					},
+					"name": "riskDetailMaxIdTarget"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_riskDetail",
+						"type": "DatasetReference"
+					},
+					"name": "riskDetails",
+					"rejectedDataLinkedService": {
+						"referenceName": "AzureBlobStorage1",
+						"type": "LinkedServiceReference"
+					}
+				},
+				{
+					"name": "maxIdLookup"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "attributeNameLookup"
+				},
+				{
+					"name": "surrogateKey2"
+				},
+				{
+					"name": "derivedColumn2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select  * from POL_RISK_DETAILS',",
+				"     format: 'query') ~> riskDetailsStaging",
+				"source(output(",
+				"          risk_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          location_id as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> targetRisk",
+				"source(output(",
+				"          LOOKUP_ID as long,",
+				"          LOOKUP_TYPE_ID as long,",
+				"          LOOKUP_CODE as string,",
+				"          LOOKUP_SHORT_DESCRIPTION as string,",
+				"          LOOKUP_DESCRIPTION as string,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          DATA_HASH as binary,",
+				"          SOURCE_KEY as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sourceRefLookUp",
+				"source(output(",
+				"          LOOKUP_TYPE_ID as long,",
+				"          LOOKUP_TYPE_DOMAIN as string,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          DATA_HASH as binary,",
+				"          SOURCE_KEY as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sourceRefLookUpType",
+				"source(output(",
+				"          maxid as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select MAX(risk_detail_id) as maxId from risk_detail',",
+				"     format: 'query') ~> riskDetailMaxIdTarget",
+				"attributeNameLookup aggregate(groupBy(RISK_ID),",
+				"     extAttributeList = collect(@(name=ATTRIBUTE_NAME,value=iif(in(['use', 'vehicletypecode', 'radiusclass', 'vehiclesizeclass', 'businessuseclass', 'registeredstate_name'], lower(ATTRIBUTE_NAME)), LOOKUP_DESCRIPTION, iif(length(ATTRIBUTE_VALUE)==0 || isNull(ATTRIBUTE_VALUE), \"\", ATTRIBUTE_VALUE) )))) ~> aggregate1",
+				"surrogateKey2 derive(json_data = toString(extAttributeList),",
+				"          riskDetail_id = skey + maxIdLookup#outputs()[1].maxRiskDetailId) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          risk_id = aggregate1@RISK_ID,",
+				"          json_data,",
+				"          risk_detail_id = riskDetail_id,",
+				"          policy_id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"aggregate1, targetRisk lookup(aggregate1@RISK_ID == targetRisk@risk_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 filter(!isNull(targetRisk@risk_id)) ~> filter1",
+				"sourceRefLookUp select(mapColumn(",
+				"          LOOKUP_ID,",
+				"          LOOKUP_TYPE_ID,",
+				"          LOOKUP_CODE,",
+				"          LOOKUP_SHORT_DESCRIPTION,",
+				"          LOOKUP_DESCRIPTION",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"sourceRefLookUpType select(mapColumn(",
+				"          LOOKUP_TYPE_ID,",
+				"          LOOKUP_TYPE_DOMAIN",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select2, select3 join(select2@LOOKUP_TYPE_ID == select3@LOOKUP_TYPE_ID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"riskDetailsStaging, join1 lookup(lower(ATTRIBUTE_NAME) == lower(LOOKUP_TYPE_DOMAIN)",
+				"     && trim(ATTRIBUTE_VALUE) == trim(LOOKUP_CODE),",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> attributeNameLookup",
+				"filter1 keyGenerate(output(skey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey2",
+				"riskDetailMaxIdTarget derive(maxRiskDetailId = iifNull(maxid, 0, maxid)) ~> derivedColumn2",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          risk_detail_id as integer,",
+				"          risk_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          extended_attributes as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> riskDetails",
+				"derivedColumn2 sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> maxIdLookup"
+			]
+		}
+	}
+}

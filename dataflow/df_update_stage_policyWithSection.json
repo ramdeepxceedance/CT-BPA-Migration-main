@@ -1,0 +1,138 @@
+{
+	"name": "df_update_stage_policyWithSection",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows/updateJsonDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "sink1",
+					"rejectedDataLinkedService": {
+						"referenceName": "AzureBlobStorage1",
+						"type": "LinkedServiceReference"
+					}
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "derivedColumn5"
+				},
+				{
+					"name": "derivedColumn6"
+				},
+				{
+					"name": "derivedColumn7"
+				},
+				{
+					"name": "derivedColumn8"
+				},
+				{
+					"name": "derivedColumn9"
+				},
+				{
+					"name": "derivedColumn10"
+				},
+				{
+					"name": "derivedColumn11"
+				},
+				{
+					"name": "filter1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     policyPrefix as string ('CFA')",
+				"}",
+				"source(output(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          policyjson as string,",
+				"          sectionjson as string,",
+				"          section_code as string,",
+				"          section_id as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     batchSize: 0,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select pc.policy_id,pc.policy_number,pc.json_data  as policyJson ,sc.json_data as sectionJson ,sc.section_code,sc.section_id from policy pc\\njoin bpa_section sc \\non pc.policy_id=sc.policy_id',",
+				"     format: 'query') ~> source1",
+				"aggregate1 derive(finalPolicy = replace(policyjson,'\"section\":[]',concat('\"section\":',toString(sections)))) ~> derivedColumn1",
+				"derivedColumn10 select(mapColumn(",
+				"          policy_id,",
+				"          policy_number,",
+				"          json_data = finalPolicy",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 alterRow(updateIf(!isNull(policy_id))) ~> AlterRow1",
+				"derivedColumn1 derive(finalPolicy = unescape(finalPolicy, 'json')) ~> derivedColumn2",
+				"filter1 aggregate(groupBy(policy_id,",
+				"          policy_number,",
+				"          policyjson),",
+				"     sections = collect(sectionjson)) ~> aggregate1",
+				"derivedColumn2 derive(finalPolicy = replace(finalPolicy,'[\"{','[{')) ~> derivedColumn3",
+				"derivedColumn6 derive(finalPolicy = replace(finalPolicy,'}\"]','}]')) ~> derivedColumn4",
+				"derivedColumn4 derive(finalPolicy = replace(finalPolicy, '\"{', '{')) ~> derivedColumn5",
+				"derivedColumn3 derive(finalPolicy = unescape(finalPolicy, 'json')) ~> derivedColumn6",
+				"derivedColumn5 derive(finalPolicy = replace(finalPolicy, '}\"', '}')) ~> derivedColumn7",
+				"derivedColumn7 derive(finalPolicy = regexReplace(finalPolicy,'\"\"([^\"]*)\"\"', '\"$1\"')) ~> derivedColumn8",
+				"derivedColumn8 derive(finalPolicy = replace(finalPolicy,'\"[','[')) ~> derivedColumn9",
+				"derivedColumn9 derive(finalPolicy = replace(finalPolicy,']\"',']')) ~> derivedColumn10",
+				"source1 derive(policyPrefixTemp = substring(policy_number, 1, 3)) ~> derivedColumn11",
+				"derivedColumn11 filter(policyPrefixTemp == $policyPrefix) ~> filter1",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['policy_id'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,124 @@
+{
+	"name": "df_source_emp_lookupType",
+	"properties": {
+		"folder": {
+			"name": "Source Stage Data Flows/lookupDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage__emp_riskType_excel",
+						"type": "DatasetReference"
+					},
+					"name": "empRiskTypeCodes"
+				},
+				{
+					"dataset": {
+						"referenceName": "StgLookUpType",
+						"type": "DatasetReference"
+					},
+					"name": "lookupTypeSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "StgLookUpType",
+						"type": "DatasetReference"
+					},
+					"name": "LookUpTypeSink"
+				},
+				{
+					"name": "lookupTypeCache"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flowlet1",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "aggregate1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          UNIT_TYPE as string,",
+				"          RSKTYPE as string,",
+				"          RISK_TYPE_CODE as string,",
+				"          DIMENSION_NAME as string,",
+				"          RISK_TYPE_CODE_DESC as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> empRiskTypeCodes",
+				"source(output(",
+				"          id as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select MAX(LOOKUP_TYPE_ID)  as id from dbo.REF_LOOKUP_TYPE',",
+				"     format: 'query') ~> lookupTypeSource",
+				"derivedColumn1 compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet1@(output1)",
+				"surrogateKey1 derive(LOOKUP_TYPE_ID = pkey + lookupTypeCache#outputs()[1].id,",
+				"          LOOKUP_TYPE_DOMAIN = DIMENSION_NAME) ~> derivedColumn1",
+				"lookupTypeSource derive(id = iifNull(id, 0, id)) ~> derivedColumn2",
+				"aggregate1 keyGenerate(output(pkey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"empRiskTypeCodes aggregate(groupBy(DIMENSION_NAME),",
+				"     count = count(DIMENSION_NAME)) ~> aggregate1",
+				"flowlet1@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          LOOKUP_TYPE_ID as long,",
+				"          LOOKUP_TYPE_DOMAIN as string,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          DATA_HASH as binary,",
+				"          SOURCE_KEY as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> LookUpTypeSink",
+				"derivedColumn2 sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> lookupTypeCache"
+			]
+		}
+	}
+}

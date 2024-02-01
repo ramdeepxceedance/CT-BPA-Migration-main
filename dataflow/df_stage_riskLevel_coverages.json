@@ -1,0 +1,370 @@
+{
+	"name": "df_stage_riskLevel_coverages",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "ssCoverages"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_coverageExt",
+						"type": "DatasetReference"
+					},
+					"name": "ssCoverageExt"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_locationRiskBridge",
+						"type": "DatasetReference"
+					},
+					"name": "sslocation"
+				},
+				{
+					"dataset": {
+						"referenceName": "ECMBPA_COV_MAP",
+						"type": "DatasetReference"
+					},
+					"name": "ecmBpaCovMap"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "targetPolicy"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "stgPolicy"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_coverage",
+						"type": "DatasetReference"
+					},
+					"name": "osStageCoverage"
+				},
+				{
+					"name": "covCache"
+				}
+			],
+			"transformations": [
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "locationSort"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "derivedColumn5"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "filterByNotPolicy"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "joinStgPolAndTargetPolicy"
+				},
+				{
+					"name": "derivedColumn6"
+				},
+				{
+					"name": "join3"
+				},
+				{
+					"name": "filterByEntityType"
+				},
+				{
+					"name": "filter2"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     isLimitUpdateOnly as boolean (false()),",
+				"     policyPrefix as string ('CFA'),",
+				"     locationState as string ('Montana')",
+				"}",
+				"source(output(",
+				"          POLICY_ID as long,",
+				"          POLICY_OVID as long,",
+				"          LOCATION_ID as long,",
+				"          LOCATION_OVID as long,",
+				"          COVERAGE_ID as long,",
+				"          COVERAGE_OVID as long,",
+				"          COVERAGE_CODE as string,",
+				"          COVERAGE_EFFECTIVE_DATE as timestamp,",
+				"          COVERAGE_EXPIRATION_DATE as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: (\"select distinct pp.POLICY_ID,pp.POLICY_VID as POLICY_OVID,pl.LOCATION_ID,pl.LOCATION_VID as LOCATION_OVID,pc.COVERAGE_ID,pc.COVERAGE_VID as COVERAGE_OVID,pc.COVERAGE_CODE,pc.COVERAGE_EFFECTIVE_DATE,pc.COVERAGE_EXPIRATION_DATE from POL_POLICY pp join POL_COVERAGE pc on pp.POLICY_ID = pc.POLICY_ID join POL_LOCATION pl on pl.POLICY_ID=pp.POLICY_ID  AND PL.LOCATION_NO IS NOT NULL  group by pp.POLICY_ID, pp.POLICY_VID,pl.LOCATION_ID,pl.LOCATION_VID,pc.COVERAGE_ID,pc.COVERAGE_VID,pc.COVERAGE_CODE,pc.COVERAGE_EFFECTIVE_DATE,pc.COVERAGE_EXPIRATION_DATE\"),",
+				"     format: 'query') ~> ssCoverages",
+				"source(output(",
+				"          COVERAGE_ID as long,",
+				"          ARICCoverageSequence as integer,",
+				"          ARICGroupCode as string,",
+				"          LocationState as string,",
+				"          ARICLOB as string,",
+				"          CoverageDescription as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select DISTINCT COVERAGE_ID,ARICCoverageSequence,ARICGroupCode,LocationState,ARICLOB,CoverageDescription from POL_COVERAGE_EXT',",
+				"     format: 'query') ~> ssCoverageExt",
+				"source(output(",
+				"          POLICY_ID as long,",
+				"          LOCATION_ID as long,",
+				"          COVERAGE_ID as long,",
+				"          RISK_ID as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select plrd.POLICY_ID,pl.LOCATION_ID,plrd.COVERAGE_ID,plrd.RISK_ID from dbo.POL_TX_BRIDGE plrd join  POL_LOCATION pl on plrd.POLICY_ID = pl.POLICY_ID ',",
+				"     format: 'query') ~> sslocation",
+				"source(output(",
+				"          COV_SEQ as string,",
+				"          BPA_SECTION_CODE as string,",
+				"          COVERAGE_CODE as string,",
+				"          COVERAGE_CODE_DES as string,",
+				"          BPA_COVERAGE_CODES as string,",
+				"          BPA_COVERAGES as string,",
+				"          COVERAGES as string,",
+				"          BPA_PRODUCT_CODE as string,",
+				"          SI_NO as string,",
+				"          id as long,",
+				"          BPA_SEC_NAME as string,",
+				"          SOURCE_PRODUCT_CODE as string,",
+				"          bpa_coverage_group as string,",
+				"          bpa_coverage_level as string,",
+				"          bpa_coverage_type as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> ecmBpaCovMap",
+				"source(output(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> targetPolicy",
+				"source(output(",
+				"          POLICY_ID as long,",
+				"          POLICY_VID as long,",
+				"          REINSURANCE_DAC as string,",
+				"          PREVIOUS_INSURANCE_NO_REMARKS as string,",
+				"          AGENCY_ID as long,",
+				"          AGENCY_OVID as long,",
+				"          PRODUCER_ID as long,",
+				"          PRODUCER_OVID as long,",
+				"          PRODUCER_CONTACT_ID as long,",
+				"          PRODUCER_CONTACT_OVID as long,",
+				"          POLICY_NUMBER as string,",
+				"          ENTITY_TYPE as string,",
+				"          ENTITY_STATUS as string,",
+				"          IS_RENEWAL_YN as string,",
+				"          REVISION_NUMBER as integer,",
+				"          PRODUCT_ID as long,",
+				"          PRODUCT_OVID as long,",
+				"          POLICY_EFFECTIVE_DATE as timestamp,",
+				"          POLICY_EXPIRATION_DATE as timestamp,",
+				"          NON_RENEWAL_CODE as string,",
+				"          POLICY_RENEWED_YN as string,",
+				"          CANCELLATION_DATE as timestamp,",
+				"          IS_RENEWABLE_YN as string,",
+				"          PREVIOUS_INSURANCE_NO_REASON as string,",
+				"          POLICY_STATUS as string,",
+				"          CANCEL_REASON_CODE as string,",
+				"          CANCEL_REASON_DESCRIPTION as string,",
+				"          CANCEL_METHOD as string,",
+				"          CANCEL_METHOD_DESC as string,",
+				"          LOSE_REASON_CODE as string,",
+				"          LOSE_REASON_DESC as string,",
+				"          DECLINATION_REASON_CODE as string,",
+				"          DECLINATION_REASON_DESC as string,",
+				"          NOT_WRITTEN_REASON_CODE as string,",
+				"          NOT_WRITTEN_REASON_DESC as string,",
+				"          POLICY_STATE_CODE as string,",
+				"          PROGRAM_ID as long,",
+				"          PROGRAM_OVID as long,",
+				"          BILLING_TYPE_CODE as string,",
+				"          UNDERWRITING_COMPANY_ID as long,",
+				"          UNDERWRITING_COMPANY_OVID as long,",
+				"          SUBMISSION_ID as long,",
+				"          PREVIOUS_INSURANCE_YN as string,",
+				"          LEGACY_POLICY_NUMBER as string,",
+				"          STATE as string,",
+				"          POLICY_POLICY as integer,",
+				"          PAYMENT_PLAN as string,",
+				"          APPLICATION_RECEIVED_DATE as timestamp,",
+				"          INCEPTION_DATE as timestamp,",
+				"          BILL_TYPE as string,",
+				"          FORMS_LANGUAGE as string,",
+				"          BASE_CURRENCY as string,",
+				"          INVOICE_CURRENCY as string,",
+				"          PREVIOUS_POLICY_ID as long,",
+				"          PREVIOUS_POLICY_OVID as long,",
+				"          REVISED_FROM_POLICY_ID as long,",
+				"          REVISED_FROM_POLICY_OVID as long,",
+				"          OPERATING_COMPANY_ID as long,",
+				"          OPERATING_COMPANY_OVID as long,",
+				"          CONVERTED_FROM_ID as long,",
+				"          CONVERTED_FROM_OVID as long,",
+				"          INSTALLMENT_RENEWAL as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: (\"select * from POL_POLICY where ENTITY_TYPE='{$policyPrefix}'\" ),",
+				"     format: 'query') ~> stgPolicy",
+				"ssCoverages sort(asc(POLICY_ID, true)) ~> sort1",
+				"derivedColumn4 derive(COVERAGE_ID = ssCoverages@COVERAGE_ID,",
+				"          jsonData = @(typeCode=bpa_cov_codes,",
+				"          coverageType=bpa_coverage_type,",
+				"          displayName=trim(bpa_cov_desc),",
+				"          parentEntityTypeName='Section',",
+				"          fullPremium=0.0,",
+				"          effectiveDate=toDate(COVERAGE_EFFECTIVE_DATE),",
+				"          expirationDate=toDate(COVERAGE_EXPIRATION_DATE),",
+				"          limit=array(),",
+				"          deductible=array(),",
+				"          option=array(),",
+				"          isCancelled=false(),",
+				"          tax=array(),",
+				"          amountItem=array(),",
+				"          extendedAttributes=array(),",
+				"          coverageGroupName=bpa_coverage_group,",
+				"          appliesToLevel='RSKUNIT',",
+				"          appliesToCode=toString(RISK_ID))) ~> derivedColumn1",
+				"derivedColumn2 select(mapColumn(",
+				"          policy_id = targetPolicyId,",
+				"          coverage_id = COVERAGE_ID,",
+				"          location_id = ssCoverages@LOCATION_ID,",
+				"          coverage_code = ssCoverages@COVERAGE_CODE,",
+				"          risk_id = RISK_ID,",
+				"          json_data",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"derivedColumn1 derive(json_data = toString(jsonData)) ~> derivedColumn2",
+				"sslocation sort(asc(POLICY_ID, false)) ~> locationSort",
+				"filterByNotPolicy, locationSort join(ssCoverages@POLICY_ID == sslocation@POLICY_ID",
+				"     && ssCoverages@COVERAGE_ID == sslocation@COVERAGE_ID",
+				"     && ssCoverages@LOCATION_ID == sslocation@LOCATION_ID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join3 derive(bpa_cov_codes = BPA_COVERAGE_CODES,",
+				"          bpa_cov_desc = BPA_COVERAGES,",
+				"          bpa_coverage_type = bpa_coverage_type,",
+				"          bpa_coverage_group = bpa_coverage_group) ~> derivedColumn4",
+				"filter2 derive(ARICCoverageSequence = COV_SEQ) ~> derivedColumn5",
+				"sort1, ssCoverageExt join(ssCoverages@COVERAGE_ID == ssCoverageExt@COVERAGE_ID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"lookup1 filter(!isNull(POLICY_ID) && !isNull(SI_NO) && bpa_coverage_level == 'U') ~> filterByNotPolicy",
+				"ecmBpaCovMap filter(BPA_SECTION_CODE != 'SEC000' && BPA_PRODUCT_CODE ==$policyPrefix && trim(bpa_coverage_level) <=> 'U'\r",
+				") ~> filter1",
+				"join2, filter2 lookup(split(ssCoverages@COVERAGE_CODE,'-')[4] == trim(ecmBpaCovMap@COVERAGE_CODE)",
+				"     && trim(toString(ARICCoverageSequence)) == trim(COV_SEQ),",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"derivedColumn6, stgPolicy join(targetPolicy@policy_number == stgPolicy@POLICY_NUMBER,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinStgPolAndTargetPolicy",
+				"targetPolicy derive(targetPolicyId = policy_id) ~> derivedColumn6",
+				"join1, filterByEntityType join(ssCoverages@POLICY_ID == stgPolicy@POLICY_ID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join3",
+				"joinStgPolAndTargetPolicy filter(ENTITY_TYPE == $policyPrefix) ~> filterByEntityType",
+				"filter1 filter(isNull(bpa_coverage_group)||($policyPrefix == 'CFA' && (bpa_coverage_group == 'Liability' ||bpa_coverage_group == 'Physical Damage' ||bpa_coverage_group == $locationState || bpa_coverage_group == 'common'))) ~> filter2",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          coverage_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          coverage_code as string,",
+				"          risk_id as long,",
+				"          location_id as long",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 2) ~> osStageCoverage",
+				"derivedColumn5 sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     keys:['ARICCoverageSequence'],",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> covCache"
+			]
+		}
+	}
+}

@@ -1,0 +1,162 @@
+{
+	"name": "df_clientPartToBlank",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "policy"
+				},
+				{
+					"dataset": {
+						"referenceName": "insuredDetails",
+						"type": "DatasetReference"
+					},
+					"name": "ecmInsured"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "insuredSelect"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "derivedColumn5"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> policy",
+				"source(output(",
+				"          PolicyPrefix as string,",
+				"          Policy as string,",
+				"          Policy_Sequence as string,",
+				"          RowStatus as string,",
+				"          EffectiveDate as timestamp,",
+				"          ExpirationDate as timestamp,",
+				"          LocationNumber as string,",
+				"          LocationUnitNumber as string,",
+				"          InsuredNumber as integer,",
+				"          InsuredType as string,",
+				"          InsuredSubType as string,",
+				"          LinkToApplicant as string,",
+				"          FirstName as string,",
+				"          MiddleName as string,",
+				"          LastName as string,",
+				"          NameSuffix as string,",
+				"          CorporateName as string,",
+				"          DBACode as string,",
+				"          AlternateName as string,",
+				"          MailingAddress1 as string,",
+				"          MailingAddress2 as string,",
+				"          MailingCity as string,",
+				"          MailingState as string,",
+				"          MailingZipCode as string,",
+				"          MailingCountryCode as string,",
+				"          DOB as date,",
+				"          Relationship as string,",
+				"          ExcludedDate as date,",
+				"          ActiveMilitary as string,",
+				"          SubTypeOther as string,",
+				"          ID as integer,",
+				"          DataSource as string,",
+				"          DW_InsertDate as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> ecmInsured",
+				"select1 alterRow(updateIf(!isNull(policy_id))) ~> AlterRow1",
+				"policy, insuredSelect join(policy_number == Policy,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"derivedColumn5 derive(json_data = replace(json_data, '\"clientParticipant\":[]', concat('\"clientParticipant\":',toString(clientArray)))) ~> derivedColumn2",
+				"join1 derive(clientParticipant = @(party=@(name=@(givenName=replace(trim(CorporateName),'\"',''),",
+				"          surname=replace(trim(CorporateName),'\"','')),",
+				"          partyTypeCode='person',",
+				"          person=@(name=@(givenName=replace(trim(CorporateName),'\"',''),",
+				"          surname=replace(trim(CorporateName),'\"','')))),",
+				"          subRoleCode='primaryInsured',",
+				"          roleCode='insured')) ~> derivedColumn3",
+				"derivedColumn4 select(mapColumn(",
+				"          policy_id,",
+				"          policy_number,",
+				"          json_data",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"ecmInsured select(mapColumn(",
+				"          PolicyPrefix,",
+				"          Policy,",
+				"          FirstName,",
+				"          MiddleName,",
+				"          LastName,",
+				"          NameSuffix,",
+				"          CorporateName,",
+				"          AlternateName",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> insuredSelect",
+				"derivedColumn2 derive(json_data = replace(json_data, '2023-12-12', '2023-12-12')) ~> derivedColumn4",
+				"derivedColumn3 derive(clientArray = array(clientParticipant)) ~> derivedColumn5",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['policy_id'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

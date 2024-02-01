@@ -1,0 +1,218 @@
+{
+	"name": "df_update_stage_policy_agent_clientparticipant",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows/updateJsonDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policy_partyrole_bridge",
+						"type": "DatasetReference"
+					},
+					"name": "policyPartyBridgeStaging"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_partyrole",
+						"type": "DatasetReference"
+					},
+					"name": "partyroleStaging"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_agency",
+						"type": "DatasetReference"
+					},
+					"name": "agencyTarget"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "policyTarget"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "policyTargetSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "join3"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "join4"
+				},
+				{
+					"name": "join5"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          POLICY_PARTY_ROLE_BRIDGE_ID as long,",
+				"          ROLE_ID as long,",
+				"          ROLE_OVID as long,",
+				"          POLICY_ID as long,",
+				"          POLICY_OVID as long,",
+				"          PARTY_ID as long,",
+				"          PARTY_OVID as long,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          SOURCE_SYSTEM as string,",
+				"          SOURCE_KEY as string,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DATA_HASH as binary,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT *\\n  FROM [DM_Source_Stage].[dbo].[POL_POLICY_PARTY_ROLE_BRIDGE]',",
+				"     format: 'query') ~> policyPartyBridgeStaging",
+				"source(output(",
+				"          ROLE_ID as long,",
+				"          ROLE_VID as long,",
+				"          ROLE_CODE as string,",
+				"          ROLE_DESCRIPTION as string,",
+				"          IS_PRIMARY_INSURED_YN as string,",
+				"          IS_DRIVER_YN as string,",
+				"          IS_CUSTOMER_YN as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> partyroleStaging",
+				"source(output(",
+				"          agency_id as integer,",
+				"          json_data as string,",
+				"          bpa_party_code as string,",
+				"          bpa_party_id as string,",
+				"          party_name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> agencyTarget",
+				"source(output(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> policyTarget",
+				"policyPartyBridgeStaging, partyroleStaging join(policyPartyBridgeStaging@ROLE_ID == partyroleStaging@ROLE_ID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 split(ROLE_CODE=='INSURED',",
+				"     ROLE_CODE=='AGENCY',",
+				"     disjoint: false) ~> split1@(split1, split2, default)",
+				"split1@split2, agencyTarget join(PARTY_ID == agency_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join3",
+				"join3 derive(agency_json_data = @(agencyCode=bpa_party_code,",
+				"          partyName=party_name)) ~> derivedColumn2",
+				"split1@split1 select(mapColumn(",
+				"          POLICY_ID",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"derivedColumn2 select(mapColumn(",
+				"          agency_json_data,",
+				"          POLICY_ID",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select1, select2 join(select1@POLICY_ID == select2@POLICY_ID,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join4",
+				"join4, policyTarget join(select1@POLICY_ID == policyTarget@policy_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join5",
+				"join5 derive(policy_json_data = replace(json_data,'\"agent\":[]', concat('\"agent\":', iif(isNull(agency_json_data), 'null', toString(agency_json_data))))) ~> derivedColumn3",
+				"derivedColumn3 select(mapColumn(",
+				"          policy_id = policyTarget@policy_id,",
+				"          json_data = policy_json_data",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select3 alterRow(updateIf(!isNull(json_data))) ~> alterRow1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['policy_id'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          policy_id,",
+				"          json_data",
+				"     )) ~> policyTargetSink"
+			]
+		}
+	}
+}

@@ -1,0 +1,207 @@
+{
+	"name": "df_source_party",
+	"properties": {
+		"folder": {
+			"name": "Source Stage Data Flows/referenceDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_party",
+						"type": "DatasetReference"
+					},
+					"name": "partySource"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_party",
+						"type": "DatasetReference"
+					},
+					"name": "partyStagingLookup"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_party",
+						"type": "DatasetReference"
+					},
+					"name": "partyStaging"
+				}
+			],
+			"transformations": [
+				{
+					"name": "metadataflowlet",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "$DF_batch"
+						}
+					}
+				},
+				{
+					"name": "selectRequiredPartyColumns"
+				},
+				{
+					"name": "partySurrogateKey"
+				},
+				{
+					"name": "deriveOtherRequiredColumns"
+				},
+				{
+					"name": "selectRequiredStagingPartyColumns"
+				},
+				{
+					"name": "derivedFullName"
+				},
+				{
+					"name": "groupByFullName"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     DF_batch as integer (1),",
+				"     DF_max_id as integer (1)",
+				"}",
+				"source(output(",
+				"          Policy as string,",
+				"          Policy_Sequence as string,",
+				"          EffectiveDate as timestamp,",
+				"          ExpirationDate as timestamp,",
+				"          LocationNumber as string,",
+				"          LocationUnitNumber as string,",
+				"          InsuredNumber as integer,",
+				"          InsuredType as string,",
+				"          InsuredSubType as string,",
+				"          FirstName as string,",
+				"          MiddleName as string,",
+				"          LastName as string,",
+				"          NameSuffix as string,",
+				"          CorporateName as string,",
+				"          AlternateName as string,",
+				"          MailingAddress1 as string,",
+				"          MailingAddress2 as string,",
+				"          MailingCity as string,",
+				"          MailingZipCode as string,",
+				"          DOB as date,",
+				"          Relationship as string,",
+				"          ExcludedDate as date,",
+				"          DW_InsertDate as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> partySource",
+				"source(output(",
+				"          PARTY_ID as long,",
+				"          PARTY_VID as long,",
+				"          POLICY_ID as long,",
+				"          POLICY_OVID as long,",
+				"          NAME_PREFIX as string,",
+				"          FIRST_NAME as string,",
+				"          MIDDLE_NAME as string,",
+				"          LAST_NAME as string,",
+				"          FULL_NAME as string,",
+				"          DATE_OF_BIRTH as timestamp,",
+				"          GENDER as string,",
+				"          SSN as string,",
+				"          HIRE_DATE as timestamp,",
+				"          POLICYINATION_DATE as timestamp,",
+				"          EMAIL as string,",
+				"          PARTY_IS_ACTIVE_YN as string,",
+				"          PARTY_EFF_DATE as timestamp,",
+				"          PARTY_EXP_DATE as timestamp,",
+				"          PARTY_TYPE as string,",
+				"          PHYSICAL_GEN_ADDRESS_ID as long,",
+				"          HOME_PHONE_NUMBER as string,",
+				"          FAX_NUMBER as string,",
+				"          YEARS_WITH_EMPLOYER as integer,",
+				"          NAME_SUFFIX as string,",
+				"          MARITAL_STATUS as string,",
+				"          OCCUPATION as string,",
+				"          DOING_BUSINESS_AS as string,",
+				"          DECEASED_DATE as timestamp,",
+				"          IS_DECEASED_YN as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> partyStagingLookup",
+				"deriveOtherRequiredColumns compose(mapParameter(",
+				"          FL_batch = $DF_batch",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> metadataflowlet@(output1)",
+				"partySource select(mapColumn(",
+				"          FIRST_NAME = FirstName,",
+				"          MIDDLE_NAME = MiddleName,",
+				"          LAST_NAME = LastName,",
+				"          GIVEN_FULL_NAME = CorporateName,",
+				"          DATE_OF_BIRTH = DOB",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredPartyColumns",
+				"groupByFullName keyGenerate(output(skey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> partySurrogateKey",
+				"partySurrogateKey derive(PARTY_ID = skey + $DF_max_id,",
+				"          PARTY_VID = 1,",
+				"          PARTY_TYPE = \"INSURED\") ~> deriveOtherRequiredColumns",
+				"partyStagingLookup select(mapColumn(",
+				"          FIRST_NAME,",
+				"          LAST_NAME,",
+				"          MIDDLE_NAME,",
+				"          FULL_NAME",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredStagingPartyColumns",
+				"selectRequiredPartyColumns derive(FULL_NAME = iif(isNull(GIVEN_FULL_NAME)|| trim(GIVEN_FULL_NAME)=='', concatWS(\" \", trim(FIRST_NAME), trim(MIDDLE_NAME), trim(LAST_NAME)), trim(GIVEN_FULL_NAME))) ~> derivedFullName",
+				"derivedFullName aggregate(groupBy(FULL_NAME),",
+				"     each(match(name!='FULL_NAME'), $$ = first($$))) ~> groupByFullName",
+				"metadataflowlet@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          PARTY_ID as long,",
+				"          PARTY_VID as long,",
+				"          NAME_PREFIX as string,",
+				"          FIRST_NAME as string,",
+				"          MIDDLE_NAME as string,",
+				"          LAST_NAME as string,",
+				"          FULL_NAME as string,",
+				"          DATE_OF_BIRTH as timestamp,",
+				"          GENDER as string,",
+				"          SSN as string,",
+				"          HIRE_DATE as timestamp,",
+				"          POLICYINATION_DATE as timestamp,",
+				"          EMAIL as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          PARTY_TYPE as string,",
+				"          PHYSICAL_GEN_ADDRESS_ID as long,",
+				"          HOME_PHONE_NUMBER as string,",
+				"          FAX_NUMBER as string,",
+				"          YEARS_WITH_EMPLOYER as integer,",
+				"          NAME_SUFFIX as string,",
+				"          MARITAL_STATUS as string,",
+				"          OCCUPATION as string,",
+				"          DOING_BUSINESS_AS as string,",
+				"          DECEASED_DATE as timestamp,",
+				"          IS_DECEASED_YN as string,",
+				"          GEN_ADDRESS_UNIQ_ID as long,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> partyStaging"
+			]
+		}
+	}
+}

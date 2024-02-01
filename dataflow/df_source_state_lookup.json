@@ -1,0 +1,159 @@
+{
+	"name": "df_source_state_lookup",
+	"properties": {
+		"folder": {
+			"name": "Source Stage Data Flows/referenceDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ecm_state_code",
+						"type": "DatasetReference"
+					},
+					"name": "ecmStateRef"
+				},
+				{
+					"dataset": {
+						"referenceName": "StgLookUpType",
+						"type": "DatasetReference"
+					},
+					"name": "lookupTypePkey"
+				},
+				{
+					"dataset": {
+						"referenceName": "lookup",
+						"type": "DatasetReference"
+					},
+					"name": "lookupPkey"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "StgLookUpType",
+						"type": "DatasetReference"
+					},
+					"name": "lookupType"
+				},
+				{
+					"name": "lookupTypeID"
+				},
+				{
+					"name": "lookupPkeyCache"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "flowlet1",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "surrogateKey1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          StateCode as string,",
+				"          StateAbbreviation as string,",
+				"          StateName as string,",
+				"          WCTypeOfLossGroupCode as string,",
+				"          QuickRaterStateID as integer,",
+				"          AutoDoNotRenewDays as integer,",
+				"          AutoConditionalRenewalNoticeDays as integer,",
+				"          AutoUMLimitFlag as string,",
+				"          AutoStateBand as string,",
+				"          AutoRegionID as integer,",
+				"          StateTypeCode as string,",
+				"          FIPSStateCode as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> ecmStateRef",
+				"source(output(",
+				"          LOOKUP_TYPE_ID as long,",
+				"          LOOKUP_TYPE_DOMAIN as string,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          DATA_HASH as binary,",
+				"          SOURCE_KEY as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select MAX(LOOKUP_TYPE_ID) as lookup_type_id from REF_LOOKUP_TYPE',",
+				"     format: 'query') ~> lookupTypePkey",
+				"source(output(",
+				"          lookup_id as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select MAX(LOOKUP_ID) as lookup_id from REF_LOOKUP',",
+				"     format: 'query') ~> lookupPkey",
+				"surrogateKey1 derive(LOOKUP_TYPE_ID = lookupTypeID#outputs()[1].LOOKUP_TYPE_ID + pkey,",
+				"          LOOKUP_TYPE_DOMAIN = 'STATE') ~> derivedColumn1",
+				"derivedColumn1 compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet1@(output1)",
+				"ecmStateRef keyGenerate(output(pkey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"flowlet1@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          LOOKUP_TYPE_ID as long,",
+				"          LOOKUP_TYPE_DOMAIN as string,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          DATA_HASH as binary,",
+				"          SOURCE_KEY as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 0) ~> lookupType",
+				"lookupTypePkey sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 0) ~> lookupTypeID",
+				"lookupPkey sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 0) ~> lookupPkeyCache"
+			]
+		}
+	}
+}

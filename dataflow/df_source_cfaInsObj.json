@@ -1,0 +1,1661 @@
+{
+	"name": "df_source_cfaInsObj",
+	"properties": {
+		"folder": {
+			"name": "Source Stage Data Flows/txnDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRisk",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRisk"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicy"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_PolicyAutoUnit",
+						"type": "DatasetReference"
+					},
+					"name": "autoUnitsSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_locationAddress",
+						"type": "DatasetReference"
+					},
+					"name": "locationAddressSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypeBreed"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypeName"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypeSex"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypePurchaseDate"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypeMortality"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypeUse"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypePrice"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypeRequestedLimit"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypeAge"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypeVehicleOwned"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypeRadiusClass"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypePrimaryClass"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypeSecondaryClass"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "sink3"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "sink4"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "sink5"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "sink6"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyRiskTypeFleet"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "sink7"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "sink8"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "sink9"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "sink10"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "sink11"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "sink13"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "sink14"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRiskDetails",
+						"type": "DatasetReference"
+					},
+					"name": "sink15"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flowlet1",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet2",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet3",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet4",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet5",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet6",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet7",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet9",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet10",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet11",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet12",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet14",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet15",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet16",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet17",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet18",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet19",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet20",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet21",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet22",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet23",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet24",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet25",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet27",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet28",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "flowlet29",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "registeredStateName"
+				},
+				{
+					"name": "originalCostNewOfVehicle"
+				},
+				{
+					"name": "model"
+				},
+				{
+					"name": "autoUnitLookup"
+				},
+				{
+					"name": "make"
+				},
+				{
+					"name": "statedAmount"
+				},
+				{
+					"name": "vin"
+				},
+				{
+					"name": "registeredState"
+				},
+				{
+					"name": "classCode"
+				},
+				{
+					"name": "year"
+				},
+				{
+					"name": "vehicleIsOwnedOrLeased"
+				},
+				{
+					"name": "radiusClass"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "primaryClassCode"
+				},
+				{
+					"name": "secondaryClassCode"
+				},
+				{
+					"name": "filter3"
+				},
+				{
+					"name": "filter4"
+				},
+				{
+					"name": "operatorExperience"
+				},
+				{
+					"name": "type"
+				},
+				{
+					"name": "use"
+				},
+				{
+					"name": "fleetPP"
+				},
+				{
+					"name": "fleetTK"
+				},
+				{
+					"name": "addressLookup"
+				},
+				{
+					"name": "zipcode"
+				},
+				{
+					"name": "territory"
+				},
+				{
+					"name": "filter5"
+				},
+				{
+					"name": "supplementaryType"
+				},
+				{
+					"name": "businessUseClass"
+				},
+				{
+					"name": "vehicleSizeClass"
+				},
+				{
+					"name": "vehicleTypeCode"
+				},
+				{
+					"name": "classCodeST"
+				},
+				{
+					"name": "classCodePP"
+				},
+				{
+					"name": "join1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     policyPrefix as string (\"CFA\"),",
+				"     policies as string[] (['CFA002097'])",
+				"}",
+				"source(output(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_NUMBER as string,",
+				"          POLICY_ID as long,",
+				"          POLICY_OVID as long,",
+				"          RISK_IS_ACTIVE_YN as string,",
+				"          RISK_EFF_DATE as timestamp,",
+				"          RISK_EXP_DATE as timestamp,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from POL_RISK ',",
+				"     format: 'query') ~> StagingPolicyRisk",
+				"source(output(",
+				"          POLICY_ID as long,",
+				"          POLICY_VID as long,",
+				"          REINSURANCE_DAC as string,",
+				"          PREVIOUS_INSURANCE_NO_REMARKS as string,",
+				"          AGENCY_ID as long,",
+				"          AGENCY_OVID as long,",
+				"          PRODUCER_ID as long,",
+				"          PRODUCER_OVID as long,",
+				"          PRODUCER_CONTACT_ID as long,",
+				"          PRODUCER_CONTACT_OVID as long,",
+				"          POLICY_NUMBER as string,",
+				"          ENTITY_TYPE as string,",
+				"          ENTITY_STATUS as string,",
+				"          IS_RENEWAL_YN as string,",
+				"          REVISION_NUMBER as integer,",
+				"          PRODUCT_ID as long,",
+				"          PRODUCT_OVID as long,",
+				"          POLICY_EFFECTIVE_DATE as timestamp,",
+				"          POLICY_EXPIRATION_DATE as timestamp,",
+				"          NON_RENEWAL_CODE as string,",
+				"          POLICY_RENEWED_YN as string,",
+				"          CANCELLATION_DATE as timestamp,",
+				"          IS_RENEWABLE_YN as string,",
+				"          PREVIOUS_INSURANCE_NO_REASON as string,",
+				"          POLICY_STATUS as string,",
+				"          CANCEL_REASON_CODE as string,",
+				"          CANCEL_REASON_DESCRIPTION as string,",
+				"          CANCEL_METHOD as string,",
+				"          CANCEL_METHOD_DESC as string,",
+				"          LOSE_REASON_CODE as string,",
+				"          LOSE_REASON_DESC as string,",
+				"          DECLINATION_REASON_CODE as string,",
+				"          DECLINATION_REASON_DESC as string,",
+				"          NOT_WRITTEN_REASON_CODE as string,",
+				"          NOT_WRITTEN_REASON_DESC as string,",
+				"          POLICY_STATE_CODE as string,",
+				"          PROGRAM_ID as long,",
+				"          PROGRAM_OVID as long,",
+				"          BILLING_TYPE_CODE as string,",
+				"          UNDERWRITING_COMPANY_ID as long,",
+				"          UNDERWRITING_COMPANY_OVID as long,",
+				"          SUBMISSION_ID as long,",
+				"          PREVIOUS_INSURANCE_YN as string,",
+				"          LEGACY_POLICY_NUMBER as string,",
+				"          STATE as string,",
+				"          POLICY_POLICY as integer,",
+				"          PAYMENT_PLAN as string,",
+				"          APPLICATION_RECEIVED_DATE as timestamp,",
+				"          INCEPTION_DATE as timestamp,",
+				"          BILL_TYPE as string,",
+				"          FORMS_LANGUAGE as string,",
+				"          BASE_CURRENCY as string,",
+				"          INVOICE_CURRENCY as string,",
+				"          PREVIOUS_POLICY_ID as long,",
+				"          PREVIOUS_POLICY_OVID as long,",
+				"          REVISED_FROM_POLICY_ID as long,",
+				"          REVISED_FROM_POLICY_OVID as long,",
+				"          OPERATING_COMPANY_ID as long,",
+				"          OPERATING_COMPANY_OVID as long,",
+				"          CONVERTED_FROM_ID as long,",
+				"          CONVERTED_FROM_OVID as long,",
+				"          INSTALLMENT_RENEWAL as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: (\"select * from POL_POLICY where policy_number like '{$policyPrefix}%'\"+iif(size($policies) >0&& size($policies) ==1&&$policies[1] =='','','and policy_number in ('+dropLeft(toString(reduce($policies, \"'\", #acc + \",'\" + #item +\"'\", #result)), 2)+')')),",
+				"     format: 'query') ~> StagingPolicy",
+				"source(output(",
+				"          PolicyPrefix as string,",
+				"          Policy as string,",
+				"          Policy_Sequence as string,",
+				"          RowStatus as string,",
+				"          EffectiveDate as timestamp,",
+				"          ExpirationDate as timestamp,",
+				"          LocationNumber as string,",
+				"          LocationUnitNumber as string,",
+				"          {UnitType/ModificationType} as string,",
+				"          YearBuild as short,",
+				"          UnitValue as decimal(13,0),",
+				"          RiskUseCode as string,",
+				"          Make as string,",
+				"          Model as string,",
+				"          UnitWidth as short,",
+				"          ISOClassCode as string,",
+				"          RiskType as string,",
+				"          UnitLength as short,",
+				"          PurchaseDate as timestamp,",
+				"          AppraisalYear as short,",
+				"          UnitDescription as string,",
+				"          AnimalUseCode as string,",
+				"          LeaseFlag as string,",
+				"          AppraisalFlag as string,",
+				"          RegistrationState as string,",
+				"          VehicleID as string,",
+				"          EngineDisplacement as short,",
+				"          FuelTypeCode as string,",
+				"          Layup as string,",
+				"          ID as integer,",
+				"          DataSource as string,",
+				"          DW_InsertDate as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: (\"select * from [dbo].[PolicyAutoUnit_P]  where PolicyPrefix='{$policyPrefix}'\"+iif(size($policies) >0&& size($policies) ==1&&$policies[1] =='','','and policy in ('+dropLeft(toString(reduce($policies, \"'\", #acc + \",'\" + #item +\"'\", #result)), 2)+')')),",
+				"     format: 'query') ~> autoUnitsSource",
+				"source(output(",
+				"          Policy as string,",
+				"          Policy_Sequence as string,",
+				"          PolicyPrefix as string,",
+				"          ProductCode as string,",
+				"          LocationNumber as string,",
+				"          BuildingNumber as string,",
+				"          LocationName as string,",
+				"          LocationAddress1 as string,",
+				"          LocationAddress2 as string,",
+				"          LocationAddress3 as string,",
+				"          LocationCity as string,",
+				"          LocationZipCode as string,",
+				"          LocationCounty as string,",
+				"          Territory as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: (\"select * from [dbo].[Location_Address]  where PolicyPrefix='{$policyPrefix}'\"+iif(size($policies) >0&& size($policies) ==1&&$policies[1] =='','','and policy in ('+dropLeft(toString(reduce($policies, \"'\", #acc + \",'\" + #item +\"'\", #result)), 2)+')')),",
+				"     format: 'query') ~> locationAddressSource",
+				"registeredStateName compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet1@(output1)",
+				"originalCostNewOfVehicle compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet2@(output1)",
+				"model compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet3@(output1)",
+				"make compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet4@(output1)",
+				"vin compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet5@(output1)",
+				"statedAmount compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet6@(output1)",
+				"classCode compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet7@(output1)",
+				"registeredState compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet9@(output1)",
+				"year compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet10@(output1)",
+				"vehicleIsOwnedOrLeased compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet11@(output1)",
+				"radiusClass compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet12@(output1)",
+				"primaryClassCode compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet14@(output1)",
+				"secondaryClassCode compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet15@(output1)",
+				"use compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet16@(output1)",
+				"type compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet17@(output1)",
+				"operatorExperience compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet18@(output1)",
+				"fleetPP compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet19@(output1)",
+				"fleetTK compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet20@(output1)",
+				"territory compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet21@(output1)",
+				"zipcode compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet22@(output1)",
+				"supplementaryType compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet23@(output1)",
+				"businessUseClass compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet24@(output1)",
+				"vehicleSizeClass compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet25@(output1)",
+				"vehicleTypeCode compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet27@(output1)",
+				"classCodeST compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet28@(output1)",
+				"classCodePP compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet29@(output1)",
+				"addressLookup filter(not(isNull(POLICY_NUMBER))) ~> filter1",
+				"filter1 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = RISK_CODE,",
+				"          ATTRIBUTE_NAME = \"registeredState_Name\",",
+				"          ATTRIBUTE_VALUE = RegistrationState) ~> registeredStateName",
+				"filter1 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = AnimalUseCode,",
+				"          ATTRIBUTE_NAME = 'OriginalCostNewOfVehicle',",
+				"          ATTRIBUTE_VALUE = UnitValue) ~> originalCostNewOfVehicle",
+				"filter1 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISKCODE = RiskUseCode,",
+				"          ATTRIBUTE_NAME = \"Model\",",
+				"          ATTRIBUTE_VALUE = trim(Model)) ~> model",
+				"join1, autoUnitsSource lookup(POLICY_NUMBER == Policy",
+				"     && split(RISK_NUMBER,'-')[1] == LocationNumber",
+				"     && split(RISK_NUMBER,'-')[2] == LocationUnitNumber,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> autoUnitLookup",
+				"filter1 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '',",
+				"          ATTRIBUTE_NAME = 'Make',",
+				"          ATTRIBUTE_VALUE = trim(Make)) ~> make",
+				"filter1 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '',",
+				"          ATTRIBUTE_NAME = 'StatedAmount',",
+				"          ATTRIBUTE_VALUE = 0) ~> statedAmount",
+				"filter1 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '',",
+				"          ATTRIBUTE_NAME = 'Vin',",
+				"          ATTRIBUTE_VALUE = VehicleID) ~> vin",
+				"filter1 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '',",
+				"          ATTRIBUTE_NAME = 'RegisteredState',",
+				"          ATTRIBUTE_VALUE = RegistrationState) ~> registeredState",
+				"filter1 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '',",
+				"          ATTRIBUTE_NAME = 'ClassCode',",
+				"          ATTRIBUTE_VALUE = ISOClassCode) ~> classCode",
+				"filter1 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = \"\",",
+				"          ATTRIBUTE_NAME = \"Year\",",
+				"          ATTRIBUTE_VALUE = YearBuild) ~> year",
+				"filter1 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = \"\",",
+				"          ATTRIBUTE_NAME = 'VehicleIsOwnedOrLeased',",
+				"          ATTRIBUTE_VALUE = iif(isNull(LeaseFlag) || trim(LeaseFlag)=='', '', LeaseFlag)) ~> vehicleIsOwnedOrLeased",
+				"filter2 derive(ATTRIBUTE_NAME = 'RadiusClass',",
+				"          ATTRIBUTE_VALUE = substring(ISOClassCode, 3,1),",
+				"          RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '') ~> radiusClass",
+				"filter3 filter(in(['HT','LT','MT','MH','TR','TK','TT','VP','TC','TL','XT'], RiskType)) ~> filter2",
+				"filter2 derive(ATTRIBUTE_NAME = 'PrimaryClassCode',",
+				"          ATTRIBUTE_VALUE = substring(ISOClassCode, 1,3),",
+				"          RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '') ~> primaryClassCode",
+				"filter2 derive(ATTRIBUTE_NAME = 'SecondaryClassCode',",
+				"          ATTRIBUTE_VALUE = substring(ISOClassCode, 4,5),",
+				"          RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '') ~> secondaryClassCode",
+				"filter1 filter(not(isNull(POLICY_NUMBER))) ~> filter3",
+				"filter3 filter(in(['SU', 'PV'], RiskType)) ~> filter4",
+				"filter4 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '',",
+				"          ATTRIBUTE_NAME = 'OperatorExperience',",
+				"          ATTRIBUTE_VALUE = 'No Operator Licensed Less Than Five Years') ~> operatorExperience",
+				"filter4 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '',",
+				"          ATTRIBUTE_NAME = 'Type',",
+				"          ATTRIBUTE_VALUE = 'Personal Use or Farm Use - Nonfleet Vehicle') ~> type",
+				"filter4 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '',",
+				"          ATTRIBUTE_NAME = 'Use',",
+				"          ATTRIBUTE_VALUE = RiskUseCode) ~> use",
+				"filter4 derive(ATTRIBUTE_NAME = 'Fleet',",
+				"          ATTRIBUTE_VALUE = 'No',",
+				"          RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '') ~> fleetPP",
+				"filter2 derive(ATTRIBUTE_NAME = 'Fleet',",
+				"          ATTRIBUTE_VALUE = iif(toInteger(substring(ISOClassCode, 3,1))>3, 'Yes', 'No')) ~> fleetTK",
+				"autoUnitLookup, locationAddressSource lookup(POLICY_NUMBER == locationAddressSource@Policy",
+				"     && autoUnitsSource@LocationNumber == locationAddressSource@LocationNumber,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> addressLookup",
+				"filter1 derive(ATTRIBUTE_NAME = 'Zipcode',",
+				"          ATTRIBUTE_VALUE = LocationZipCode,",
+				"          RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '') ~> zipcode",
+				"filter1 derive(ATTRIBUTE_NAME = 'Territory',",
+				"          ATTRIBUTE_VALUE = Territory,",
+				"          RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '') ~> territory",
+				"filter3 filter(!in(['HT','LT','MT','MH','TR','TK','TT','VP','TC','TL','XT', 'PV', 'SU'], RiskType)) ~> filter5",
+				"filter5 derive(ATRRIBUTE_NAME = 'SupplementaryType',",
+				"          ATRRIBUTE_VALUE = '',",
+				"          RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '') ~> supplementaryType",
+				"filter2 derive(ATTRIBUTE_NAME = 'BusinessUseClass',",
+				"          ATTRIBUTE_VALUE = RiskUseCode,",
+				"          RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '') ~> businessUseClass",
+				"filter2 derive(ATTRIBUTE_NAME = 'vehicleSizeClass',",
+				"          ATTRIBUTE_VALUE = RiskType,",
+				"          RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '') ~> vehicleSizeClass",
+				"filter1 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '',",
+				"          ATTRIBUTE_NAME = 'VehicleTypeCode',",
+				"          ATTRIBUTE_VALUE = RiskType) ~> vehicleTypeCode",
+				"filter5 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '',",
+				"          ATTRIBUTE_NAME = 'ClassCode',",
+				"          ATTRIBUTE_VALUE = ISOClassCode) ~> classCodeST",
+				"filter4 derive(RISK_ID = RISK_ID,",
+				"          RISK_VID = RISK_VID,",
+				"          RISK_TYPE_CD = RiskType,",
+				"          RISK_CODE = '',",
+				"          ATTRIBUTE_NAME = 'ClassCode',",
+				"          ATTRIBUTE_VALUE = ISOClassCode) ~> classCodePP",
+				"StagingPolicyRisk, StagingPolicy join(StagingPolicyRisk@POLICY_ID == StagingPolicy@POLICY_ID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"flowlet1@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypeBreed",
+				"flowlet2@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypeName",
+				"flowlet3@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypeSex",
+				"flowlet5@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypePurchaseDate",
+				"flowlet6@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypeMortality",
+				"flowlet4@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypeUse",
+				"flowlet9@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypePrice",
+				"flowlet7@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypeRequestedLimit",
+				"flowlet10@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypeAge",
+				"flowlet11@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypeVehicleOwned",
+				"flowlet12@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypeRadiusClass",
+				"flowlet14@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypePrimaryClass",
+				"flowlet15@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypeSecondaryClass",
+				"flowlet18@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink3",
+				"flowlet17@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink4",
+				"flowlet16@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink5",
+				"flowlet19@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink6",
+				"flowlet20@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyRiskTypeFleet",
+				"flowlet22@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink7",
+				"flowlet21@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink8",
+				"flowlet23@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink9",
+				"flowlet24@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink10",
+				"flowlet25@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink11",
+				"flowlet27@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink13",
+				"flowlet28@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink14",
+				"flowlet29@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          RISK_ID as long,",
+				"          RISK_VID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          RISK_CODE as string,",
+				"          ATTRIBUTE_NAME as string,",
+				"          ATTRIBUTE_VALUE as string,",
+				"          SORT_ORDER as integer,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink15"
+			]
+		}
+	}
+}

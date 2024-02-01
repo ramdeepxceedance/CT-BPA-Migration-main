@@ -1,0 +1,105 @@
+{
+	"name": "df_addDeductible_to_risk_level_coverage",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows/deductibles"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_coverage",
+						"type": "DatasetReference"
+					},
+					"name": "targetCoverage"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_deductible",
+						"type": "DatasetReference"
+					},
+					"name": "osTargetDeductible"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_coverage",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "updatedDeductiblejson"
+				},
+				{
+					"name": "filter1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          coverage_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          coverage_code as string,",
+				"          risk_id as long,",
+				"          location_id as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> targetCoverage",
+				"source(output(",
+				"          deductible_id as integer,",
+				"          coverage_id as integer,",
+				"          json_data as string,",
+				"          risk_id as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> osTargetDeductible",
+				"filter1, updatedDeductiblejson join(targetCoverage@coverage_id == osTargetDeductible@coverage_id",
+				"     && targetCoverage@risk_id == osTargetDeductible@risk_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 derive(json_data = replace(targetCoverage@json_data, '\"deductible\":[]',concat( '\"deductible\":', deductibleJson))) ~> derivedColumn2",
+				"derivedColumn2 alterRow(updateIf(!isNull(targetCoverage@coverage_id))) ~> AlterRow1",
+				"osTargetDeductible derive(deductibleJson = json_data) ~> updatedDeductiblejson",
+				"targetCoverage filter(!isNull (risk_id)) ~> filter1",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          coverage_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          coverage_code as string,",
+				"          risk_id as long,",
+				"          location_id as long",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['policy_id','coverage_id','risk_id'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

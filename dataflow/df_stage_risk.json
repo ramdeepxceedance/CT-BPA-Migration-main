@@ -1,0 +1,443 @@
+{
+	"name": "df_stage_risk",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policyRisk",
+						"type": "DatasetReference"
+					},
+					"name": "ssRisk"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_riskDetail",
+						"type": "DatasetReference"
+					},
+					"name": "riskDetails"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "stgPolicy"
+				},
+				{
+					"dataset": {
+						"referenceName": "StgRefLookUp",
+						"type": "DatasetReference"
+					},
+					"name": "lookUp"
+				},
+				{
+					"dataset": {
+						"referenceName": "StgLookUpType",
+						"type": "DatasetReference"
+					},
+					"name": "lookupType"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "targetPolicy"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_risk",
+						"type": "DatasetReference"
+					},
+					"name": "targetRisk"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_risk",
+						"type": "DatasetReference"
+					},
+					"name": "targetRiskCfa"
+				}
+			],
+			"transformations": [
+				{
+					"name": "addRiskDetails"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "stringify"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "riskInfoCFA"
+				},
+				{
+					"name": "alterRow2"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "typeLookup"
+				},
+				{
+					"name": "targetPolicyWithStgPolicy"
+				},
+				{
+					"name": "renamePolicyIDCol"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "select4"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     isRiskUpdateOnly as boolean (false()),",
+				"     policyPrefix as string ('EMP')",
+				"}",
+				"source(output(",
+				"          RISK_ID as long,",
+				"          RISK_TYPE_CD as string,",
+				"          POLICY_ID as long,",
+				"          LOCATION_ID as long,",
+				"          ENTITY_TYPE as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select pr.RISK_ID, pr.RISK_TYPE_CD,pr.POLICY_ID,lrb.LOCATION_ID,pl.ENTITY_TYPE from \\nPOL_RISK pr \\njoin [POL_POLICY] pl\\non pl.POLICY_ID = pr.POLICY_ID\\njoin [POL_LOCATION_RISK_BRIDGE] lrb\\non lrb.RISK_ID = pr.RISK_ID\\n',",
+				"     format: 'query') ~> ssRisk",
+				"source(output(",
+				"          risk_detail_id as integer,",
+				"          risk_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          extended_attributes as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT * FROM public.risk_detail ',",
+				"     format: 'query') ~> riskDetails",
+				"source(output(",
+				"          POLICY_ID as long,",
+				"          POLICY_VID as long,",
+				"          REINSURANCE_DAC as string,",
+				"          PREVIOUS_INSURANCE_NO_REMARKS as string,",
+				"          AGENCY_ID as long,",
+				"          AGENCY_OVID as long,",
+				"          PRODUCER_ID as long,",
+				"          PRODUCER_OVID as long,",
+				"          PRODUCER_CONTACT_ID as long,",
+				"          PRODUCER_CONTACT_OVID as long,",
+				"          POLICY_NUMBER as string,",
+				"          ENTITY_TYPE as string,",
+				"          ENTITY_STATUS as string,",
+				"          IS_RENEWAL_YN as string,",
+				"          REVISION_NUMBER as integer,",
+				"          PRODUCT_ID as long,",
+				"          PRODUCT_OVID as long,",
+				"          POLICY_EFFECTIVE_DATE as timestamp,",
+				"          POLICY_EXPIRATION_DATE as timestamp,",
+				"          NON_RENEWAL_CODE as string,",
+				"          POLICY_RENEWED_YN as string,",
+				"          CANCELLATION_DATE as timestamp,",
+				"          IS_RENEWABLE_YN as string,",
+				"          PREVIOUS_INSURANCE_NO_REASON as string,",
+				"          POLICY_STATUS as string,",
+				"          CANCEL_REASON_CODE as string,",
+				"          CANCEL_REASON_DESCRIPTION as string,",
+				"          CANCEL_METHOD as string,",
+				"          CANCEL_METHOD_DESC as string,",
+				"          LOSE_REASON_CODE as string,",
+				"          LOSE_REASON_DESC as string,",
+				"          DECLINATION_REASON_CODE as string,",
+				"          DECLINATION_REASON_DESC as string,",
+				"          NOT_WRITTEN_REASON_CODE as string,",
+				"          NOT_WRITTEN_REASON_DESC as string,",
+				"          POLICY_STATE_CODE as string,",
+				"          PROGRAM_ID as long,",
+				"          PROGRAM_OVID as long,",
+				"          BILLING_TYPE_CODE as string,",
+				"          UNDERWRITING_COMPANY_ID as long,",
+				"          UNDERWRITING_COMPANY_OVID as long,",
+				"          SUBMISSION_ID as long,",
+				"          PREVIOUS_INSURANCE_YN as string,",
+				"          LEGACY_POLICY_NUMBER as string,",
+				"          STATE as string,",
+				"          POLICY_POLICY as integer,",
+				"          PAYMENT_PLAN as string,",
+				"          APPLICATION_RECEIVED_DATE as timestamp,",
+				"          INCEPTION_DATE as timestamp,",
+				"          BILL_TYPE as string,",
+				"          FORMS_LANGUAGE as string,",
+				"          BASE_CURRENCY as string,",
+				"          INVOICE_CURRENCY as string,",
+				"          PREVIOUS_POLICY_ID as long,",
+				"          PREVIOUS_POLICY_OVID as long,",
+				"          REVISED_FROM_POLICY_ID as long,",
+				"          REVISED_FROM_POLICY_OVID as long,",
+				"          OPERATING_COMPANY_ID as long,",
+				"          OPERATING_COMPANY_OVID as long,",
+				"          CONVERTED_FROM_ID as long,",
+				"          CONVERTED_FROM_OVID as long,",
+				"          INSTALLMENT_RENEWAL as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from POL_POLICY ',",
+				"     format: 'query') ~> stgPolicy",
+				"source(output(",
+				"          LOOKUP_ID as long,",
+				"          LOOKUP_TYPE_ID as long,",
+				"          LOOKUP_CODE as string,",
+				"          LOOKUP_SHORT_DESCRIPTION as string,",
+				"          LOOKUP_DESCRIPTION as string,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          DATA_HASH as binary,",
+				"          SOURCE_KEY as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> lookUp",
+				"source(output(",
+				"          LOOKUP_TYPE_ID as long,",
+				"          LOOKUP_TYPE_DOMAIN as string,",
+				"          BATCH_ID as long,",
+				"          DELETED_YN as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          DATA_HASH as binary,",
+				"          SOURCE_KEY as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> lookupType",
+				"source(output(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from policy',",
+				"     format: 'query') ~> targetPolicy",
+				"split1@emp derive(json_data = @(businessKey=split1@emp@RISK_ID,",
+				"          typeCode='equine',",
+				"          extendedAttributes=horseDetails,",
+				"          appliesToLevel='LOC',",
+				"          appliesToCode=LOCATION_ID,",
+				"          isCancelled=false()),",
+				"          policy_id = targetPolicyId,",
+				"          location_id = LOCATION_ID) ~> addRiskDetails",
+				"join1, derivedColumn2 lookup(ssRisk@RISK_ID == riskDetails@risk_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"derivedColumn3 derive(horseDetails = json_data,",
+				"          lookupRiskID = risk_id) ~> derivedColumn2",
+				"addRiskDetails derive(json_data = toString(json_data),",
+				"          risk_id = split1@emp@RISK_ID) ~> stringify",
+				"select3 alterRow(updateIf(!isNull(lookupRiskID)&&$isRiskUpdateOnly),",
+				"     insertIf(isNull(lookupRiskID))) ~> AlterRow1",
+				"ssRisk, targetPolicyWithStgPolicy join(ssRisk@POLICY_ID == stgPolicy@POLICY_ID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"aggregate1 split($policyPrefix == 'EMP' && ENTITY_TYPE == 'EMP',",
+				"     $policyPrefix == 'CFA'  && ENTITY_TYPE == 'CFA',",
+				"     disjoint: false) ~> split1@(emp, cfa, others)",
+				"typeLookup derive(policy_id = targetPolicyId,",
+				"          location_id = LOCATION_ID,",
+				"          json_data = toString(@(businessKey=split1@cfa@RISK_ID,",
+				"          typeCode=LOOKUP_DESCRIPTION,",
+				"          extendedAttributes=horseDetails,",
+				"          appliesToLevel='LOC',",
+				"          appliesToCode=LOCATION_ID,",
+				"          isCancelled=false()))) ~> riskInfoCFA",
+				"select2 alterRow(updateIf(!isNull(lookupRiskID)&&$isRiskUpdateOnly),",
+				"     insertIf(isNull(lookupRiskID))) ~> alterRow2",
+				"lookUp, lookupType join(lookUp@LOOKUP_TYPE_ID == lookupType@LOOKUP_TYPE_ID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join2 select(mapColumn(",
+				"          LOOKUP_CODE,",
+				"          LOOKUP_DESCRIPTION",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"split1@cfa, select1 lookup(RISK_TYPE_CD == LOOKUP_CODE,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> typeLookup",
+				"derivedColumn4, renamePolicyIDCol join(stgPolicy@POLICY_NUMBER == targetPolicy@policy_number,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> targetPolicyWithStgPolicy",
+				"targetPolicy derive(targetPolicyId = policy_id) ~> renamePolicyIDCol",
+				"riskInfoCFA select(mapColumn(",
+				"          RISK_ID = split1@cfa@RISK_ID,",
+				"          LOCATION_ID = riskInfoCFA@location_id,",
+				"          json_data,",
+				"          POLICY_ID = targetPolicyId,",
+				"          lookupRiskID",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"stringify select(mapColumn(",
+				"          risk_id = stringify@risk_id,",
+				"          policy_id = targetPolicyId,",
+				"          LOCATION_ID = split1@emp@LOCATION_ID,",
+				"          json_data,",
+				"          lookupRiskID",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select4 aggregate(groupBy(select4@RISK_ID),",
+				"     each(match(name != 'RISK_ID'), $$ = first($$))) ~> aggregate1",
+				"riskDetails derive(rd_policyID = policy_id) ~> derivedColumn3",
+				"stgPolicy derive(stg_policy_id = POLICY_ID) ~> derivedColumn4",
+				"lookup1 select(mapColumn(",
+				"          RISK_ID = ssRisk@RISK_ID,",
+				"          RISK_TYPE_CD,",
+				"          POLICY_ID = ssRisk@POLICY_ID,",
+				"          LOCATION_ID,",
+				"          ENTITY_TYPE = ssRisk@ENTITY_TYPE,",
+				"          POLICY_NUMBER = stgPolicy@POLICY_NUMBER,",
+				"          ENTITY_TYPE = stgPolicy@ENTITY_TYPE,",
+				"          REVISION_NUMBER,",
+				"          POLICY_STATUS,",
+				"          POLICY_STATE_CODE,",
+				"          LEGACY_POLICY_NUMBER,",
+				"          STATE,",
+				"          POLICY_POLICY,",
+				"          stg_policy_id,",
+				"          policy_id = targetPolicy@policy_id,",
+				"          policy_number = targetPolicy@policy_number,",
+				"          json_data = targetPolicy@json_data,",
+				"          targetPolicyId,",
+				"          risk_detail_id,",
+				"          risk_id = riskDetails@risk_id,",
+				"          policy_id = riskDetails@policy_id,",
+				"          json_data = riskDetails@json_data,",
+				"          extended_attributes,",
+				"          rd_policyID,",
+				"          horseDetails,",
+				"          lookupRiskID,",
+				"          RISK_ID = ssRisk@RISK_ID,",
+				"          ENTITY_TYPE = ssRisk@ENTITY_TYPE",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          risk_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          location_id as long",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:true,",
+				"     upsertable:true,",
+				"     keys:['risk_id'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          risk_id,",
+				"          policy_id,",
+				"          json_data,",
+				"          location_id = LOCATION_ID",
+				"     )) ~> targetRisk",
+				"alterRow2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          risk_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          location_id as long",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:true,",
+				"     upsertable:true,",
+				"     keys:['risk_id'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          risk_id = RISK_ID,",
+				"          policy_id = POLICY_ID,",
+				"          json_data,",
+				"          location_id = LOCATION_ID",
+				"     )) ~> targetRiskCfa"
+			]
+		}
+	}
+}

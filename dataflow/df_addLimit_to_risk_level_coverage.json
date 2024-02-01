@@ -1,0 +1,140 @@
+{
+	"name": "df_addLimit_to_risk_level_coverage",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows/limits"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_coverage",
+						"type": "DatasetReference"
+					},
+					"name": "targetCoverage"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_limit",
+						"type": "DatasetReference"
+					},
+					"name": "osTargeLimit"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_deductible",
+						"type": "DatasetReference"
+					},
+					"name": "osTargetDeductible"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_coverage",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "AlterRow1"
+				},
+				{
+					"name": "updatedDeductiblejson"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "filter2"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     policyPrefix as string ('CFA')",
+				"}",
+				"source(output(",
+				"          coverage_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          coverage_code as string,",
+				"          risk_id as long,",
+				"          location_id as long,",
+				"          policy_number as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select cov.coverage_id     ,cov.policy_id     ,cov.json_data,     cov.coverage_code,     cov.risk_id,cov.location_id,p.policy_number\\n from coverage cov join policy p on cov.policy_id = p.policy_id ',",
+				"     format: 'query') ~> targetCoverage",
+				"source(output(",
+				"          limit_id as integer,",
+				"          coverage_id as integer,",
+				"          json_data as string,",
+				"          risk_id as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from cov_limit',",
+				"     format: 'query') ~> osTargeLimit",
+				"source(output(",
+				"          deductible_id as integer,",
+				"          coverage_id as integer,",
+				"          json_data as string,",
+				"          risk_id as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> osTargetDeductible",
+				"filter1, derivedColumn1 join(targetCoverage@coverage_id == osTargeLimit@coverage_id",
+				"     && targetCoverage@risk_id == osTargeLimit@risk_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"osTargeLimit derive(limitJson = json_data) ~> derivedColumn1",
+				"join1 derive(json_data = replace(targetCoverage@json_data, '\"limit\":[]',concat( '\"limit\":', limitJson))) ~> derivedColumn2",
+				"derivedColumn2 alterRow(updateIf(!isNull(targetCoverage@coverage_id))) ~> AlterRow1",
+				"osTargetDeductible derive(deductibleJson = json_data) ~> updatedDeductiblejson",
+				"filter2 filter(!isNull (risk_id)) ~> filter1",
+				"targetCoverage derive(policyPrefixTemp = substring(policy_number, 1, 3) ) ~> derivedColumn3",
+				"derivedColumn3 filter(policyPrefixTemp == $policyPrefix) ~> filter2",
+				"AlterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          coverage_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          coverage_code as string,",
+				"          risk_id as long,",
+				"          location_id as long",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['policy_id','coverage_id','risk_id'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

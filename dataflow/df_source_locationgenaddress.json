@@ -1,0 +1,151 @@
+{
+	"name": "df_source_locationgenaddress",
+	"properties": {
+		"folder": {
+			"name": "Source Stage Data Flows/referenceDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_locationAddress",
+						"type": "DatasetReference"
+					},
+					"name": "locationAddressSource"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_genAddress",
+						"type": "DatasetReference"
+					},
+					"name": "genAddressStagingLookup"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_genAddress",
+						"type": "DatasetReference"
+					},
+					"name": "genAddressStaging"
+				}
+			],
+			"transformations": [
+				{
+					"name": "selectRequiredAddressColumns"
+				},
+				{
+					"name": "addressSurrogateKey"
+				},
+				{
+					"name": "deriveSourceKey"
+				},
+				{
+					"name": "alreadyExistsCheck"
+				},
+				{
+					"name": "groupBySourceKey"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     DF_max_id as integer (1),",
+				"     policyPrefix as string ('CFA')",
+				"}",
+				"source(output(",
+				"          Policy as string,",
+				"          Policy_Sequence as string,",
+				"          PolicyPrefix as string,",
+				"          ProductCode as string,",
+				"          LocationNumber as string,",
+				"          BuildingNumber as string,",
+				"          LocationName as string,",
+				"          LocationAddress1 as string,",
+				"          LocationAddress2 as string,",
+				"          LocationAddress3 as string,",
+				"          LocationCity as string,",
+				"          LocationZipCode as string,",
+				"          LocationCounty as string,",
+				"          Territory as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: (\"select * from [dbo].[Location_Address] where  PolicyPrefix = '{$policyPrefix}' and LocationNumber != '000'\"),",
+				"     format: 'query') ~> locationAddressSource",
+				"source(output(",
+				"          GEN_ADDRESS_UNIQ_ID as long,",
+				"          ADDRESS_STREET1 as string,",
+				"          ADDRESS_STREET2 as string,",
+				"          COUNTY_CODE as string,",
+				"          COUNTY as string,",
+				"          ADDRESS_CITY as string,",
+				"          ADD_DESCRIPTION as string,",
+				"          STATE_PROVINCE_CODE as string,",
+				"          POSTAL_CODE as string,",
+				"          POSTAL_CODE_EXT as string,",
+				"          COUNTRY_CODE as string,",
+				"          SOURCE_INSERTED_ON as timestamp,",
+				"          SOURCE_UPDATED_ON as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary,",
+				"          TERRITORY as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> genAddressStagingLookup",
+				"locationAddressSource select(mapColumn(",
+				"          ADDRESS_STREET1 = LocationAddress1,",
+				"          ADDRESS_STREET2 = LocationAddress2,",
+				"          ADDRESS_CITY = LocationCity,",
+				"          POSTAL_CODE = LocationZipCode,",
+				"          COUNTY = LocationCounty,",
+				"          TERRITORY = Territory",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredAddressColumns",
+				"selectRequiredAddressColumns keyGenerate(output(skey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> addressSurrogateKey",
+				"addressSurrogateKey derive(GEN_ADDRESS_UNIQ_ID = skey + $DF_max_id,",
+				"          SOURCE_INSERTED_ON = currentTimestamp(),",
+				"          SOURCE_UPDATED_ON = currentTimestamp(),",
+				"          SOURCE_KEY = concatWS('', iif(isNull(ADDRESS_STREET1), '', replace(ADDRESS_STREET1, ' ', '')), iif(isNull(ADDRESS_STREET2), '', replace(ADDRESS_STREET2, ' ', '')), iif(isNull(ADDRESS_CITY), '', replace(ADDRESS_CITY, ' ', '')) , iif(isNull(POSTAL_CODE), '', replace(POSTAL_CODE, ' ', '')), iif(isNull(TERRITORY), '', replace(TERRITORY, ' ', '')))) ~> deriveSourceKey",
+				"groupBySourceKey, genAddressStagingLookup exists(groupBySourceKey@SOURCE_KEY == genAddressStagingLookup@SOURCE_KEY,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> alreadyExistsCheck",
+				"deriveSourceKey aggregate(groupBy(SOURCE_KEY),",
+				"     each(match(name!='SOURCE_KEY'), $$ = first($$))) ~> groupBySourceKey",
+				"alreadyExistsCheck sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          GEN_ADDRESS_UNIQ_ID as long,",
+				"          ADDRESS_STREET1 as string,",
+				"          ADDRESS_STREET2 as string,",
+				"          COUNTY_CODE as string,",
+				"          COUNTY as string,",
+				"          ADDRESS_CITY as string,",
+				"          ADD_DESCRIPTION as string,",
+				"          STATE_PROVINCE_CODE as string,",
+				"          POSTAL_CODE as string,",
+				"          POSTAL_CODE_EXT as string,",
+				"          COUNTRY_CODE as string,",
+				"          SOURCE_INSERTED_ON as timestamp,",
+				"          SOURCE_UPDATED_ON as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary,",
+				"          TERRITORY as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> genAddressStaging"
+			]
+		}
+	}
+}

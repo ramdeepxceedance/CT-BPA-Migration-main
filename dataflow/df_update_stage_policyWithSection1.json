@@ -1,0 +1,50 @@
+{
+	"name": "df_update_stage_policyWithSection1",
+	"properties": {
+		"type": "Flowlet",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "derivedColumn5"
+				},
+				{
+					"name": "derivedColumn6"
+				},
+				{
+					"name": "derivedColumn7"
+				},
+				{
+					"name": "input1"
+				},
+				{
+					"name": "output1"
+				}
+			],
+			"scriptLines": [
+				"input(output(",
+				"          json as string,",
+				"          id as long,",
+				"          sec_id as long,",
+				"          sec_code as string,",
+				"          filteredSection as string",
+				"     ),",
+				"     order: 0,",
+				"     allowSchemaDrift: true) ~> input1",
+				"input1 derive(finalJson = replace(json,'[\"{','[{')) ~> derivedColumn3",
+				"derivedColumn6 derive(finalJson = replace(finalJson,'}\"]','}]')) ~> derivedColumn4",
+				"derivedColumn4 derive(finalJson = replace(finalJson, '\"{', '{')) ~> derivedColumn5",
+				"derivedColumn3 derive(finalJson = unescape(finalJson, 'json')) ~> derivedColumn6",
+				"derivedColumn5 derive(finalJson = replace(finalJson, '}\"', '}')) ~> derivedColumn7",
+				"derivedColumn7 output() ~> output1"
+			]
+		}
+	}
+}

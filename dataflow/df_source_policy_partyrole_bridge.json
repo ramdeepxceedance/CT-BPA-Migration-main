@@ -1,0 +1,440 @@
+{
+	"name": "df_source_policy_partyrole_bridge",
+	"properties": {
+		"folder": {
+			"name": "Source Stage Data Flows/txnDataFlow/bridge"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_party",
+						"type": "DatasetReference"
+					},
+					"name": "EcmParty"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_party",
+						"type": "DatasetReference"
+					},
+					"name": "StagingParty"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicy"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_partyrole",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPartyRole"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policy_partyrole_bridge",
+						"type": "DatasetReference"
+					},
+					"name": "bridgeMaxId"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policy_partyrole_bridge",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicyPartyRoleBridge"
+				},
+				{
+					"name": "maxIdCache"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flowlet1",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "flatten1"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "derivedColumn5"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "sourceStagePartyLookup"
+				},
+				{
+					"name": "surrogateKey2"
+				},
+				{
+					"name": "derivedColumn6"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "filter3"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "select5"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     policies as string[] (['']),",
+				"     policyPrefix as string ('')",
+				"}",
+				"source(output(",
+				"          Policy as string,",
+				"          Policy_Sequence as string,",
+				"          EffectiveDate as timestamp,",
+				"          ExpirationDate as timestamp,",
+				"          LocationNumber as string,",
+				"          LocationUnitNumber as string,",
+				"          InsuredNumber as short,",
+				"          InsuredType as string,",
+				"          InsuredSubType as string,",
+				"          FirstName as string,",
+				"          MiddleName as string,",
+				"          LastName as string,",
+				"          NameSuffix as string,",
+				"          CorporateName as string,",
+				"          AlternateName as string,",
+				"          MailingAddress1 as string,",
+				"          MailingAddress2 as string,",
+				"          MailingCity as string,",
+				"          MailingZipCode as string,",
+				"          DOB as date,",
+				"          Relationship as string,",
+				"          ExcludedDate as date,",
+				"          DW_InsertDate as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: (\"select * from Additional_Insured \"+iif(size($policies) >0&& size($policies) ==1&&$policies[1] =='','','where policy in ('+dropLeft(toString(reduce($policies, \"'\", #acc + \",'\" + #item +\"'\", #result)), 2)+')')),",
+				"     format: 'query') ~> EcmParty",
+				"source(output(",
+				"          PARTY_ID as long,",
+				"          PARTY_VID as long,",
+				"          NAME_PREFIX as string,",
+				"          FIRST_NAME as string,",
+				"          MIDDLE_NAME as string,",
+				"          LAST_NAME as string,",
+				"          FULL_NAME as string,",
+				"          DATE_OF_BIRTH as timestamp,",
+				"          GENDER as string,",
+				"          SSN as string,",
+				"          HIRE_DATE as timestamp,",
+				"          POLICYINATION_DATE as timestamp,",
+				"          EMAIL as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          PARTY_TYPE as string,",
+				"          PHYSICAL_GEN_ADDRESS_ID as long,",
+				"          HOME_PHONE_NUMBER as string,",
+				"          FAX_NUMBER as string,",
+				"          YEARS_WITH_EMPLOYER as integer,",
+				"          NAME_SUFFIX as string,",
+				"          MARITAL_STATUS as string,",
+				"          OCCUPATION as string,",
+				"          DOING_BUSINESS_AS as string,",
+				"          DECEASED_DATE as timestamp,",
+				"          IS_DECEASED_YN as string,",
+				"          GEN_ADDRESS_UNIQ_ID as long,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from POL_PARTY',",
+				"     format: 'query') ~> StagingParty",
+				"source(output(",
+				"          POLICY_ID as long,",
+				"          POLICY_VID as long,",
+				"          REINSURANCE_DAC as string,",
+				"          PREVIOUS_INSURANCE_NO_REMARKS as string,",
+				"          AGENCY_ID as long,",
+				"          AGENCY_OVID as long,",
+				"          PRODUCER_ID as long,",
+				"          PRODUCER_OVID as long,",
+				"          PRODUCER_CONTACT_ID as long,",
+				"          PRODUCER_CONTACT_OVID as long,",
+				"          POLICY_NUMBER as string,",
+				"          ENTITY_TYPE as string,",
+				"          ENTITY_STATUS as string,",
+				"          IS_RENEWAL_YN as string,",
+				"          REVISION_NUMBER as integer,",
+				"          PRODUCT_ID as long,",
+				"          PRODUCT_OVID as long,",
+				"          POLICY_EFFECTIVE_DATE as timestamp,",
+				"          POLICY_EXPIRATION_DATE as timestamp,",
+				"          NON_RENEWAL_CODE as string,",
+				"          POLICY_RENEWED_YN as string,",
+				"          CANCELLATION_DATE as timestamp,",
+				"          IS_RENEWABLE_YN as string,",
+				"          PREVIOUS_INSURANCE_NO_REASON as string,",
+				"          POLICY_STATUS as string,",
+				"          CANCEL_REASON_CODE as string,",
+				"          CANCEL_REASON_DESCRIPTION as string,",
+				"          CANCEL_METHOD as string,",
+				"          CANCEL_METHOD_DESC as string,",
+				"          LOSE_REASON_CODE as string,",
+				"          LOSE_REASON_DESC as string,",
+				"          DECLINATION_REASON_CODE as string,",
+				"          DECLINATION_REASON_DESC as string,",
+				"          NOT_WRITTEN_REASON_CODE as string,",
+				"          NOT_WRITTEN_REASON_DESC as string,",
+				"          POLICY_STATE_CODE as string,",
+				"          PROGRAM_ID as long,",
+				"          PROGRAM_OVID as long,",
+				"          BILLING_TYPE_CODE as string,",
+				"          UNDERWRITING_COMPANY_ID as long,",
+				"          UNDERWRITING_COMPANY_OVID as long,",
+				"          SUBMISSION_ID as long,",
+				"          PREVIOUS_INSURANCE_YN as string,",
+				"          LEGACY_POLICY_NUMBER as string,",
+				"          POLICY_POLICY as short,",
+				"          PAYMENT_PLAN as string,",
+				"          APPLICATION_RECEIVED_DATE as timestamp,",
+				"          INCEPTION_DATE as timestamp,",
+				"          BILL_TYPE as string,",
+				"          FORMS_LANGUAGE as string,",
+				"          BASE_CURRENCY as string,",
+				"          INVOICE_CURRENCY as string,",
+				"          PREVIOUS_POLICY_ID as long,",
+				"          PREVIOUS_POLICY_OVID as long,",
+				"          REVISED_FROM_POLICY_ID as long,",
+				"          REVISED_FROM_POLICY_OVID as long,",
+				"          OPERATING_COMPANY_ID as long,",
+				"          OPERATING_COMPANY_OVID as long,",
+				"          CONVERTED_FROM_ID as long,",
+				"          CONVERTED_FROM_OVID as long,",
+				"          INSTALLMENT_RENEWAL as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: (\"select * from POL_POLICY where policy_number like '{$policyPrefix}%'\"+iif(size($policies) >0&& size($policies) ==1&&$policies[1] =='','','and policy_number in ('+dropLeft(toString(reduce($policies, \"'\", #acc + \",'\" + #item +\"'\", #result)), 2)+')')),",
+				"     format: 'query') ~> StagingPolicy",
+				"source(output(",
+				"          ROLE_ID as long,",
+				"          ROLE_VID as long,",
+				"          ROLE_CODE as string,",
+				"          ROLE_DESCRIPTION as string,",
+				"          IS_PRIMARY_INSURED_YN as string,",
+				"          IS_DRIVER_YN as string,",
+				"          IS_CUSTOMER_YN as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> StagingPartyRole",
+				"source(output(",
+				"          maxId as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT isnull(MAX(POLICY_PARTY_ROLE_BRIDGE_ID), 0) as maxId\\nFROM dbo.POL_POLICY_PARTY_ROLE_BRIDGE',",
+				"     format: 'query') ~> bridgeMaxId",
+				"derivedColumn6 compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet1@(output1)",
+				"EcmParty derive(full_name = iif(isNull(CorporateName)|| trim(CorporateName)=='', concatWS(\" \", trim(FirstName), trim(MiddleName), trim(LastName)), trim(CorporateName))) ~> derivedColumn1",
+				"StagingParty select(mapColumn(",
+				"          PARTY_ID,",
+				"          PARTY_OVID = PARTY_VID,",
+				"          FULL_NAME",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"derivedColumn1 select(mapColumn(",
+				"          full_name,",
+				"          policy = Policy",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"StagingPolicy select(mapColumn(",
+				"          POLICY_ID,",
+				"          POLICY_OVID = POLICY_VID,",
+				"          AGENCY_ID,",
+				"          AGENCY_OVID,",
+				"          PRODUCER_ID,",
+				"          PRODUCER_OVID,",
+				"          POLICY_NUMBER",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select3, sourceStagePartyLookup join(POLICY_NUMBER == policy,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"filter3 derive(party_id_array = [PARTY_ID,AGENCY_ID,PRODUCER_ID],",
+				"          party_ovid_array = [iif(isNull(PARTY_OVID), toLong(1), PARTY_OVID),iif(isNull(AGENCY_OVID), toLong(1), AGENCY_OVID),iif(isNull(PRODUCER_OVID), toLong(1), PRODUCER_OVID)],",
+				"          role_array = ['INSURED', 'AGENCY', 'PRODUCER']) ~> derivedColumn2",
+				"derivedColumn4 foldDown(unroll(final_array),",
+				"     mapColumn(",
+				"          POLICY_ID,",
+				"          POLICY_OVID,",
+				"          final_array",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"derivedColumn2 derive(final_array = mapIndex(party_id_array, toString(#item)+'_'+toString(party_ovid_array[#index])+'_'+role_array[#index])) ~> derivedColumn4",
+				"flatten1 derive(PARTY_ID = toLong(split(toString(final_array), \"_\")[1]),",
+				"          PARTY_OVID = toLong(split(toString(final_array), \"_\")[2]),",
+				"          ROLE = split(toString(final_array), \"_\")[3],",
+				"          SOURCE_SYSTEM = 'ECM') ~> derivedColumn5",
+				"StagingPartyRole select(mapColumn(",
+				"          ROLE_ID,",
+				"          ROLE_OVID = ROLE_VID,",
+				"          ROLE_CODE",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"derivedColumn5, select4 join(ROLE == ROLE_CODE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"select2, select1 join(select2@full_name == select1@FULL_NAME,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> sourceStagePartyLookup",
+				"filter1 keyGenerate(output(skey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey2",
+				"surrogateKey2 derive(POLICY_PARTY_ROLE_BRIDGE_ID = skey+maxIdCache#outputs()[1].maxId) ~> derivedColumn6",
+				"select5 filter(!isNull(POLICY_ID) && !isNull(ROLE_ID) && !isNull(PARTY_ID) && !isNull(POLICY_OVID) && !isNull(ROLE_OVID) && !isNull(PARTY_OVID)) ~> filter1",
+				"sourceStagePartyLookup filter(startsWith(policy, 'EMP')) ~> filter2",
+				"join1 filter(!isNull(PARTY_ID)) ~> filter3",
+				"join2, select1 lookup(derivedColumn5@PARTY_ID == select1@PARTY_ID,",
+				"     multiple: false,",
+				"     pickup: 'first',",
+				"     asc(select1@PARTY_ID, true),",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 select(mapColumn(",
+				"          POLICY_ID,",
+				"          POLICY_OVID,",
+				"          final_array,",
+				"          ROLE,",
+				"          SOURCE_SYSTEM,",
+				"          ROLE_ID,",
+				"          ROLE_OVID,",
+				"          ROLE_CODE,",
+				"          PARTY_ID = select1@PARTY_ID,",
+				"          PARTY_OVID = select1@PARTY_OVID,",
+				"          FULL_NAME",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select5",
+				"flowlet1@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          POLICY_PARTY_ROLE_BRIDGE_ID as long,",
+				"          ROLE_ID as long,",
+				"          ROLE_OVID as long,",
+				"          POLICY_ID as long,",
+				"          POLICY_OVID as long,",
+				"          PARTY_ID as long,",
+				"          PARTY_OVID as long,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          SOURCE_SYSTEM as string,",
+				"          SOURCE_KEY as string,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DATA_HASH as binary,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StagingPolicyPartyRoleBridge",
+				"bridgeMaxId sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> maxIdCache"
+			]
+		}
+	}
+}

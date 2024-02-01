@@ -1,0 +1,424 @@
+{
+	"name": "df_stage_section",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_coverage",
+						"type": "DatasetReference"
+					},
+					"name": "SScoverages"
+				},
+				{
+					"dataset": {
+						"referenceName": "ECMBPA_COV_MAP",
+						"type": "DatasetReference"
+					},
+					"name": "EcmBPACovMap"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_coverage",
+						"type": "DatasetReference"
+					},
+					"name": "targetCoverage"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "targetPolicy"
+				},
+				{
+					"dataset": {
+						"referenceName": "targetSection",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "targetPolicyCopy"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "sourceStgPolicy"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "targetSection",
+						"type": "DatasetReference"
+					},
+					"name": "targetSection"
+				},
+				{
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedMap"
+				},
+				{
+					"name": "onlymatchedCoverages"
+				},
+				{
+					"name": "aggregateByPolivyIdByBPASecCode"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "reaplceCoverages"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "targetCoverageDerived"
+				},
+				{
+					"name": "joinToSrcCoverageTemplate"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "filteredCov"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "join3"
+				},
+				{
+					"name": "joinPolicy"
+				},
+				{
+					"name": "derivedColumn6"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "join4"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "derivedColumn7"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "derivedColumn8"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "aggregate2"
+				},
+				{
+					"name": "derivedColumn9"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     policyPrefix as string ('EMP')",
+				"}",
+				"source(output(",
+				"          POLICY_ID as long,",
+				"          COVERAGE_ID as long,",
+				"          COVERAGE_CODE as string,",
+				"          RISK_ID as long,",
+				"          LOCATION_ID as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: ' select  pc.POLICY_ID,pc.COVERAGE_ID,pc.COVERAGE_CODE,ptl.RISK_ID,ptl.LOCATION_ID  from POL_COVERAGE pc join POL_TX_LIMIT_DED_OPT ptl on ptl.COVERAGE_ID=pc.COVERAGE_ID ',",
+				"     format: 'query') ~> SScoverages",
+				"source(output(",
+				"          COV_SEQ as string,",
+				"          BPA_SECTION_CODE as string,",
+				"          COVERAGE_CODE as string,",
+				"          COVERAGE_CODE_DES as string,",
+				"          BPA_COVERAGE_CODES as string,",
+				"          BPA_COVERAGES as string,",
+				"          COVERAGES as string,",
+				"          BPA_PRODUCT_CODE as string,",
+				"          SI_NO as string,",
+				"          id as long,",
+				"          BPA_SEC_NAME as string,",
+				"          SOURCE_PRODUCT_CODE as string,",
+				"          bpa_coverage_group as string,",
+				"          bpa_coverage_level as string,",
+				"          bpa_coverage_type as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> EcmBPACovMap",
+				"source(output(",
+				"          coverage_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          coverage_code as string,",
+				"          risk_id as long,",
+				"          location_id as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from coverage ',",
+				"     format: 'query') ~> targetCoverage",
+				"source(output(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from policy',",
+				"     format: 'query') ~> targetPolicy",
+				"source(output(",
+				"          section_id as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select coalesce(MAX(section_id),0) as section_id from bpa_section',",
+				"     format: 'query') ~> source2",
+				"source(output(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from policy ',",
+				"     format: 'query') ~> targetPolicyCopy",
+				"source(output(",
+				"          POLICY_ID as long,",
+				"          POLICY_VID as long,",
+				"          REINSURANCE_DAC as string,",
+				"          PREVIOUS_INSURANCE_NO_REMARKS as string,",
+				"          AGENCY_ID as long,",
+				"          AGENCY_OVID as long,",
+				"          PRODUCER_ID as long,",
+				"          PRODUCER_OVID as long,",
+				"          PRODUCER_CONTACT_ID as long,",
+				"          PRODUCER_CONTACT_OVID as long,",
+				"          POLICY_NUMBER as string,",
+				"          ENTITY_TYPE as string,",
+				"          ENTITY_STATUS as string,",
+				"          IS_RENEWAL_YN as string,",
+				"          REVISION_NUMBER as integer,",
+				"          PRODUCT_ID as long,",
+				"          PRODUCT_OVID as long,",
+				"          POLICY_EFFECTIVE_DATE as timestamp,",
+				"          POLICY_EXPIRATION_DATE as timestamp,",
+				"          NON_RENEWAL_CODE as string,",
+				"          POLICY_RENEWED_YN as string,",
+				"          CANCELLATION_DATE as timestamp,",
+				"          IS_RENEWABLE_YN as string,",
+				"          PREVIOUS_INSURANCE_NO_REASON as string,",
+				"          POLICY_STATUS as string,",
+				"          CANCEL_REASON_CODE as string,",
+				"          CANCEL_REASON_DESCRIPTION as string,",
+				"          CANCEL_METHOD as string,",
+				"          CANCEL_METHOD_DESC as string,",
+				"          LOSE_REASON_CODE as string,",
+				"          LOSE_REASON_DESC as string,",
+				"          DECLINATION_REASON_CODE as string,",
+				"          DECLINATION_REASON_DESC as string,",
+				"          NOT_WRITTEN_REASON_CODE as string,",
+				"          NOT_WRITTEN_REASON_DESC as string,",
+				"          POLICY_STATE_CODE as string,",
+				"          PROGRAM_ID as long,",
+				"          PROGRAM_OVID as long,",
+				"          BILLING_TYPE_CODE as string,",
+				"          UNDERWRITING_COMPANY_ID as long,",
+				"          UNDERWRITING_COMPANY_OVID as long,",
+				"          SUBMISSION_ID as long,",
+				"          PREVIOUS_INSURANCE_YN as string,",
+				"          LEGACY_POLICY_NUMBER as string,",
+				"          STATE as string,",
+				"          POLICY_POLICY as integer,",
+				"          PAYMENT_PLAN as string,",
+				"          APPLICATION_RECEIVED_DATE as timestamp,",
+				"          INCEPTION_DATE as timestamp,",
+				"          BILL_TYPE as string,",
+				"          FORMS_LANGUAGE as string,",
+				"          BASE_CURRENCY as string,",
+				"          INVOICE_CURRENCY as string,",
+				"          PREVIOUS_POLICY_ID as long,",
+				"          PREVIOUS_POLICY_OVID as long,",
+				"          REVISED_FROM_POLICY_ID as long,",
+				"          REVISED_FROM_POLICY_OVID as long,",
+				"          OPERATING_COMPANY_ID as long,",
+				"          OPERATING_COMPANY_OVID as long,",
+				"          CONVERTED_FROM_ID as long,",
+				"          CONVERTED_FROM_OVID as long,",
+				"          INSTALLMENT_RENEWAL as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from pol_policy ',",
+				"     format: 'query') ~> sourceStgPolicy",
+				"SScoverages derive(lob = case(split(COVERAGE_CODE,'-')[3] == '091','CFA',split(COVERAGE_CODE,'-')[3] == '087','EMP'),",
+				"          srcCoverageGrCode = split(COVERAGE_CODE,'-')[4],",
+				"          srcCoverageSeq = split(COVERAGE_CODE,'-')[5],",
+				"          productCode = $policyPrefix) ~> derivedColumn1",
+				"EcmBPACovMap derive(COVERAGE_CODE = COVERAGE_CODE) ~> derivedMap",
+				"join3 filter(!isNull(COV_SEQ)) ~> onlymatchedCoverages",
+				"derivedColumn2 aggregate(groupBy(policy_id = targetPolicy_id,",
+				"          BPA_SECTION_CODE),",
+				"     coverage = collect(coverageJson)) ~> aggregateByPolivyIdByBPASecCode",
+				"filter1 derive(lineOfBusinessCode = case(lob=='CFA','CAUT',",
+				"     lob=='EMP','EQMR'),",
+				"          coverTypeCode = BPA_SECTION_CODE) ~> derivedColumn2",
+				"surrogateKey1 derive(policy_id = policy_id,",
+				"          json_data = toString(@(lineOfBusinessCode='EQMR',",
+				"          coverTypeCode=BPA_SECTION_CODE,",
+				"          coverage=coverage,",
+				"          insurableObject=array(),",
+				"          location=array()",
+				"          )),",
+				"          section_code = BPA_SECTION_CODE,",
+				"          section_id = sink1#outputs()[1].section_id + pkey) ~> reaplceCoverages",
+				"derivedColumn9 keyGenerate(output(pkey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"targetCoverage derive(json_data = unescape(json_data, 'json'),",
+				"          targetPolicyID = policy_id) ~> targetCoverageDerived",
+				"derivedColumn1, derivedMap join(lob == BPA_PRODUCT_CODE",
+				"     && srcCoverageGrCode == derivedMap@COVERAGE_CODE",
+				"     && srcCoverageSeq == COV_SEQ,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinToSrcCoverageTemplate",
+				"aggregateByPolivyIdByBPASecCode derive(coverage = distinct(coverage)) ~> derivedColumn3",
+				"split1@unitLevelaggregation, filteredCov join(targetPolicy_id == targetPolicy@policy_id",
+				"     && split1@unitLevelaggregation@COVERAGE_ID == targetCoverage@coverage_id",
+				"     && split1@unitLevelaggregation@RISK_ID == targetCoverage@risk_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"targetCoverageDerived, targetPolicy join(targetCoverage@policy_id == targetPolicy@policy_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join2 derive(policyPrefixTemp = substring(policy_number,1, 3),",
+				"          coverageJson = targetCoverageDerived@json_data) ~> derivedColumn4",
+				"derivedColumn4 filter(policyPrefixTemp == $policyPrefix) ~> filteredCov",
+				"join1 filter(lob == $policyPrefix && !isNull(targetPolicyID)) ~> filter1",
+				"joinToSrcCoverageTemplate, joinPolicy join(SScoverages@POLICY_ID == targetPolicyCopy@policy_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join3",
+				"derivedColumn6, sourceStgPolicy join(targetPolicyCopy@policy_number == sourceStgPolicy@POLICY_NUMBER,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinPolicy",
+				"targetPolicyCopy derive(targetPolicy_id = policy_id) ~> derivedColumn6",
+				"onlymatchedCoverages split(!isNull(RISK_ID),",
+				"     disjoint: false) ~> split1@(unitLevelaggregation, policyLevelaggregation)",
+				"split1@policyLevelaggregation, filteredCov join(targetPolicy_id == targetCoverage@policy_id",
+				"     && split1@policyLevelaggregation@COVERAGE_ID == targetCoverage@coverage_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join4",
+				"join4 filter(lob == $policyPrefix && !isNull(targetPolicyID)) ~> filter2",
+				"filter2 derive(lineOfBusinessCode = case(lob=='CFA','CAUT',     lob=='EMP','EQMR'),",
+				"          coverTypeCode = BPA_SECTION_CODE) ~> derivedColumn7",
+				"derivedColumn7 aggregate(groupBy(targetPolicy_id,",
+				"          BPA_SECTION_CODE),",
+				"     coverage = collect(coverageJson)) ~> aggregate1",
+				"aggregate1 derive(coverage = distinct(coverage),",
+				"          policy_id = targetPolicy_id) ~> derivedColumn8",
+				"derivedColumn3, derivedColumn8 union(byName: true)~> union1",
+				"union1 aggregate(groupBy(policy_id,",
+				"          BPA_SECTION_CODE),",
+				"     coverage = collect(coverage)) ~> aggregate2",
+				"aggregate2 derive(coverage = flatten(coverage)) ~> derivedColumn9",
+				"reaplceCoverages sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          section_id as integer,",
+				"          policy_id as integer,",
+				"          coverage_id as integer,",
+				"          location_id as integer,",
+				"          limit_id as integer,",
+				"          deductible_id as integer,",
+				"          insurableobject_id as integer,",
+				"          json_data as string,",
+				"          extendedattributes as string,",
+				"          section_code as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> targetSection",
+				"source2 sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> sink1"
+			]
+		}
+	}
+}

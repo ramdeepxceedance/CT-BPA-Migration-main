@@ -1,0 +1,77 @@
+{
+	"name": "df_target_premium_report",
+	"properties": {
+		"folder": {
+			"name": "utility"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_target_rater_report",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "rater_report",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          source_policy_number as string,",
+				"          stage_policy_number as string,",
+				"          target_policy_number as string,",
+				"          transaction_type as string,",
+				"          source_coverage_code as string,",
+				"          target_coverage_code as string,",
+				"          source_insurable_object as string,",
+				"          target_insurable_object as string,",
+				"          target_section as string,",
+				"          source_premium as string,",
+				"          target_premium as string,",
+				"          batch_id as integer,",
+				"          bpa_tenant_id as string,",
+				"          product_code as string,",
+				"          created_at as timestamp,",
+				"          updated_at as timestamp,",
+				"          horse_breed as string,",
+				"          horse_sex as string,",
+				"          use as string,",
+				"          age_in_years as string,",
+				"          year_born as string,",
+				"          purchase_date as string,",
+				"          purchase_price as string,",
+				"          requested_limit as string,",
+				"          location_state as string,",
+				"          target_section_name as string,",
+				"          target_coverage_name as string,",
+				"          source_coverage_name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Code as string,",
+				"          Description as string,",
+				"          SubCode as string,",
+				"          Order as string,",
+				"          ExtendedAttributes as string",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

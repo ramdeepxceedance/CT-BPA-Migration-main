@@ -1,0 +1,209 @@
+{
+	"name": "df_stage_Deductible",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_POL_TX_LIMIT_DED_OPT",
+						"type": "DatasetReference"
+					},
+					"name": "stageDeductible"
+				},
+				{
+					"dataset": {
+						"referenceName": "ECMBPA_COV_MAP",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_coverage",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_deductible",
+						"type": "DatasetReference"
+					},
+					"name": "TargetdeductSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggByPolByCoverByRiskID"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "columnMapping"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "derivedColumn2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          TX_LIMIT_DED_OPT_ID as long,",
+				"          TX_ID as long,",
+				"          LOCATION_ID as long,",
+				"          LOCATION_OVID as long,",
+				"          SECTION_ID as long,",
+				"          SECTION_OVID as long,",
+				"          TX_BRIDGE_ID as long,",
+				"          RISK_ID as long,",
+				"          RISK_OVID as long,",
+				"          POLICY_ID as long,",
+				"          POLICY_OVID as long,",
+				"          LIMIT_DED_OPT_TYPE_ID as long,",
+				"          LDO_FLAG as string,",
+				"          LDO_CODE as string,",
+				"          LIMIT_OCCURRENCE_FLAG as string,",
+				"          LDO_VALUE as long,",
+				"          LDO_VALUE_CCY_CODE as string,",
+				"          LDO_PERCENTAGE as decimal(6,4),",
+				"          LDO_TEXT as string,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          DATA_HASH as binary,",
+				"          SOURCE_KEY as string,",
+				"          COVERAGE_ID as long,",
+				"          COVERAGE_OVID as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select *  from [dbo].[POL_TX_LIMIT_DED_OPT]  where LIMIT_DED_OPT_TYPE_ID =1 ',",
+				"     format: 'query') ~> stageDeductible",
+				"source(output(",
+				"          COV_SEQ as string,",
+				"          BPA_SECTION_CODE as string,",
+				"          COVERAGE_CODE as string,",
+				"          COVERAGE_CODE_DES as string,",
+				"          BPA_COVERAGE_CODES as string,",
+				"          BPA_COVERAGES as string,",
+				"          COVERAGES as string,",
+				"          BPA_PRODUCT_CODE as string,",
+				"          SI_NO as string,",
+				"          id as long,",
+				"          BPA_SEC_NAME as string,",
+				"          SOURCE_PRODUCT_CODE as string,",
+				"          bpa_coverage_group as string,",
+				"          bpa_coverage_level as string,",
+				"          bpa_coverage_type as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source(output(",
+				"          COVERAGE_ID as long,",
+				"          COVERAGE_VID as long,",
+				"          COVERAGE_CODE_ID as long,",
+				"          POLICY_ID as long,",
+				"          POLICY_OVID as long,",
+				"          COV_STATE_ID as long,",
+				"          COVERAGE_EFFECTIVE_DATE as timestamp,",
+				"          COVERAGE_EXPIRATION_DATE as timestamp,",
+				"          ASL_CODE as string,",
+				"          ASSL_CODE as string,",
+				"          ASL_CODE_GBL as string,",
+				"          ASSL_CODE_GBL as string,",
+				"          CLASSIFICATION_CODE_ID as long,",
+				"          CLASSIFICATION_CODE_OVID as long,",
+				"          COVERAGE_CODE as string,",
+				"          RETROACTIVE_DATE as timestamp,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source2",
+				"filter1 aggregate(groupBy(stageDeductible@POLICY_ID,",
+				"          stageDeductible@COVERAGE_ID,",
+				"          RISK_ID,",
+				"          LDO_CODE),",
+				"     json_data = toString(collect(@(typeCode=\"Per Claim\",name=toString(deductibleName),valueType='amount',value=LDO_VALUE,currencyCode='USD')))) ~> aggByPolByCoverByRiskID",
+				"columnMapping keyGenerate(output(deductible_id as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"aggByPolByCoverByRiskID derive(coverage_id = COVERAGE_ID,",
+				"          risk_id = RISK_ID) ~> columnMapping",
+				"source2 derive(seq = split(COVERAGE_CODE, '-')[5]) ~> derivedColumn1",
+				"derivedColumn2, select1 join(COV_SEQ == seq,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"derivedColumn1 select(mapColumn(",
+				"          COVERAGE_ID,",
+				"          POLICY_ID,",
+				"          COVERAGE_CODE,",
+				"          seq",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"stageDeductible, join1 lookup(stageDeductible@COVERAGE_ID == select1@COVERAGE_ID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 filter(!isNull(COV_SEQ)) ~> filter1",
+				"source1 derive(deductibleName = case(BPA_COVERAGE_CODES=='EMMS', 'Major Medical Deductible', BPA_COVERAGE_CODES=='EMMSP','Major Medical Plus Deductible',BPA_COVERAGE_CODES=='EACI','Equine Accident Illness Deductible',BPA_COVERAGE_CODES=='EQSG','Equine Surgical Deductible',BPA_COVERAGE_CODES=='EQSG','Equine Surgical Deductible',BPA_COVERAGE_CODES=='EQCO','Equine Colic Deductible',",
+				"BPA_COVERAGE_CODES=='HE001', 'Tack (personal property)',BPA_COVERAGE_CODES=='HE001', 'Non-owned personal property'",
+				")) ~> derivedColumn2",
+				"surrogateKey1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          deductible_id as integer,",
+				"          coverage_id as integer,",
+				"          json_data as string,",
+				"          risk_id as long",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> TargetdeductSink"
+			]
+		}
+	}
+}

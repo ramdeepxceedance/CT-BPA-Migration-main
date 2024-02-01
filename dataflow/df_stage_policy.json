@@ -1,0 +1,256 @@
+{
+	"name": "df_stage_policy",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "StagingPolicy"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "pkey"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "targetPolicyEMP"
+				},
+				{
+					"name": "nextPkey"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "targetPolicyCFA"
+				}
+			],
+			"transformations": [
+				{
+					"name": "policyDefaultJsonEMP"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "nbsCheck"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "policyDefaultJsonCfa"
+				},
+				{
+					"name": "select2"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     policyPrefix as string ('CFA')",
+				"}",
+				"source(output(",
+				"          POLICY_ID as long,",
+				"          POLICY_VID as long,",
+				"          REINSURANCE_DAC as string,",
+				"          PREVIOUS_INSURANCE_NO_REMARKS as string,",
+				"          AGENCY_ID as long,",
+				"          AGENCY_OVID as long,",
+				"          PRODUCER_ID as long,",
+				"          PRODUCER_OVID as long,",
+				"          PRODUCER_CONTACT_ID as long,",
+				"          PRODUCER_CONTACT_OVID as long,",
+				"          POLICY_NUMBER as string,",
+				"          ENTITY_TYPE as string,",
+				"          ENTITY_STATUS as string,",
+				"          IS_RENEWAL_YN as string,",
+				"          REVISION_NUMBER as integer,",
+				"          PRODUCT_ID as long,",
+				"          PRODUCT_OVID as long,",
+				"          POLICY_EFFECTIVE_DATE as timestamp,",
+				"          POLICY_EXPIRATION_DATE as timestamp,",
+				"          NON_RENEWAL_CODE as string,",
+				"          POLICY_RENEWED_YN as string,",
+				"          CANCELLATION_DATE as timestamp,",
+				"          IS_RENEWABLE_YN as string,",
+				"          PREVIOUS_INSURANCE_NO_REASON as string,",
+				"          POLICY_STATUS as string,",
+				"          CANCEL_REASON_CODE as string,",
+				"          CANCEL_REASON_DESCRIPTION as string,",
+				"          CANCEL_METHOD as string,",
+				"          CANCEL_METHOD_DESC as string,",
+				"          LOSE_REASON_CODE as string,",
+				"          LOSE_REASON_DESC as string,",
+				"          DECLINATION_REASON_CODE as string,",
+				"          DECLINATION_REASON_DESC as string,",
+				"          NOT_WRITTEN_REASON_CODE as string,",
+				"          NOT_WRITTEN_REASON_DESC as string,",
+				"          POLICY_STATE_CODE as string,",
+				"          PROGRAM_ID as long,",
+				"          PROGRAM_OVID as long,",
+				"          BILLING_TYPE_CODE as string,",
+				"          UNDERWRITING_COMPANY_ID as long,",
+				"          UNDERWRITING_COMPANY_OVID as long,",
+				"          SUBMISSION_ID as long,",
+				"          PREVIOUS_INSURANCE_YN as string,",
+				"          LEGACY_POLICY_NUMBER as string,",
+				"          POLICY_POLICY as short,",
+				"          PAYMENT_PLAN as string,",
+				"          APPLICATION_RECEIVED_DATE as timestamp,",
+				"          INCEPTION_DATE as timestamp,",
+				"          BILL_TYPE as string,",
+				"          FORMS_LANGUAGE as string,",
+				"          BASE_CURRENCY as string,",
+				"          INVOICE_CURRENCY as string,",
+				"          PREVIOUS_POLICY_ID as long,",
+				"          PREVIOUS_POLICY_OVID as long,",
+				"          REVISED_FROM_POLICY_ID as long,",
+				"          REVISED_FROM_POLICY_OVID as long,",
+				"          OPERATING_COMPANY_ID as long,",
+				"          OPERATING_COMPANY_OVID as long,",
+				"          CONVERTED_FROM_ID as long,",
+				"          CONVERTED_FROM_OVID as long,",
+				"          INSTALLMENT_RENEWAL as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> StagingPolicy",
+				"source(output(",
+				"          policy_id as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select Max(policy_id) as policy_id from policy ',",
+				"     format: 'query') ~> pkey",
+				"split1@emp derive(json_data = toString(@(companyProductCode=\"EMPL\",",
+				"          lineofBusinessCode=\"EQMR\",",
+				"          isSTP=true(),",
+				"          effectiveDate='2024-01-01',",
+				"          expirationDate='2024-12-31',",
+				"          policyTerm=PAYMENT_PLAN,",
+				"          operatingCompanyCode=\"P204855\",",
+				"          productVersion=\"1.0\",",
+				"          statusCodeDisplayName=\"BoundPendingIssuance\",",
+				"          paymentInfo=billingInfo,",
+				"          carrierProcessingType=\"carrier\",",
+				"          currencyCode=\"USD\",",
+				"          section=array(),",
+				"          clientParticipant=array(),",
+				"          agent=array(),",
+				"          extendedAttributes=array(extendedAttributes)))) ~> policyDefaultJsonEMP",
+				"StagingPolicy keyGenerate(output(pkey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"derivedColumn1 derive(bptc = iif(REVISION_NUMBER==1,'NBS',''),",
+				"          bpt = iif(REVISION_NUMBER==1,'NBS','New Business'),",
+				"          clientParticipant = @(roleCode='insured',",
+				"          partyCode='P216723',",
+				"          subRoleCode='primaryInsured',",
+				"          professionalRole='insured'),",
+				"          agent = @(typeCode='writing',",
+				"          agencyCode='P334416',",
+				"          partyCode='P356264',",
+				"          agencyType='wholesale',",
+				"          agencyTier='T2'),",
+				"          extendedAttributes = @(name='externalPolicyNo',",
+				"          value=POLICY_NUMBER),",
+				"          billingInfo = @(billingType='DBI',",
+				"          paymentPlan='PPC001'),",
+				"          policy_number = POLICY_NUMBER) ~> nbsCheck",
+				"policyDefaultJsonEMP select(mapColumn(",
+				"          policy_id = split1@emp@POLICY_ID,",
+				"          policy_number = split1@emp@policy_number,",
+				"          json_data",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"surrogateKey1 derive(effectiveDate = split(toString(POLICY_EFFECTIVE_DATE), ' ')[1],",
+				"          expirationDate = split(toString(POLICY_EXPIRATION_DATE), ' ')[1],",
+				"          policy_id = toLong(nextPkey#outputs()[1].policy_id)+pkey) ~> derivedColumn1",
+				"pkey derive(policy_id = iifNull(policy_id, 0, policy_id)) ~> derivedColumn2",
+				"nbsCheck split($policyPrefix == 'EMP' && ENTITY_TYPE=='EMP',",
+				"     ENTITY_TYPE=='CFA' && $policyPrefix == 'CFA',",
+				"     disjoint: false) ~> split1@(emp, cfa, others)",
+				"split1@cfa derive(json_data = toString(@(companyProductCode=\"CFA1\",          lineofBusinessCode=\"CFA\",isSTP=true(),      effectiveDate= '2023-12-02' ,          expirationDate= '2024-12-31' ,         policyTerm=PAYMENT_PLAN,          operatingCompanyCode=\"P204855\",          productVersion=\"1.0\", statusCodeDisplayName=\"BoundPendingIssuance\",  paymentInfo=billingInfo   ,              carrierProcessingType=\"carrier\",                   currencyCode=\"USD\",         section=array(),clientParticipant=array(),agent=array(),extendedAttributes=array(extendedAttributes)))) ~> policyDefaultJsonCfa",
+				"policyDefaultJsonCfa select(mapColumn(",
+				"          policy_id = split1@cfa@policy_id,",
+				"          policy_number = split1@cfa@policy_number,",
+				"          json_data",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> targetPolicyEMP",
+				"derivedColumn2 sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> nextPkey",
+				"select2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> targetPolicyCFA"
+			]
+		}
+	}
+}

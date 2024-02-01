@@ -1,0 +1,249 @@
+{
+	"name": "df_stage_covLimit_risk_level_cov",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows/limits"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_POL_TX_LIMIT_DED_OPT",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_coverageExt",
+						"type": "DatasetReference"
+					},
+					"name": "osStagingCoverageExt"
+				},
+				{
+					"dataset": {
+						"referenceName": "ECMBPA_COV_MAP",
+						"type": "DatasetReference"
+					},
+					"name": "srcBpaCovMap"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_BPA_limit",
+						"type": "DatasetReference"
+					},
+					"name": "BPAlimitRef"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_limit",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_limit",
+						"type": "DatasetReference"
+					},
+					"name": "TargetlimitSink"
+				},
+				{
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "limitNameBySeq"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "join3"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "policyPrefixFilter"
+				},
+				{
+					"name": "filter2"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     policyPrefix as string ('CFA'),",
+				"     locationCode as string ('MT')",
+				"}",
+				"source(output(",
+				"          TX_LIMIT_DED_OPT_ID as long,",
+				"          TX_ID as long,",
+				"          LOCATION_ID as long,",
+				"          LOCATION_OVID as long,",
+				"          SECTION_ID as long,",
+				"          SECTION_OVID as long,",
+				"          TX_BRIDGE_ID as long,",
+				"          RISK_ID as long,",
+				"          RISK_OVID as long,",
+				"          POLICY_ID as long,",
+				"          POLICY_OVID as long,",
+				"          LIMIT_DED_OPT_TYPE_ID as long,",
+				"          LDO_FLAG as string,",
+				"          LDO_CODE as string,",
+				"          LIMIT_OCCURRENCE_FLAG as string,",
+				"          LDO_VALUE as long,",
+				"          LDO_VALUE_CCY_CODE as string,",
+				"          LDO_PERCENTAGE as decimal(6,4),",
+				"          LDO_TEXT as string,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          DATA_HASH as binary,",
+				"          SOURCE_KEY as string,",
+				"          COVERAGE_ID as long,",
+				"          COVERAGE_OVID as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select *  from [dbo].[POL_TX_LIMIT_DED_OPT]  where LIMIT_DED_OPT_TYPE_ID !=1  and LDO_CODE=\\'LIMIT1\\' ',",
+				"     format: 'query') ~> source1",
+				"source(output(",
+				"          COVERAGE_ID as long,",
+				"          POLICY_ID as long,",
+				"          ARICCoverageSequence as integer,",
+				"          ARICGroupCode as string,",
+				"          ARICLOB as string,",
+				"          CoverageDescription as string,",
+				"          COVERAGE_CODE as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select ext.COVERAGE_ID AS COVERAGE_ID ,pc.POLICY_ID,ext.ARICCoverageSequence,ARICGroupCode,ARICLOB,CoverageDescription,pc.COVERAGE_CODE from [dbo].[POL_COVERAGE_EXT] ext\\njoin POL_COVERAGE pc on ext.COVERAGE_ID=pc.COVERAGE_ID\\n',",
+				"     format: 'query') ~> osStagingCoverageExt",
+				"source(output(",
+				"          COV_SEQ as string,",
+				"          BPA_SECTION_CODE as string,",
+				"          COVERAGE_CODE as string,",
+				"          COVERAGE_CODE_DES as string,",
+				"          BPA_COVERAGE_CODES as string,",
+				"          BPA_COVERAGES as string,",
+				"          COVERAGES as string,",
+				"          BPA_PRODUCT_CODE as string,",
+				"          SI_NO as string,",
+				"          id as long,",
+				"          BPA_SEC_NAME as string,",
+				"          SOURCE_PRODUCT_CODE as string,",
+				"          bpa_coverage_group as string,",
+				"          bpa_coverage_level as string,",
+				"          bpa_coverage_type as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> srcBpaCovMap",
+				"source(output(",
+				"          limit_id as long,",
+				"          coverageCode as string,",
+				"          secCode as string,",
+				"          limitValueType as string,",
+				"          limitTypeCode as string,",
+				"          limitName as string,",
+				"          coverage_group_code as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> BPAlimitRef",
+				"source(output(",
+				"          limit_id as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select coalesce ( MAX(limit_id),0) as limit_id from cov_limit',",
+				"     format: 'query') ~> source2",
+				"filter1 aggregate(groupBy(source1@POLICY_ID,",
+				"          source1@COVERAGE_ID,",
+				"          RISK_ID,",
+				"          limit_id,",
+				"          LDO_CODE),",
+				"     json_data = toString(collect(@(name=limitName,typeCode=limitTypeCode,valueType=limitValueType,value=LDO_VALUE,currencyCode='USD')))) ~> aggregate1",
+				"derivedColumn1 keyGenerate(output(limit_id_pkey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"aggregate1 derive(coverage_id = COVERAGE_ID,",
+				"          risk_id = RISK_ID) ~> derivedColumn1",
+				"osStagingCoverageExt, srcBpaCovMap join(split(osStagingCoverageExt@COVERAGE_CODE,'-')[4] == srcBpaCovMap@COVERAGE_CODE",
+				"     && toString(ARICCoverageSequence) == COV_SEQ,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join3 derive(srcCovId = COVERAGE_ID,",
+				"          limitName = limitName) ~> limitNameBySeq",
+				"source1, policyPrefixFilter join(source1@POLICY_ID == osStagingCoverageExt@POLICY_ID",
+				"     && source1@COVERAGE_ID == osStagingCoverageExt@COVERAGE_ID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join1, filter2 join(BPA_COVERAGE_CODES == coverageCode,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join3",
+				"surrogateKey1 derive(limit_id = sink2#outputs()[1].limit_id + limit_id_pkey) ~> derivedColumn2",
+				"join2 filter(!isNull(RISK_ID)) ~> filter1",
+				"limitNameBySeq filter(SOURCE_PRODUCT_CODE == $policyPrefix) ~> policyPrefixFilter",
+				"BPAlimitRef filter(coverage_group_code == 'LI' ||coverage_group_code == 'PD' ||coverage_group_code == 'CN' || coverage_group_code == $locationCode || isNull(coverage_group_code)) ~> filter2",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          limit_id as integer,",
+				"          coverage_id as integer,",
+				"          json_data as string,",
+				"          risk_id as long",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 2) ~> TargetlimitSink",
+				"source2 sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> sink2"
+			]
+		}
+	}
+}

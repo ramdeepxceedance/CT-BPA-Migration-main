@@ -1,0 +1,167 @@
+{
+	"name": "df_stage_horsedetails_lookup",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows/lookupDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_horseBreed_lookup",
+						"type": "DatasetReference"
+					},
+					"name": "horseBreedCodes"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_horseDetailsLookup",
+						"type": "DatasetReference"
+					},
+					"name": "stageHorseDetailsLookup"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_horseSex_lookup",
+						"type": "DatasetReference"
+					},
+					"name": "horseSexCodes"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_horseUse_lookup",
+						"type": "DatasetReference"
+					},
+					"name": "horseUseCodes"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_horseDetailsLookup",
+						"type": "DatasetReference"
+					},
+					"name": "horseDetailsBreedTarget"
+				},
+				{
+					"name": "lookupCache"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "union1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Code as string,",
+				"          Description as string,",
+				"          SubCode as string,",
+				"          Order as string,",
+				"          ExtendedAttributes as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> horseBreedCodes",
+				"source(output(",
+				"          id as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select MAX(lookup_id)  as id from bpa_horse_details_lookup',",
+				"     format: 'query') ~> stageHorseDetailsLookup",
+				"source(output(",
+				"          Code as string,",
+				"          Description as string,",
+				"          SubCode as string,",
+				"          Order as string,",
+				"          ExtendedAttributes as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> horseSexCodes",
+				"source(output(",
+				"          Code as string,",
+				"          Description as string,",
+				"          SubCode as string,",
+				"          Order as string,",
+				"          ExtendedAttributes as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> horseUseCodes",
+				"surrogateKey1 derive(lookup_id = pkey + lookupCache#outputs()[1].id,",
+				"          desc = trim(Description)) ~> derivedColumn1",
+				"stageHorseDetailsLookup derive(id = iifNull(id, 0, id)) ~> derivedColumn2",
+				"union1 keyGenerate(output(pkey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"horseBreedCodes select(mapColumn(",
+				"          Code,",
+				"          Description",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"horseSexCodes select(mapColumn(",
+				"          Code,",
+				"          Description",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"horseUseCodes select(mapColumn(",
+				"          Code,",
+				"          Description",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select1, select2, select3 union(byName: true)~> union1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          lookup_id as integer,",
+				"          bpa_code as string,",
+				"          bpa_code_desc as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          lookup_id,",
+				"          bpa_code = Code,",
+				"          bpa_code_desc = desc",
+				"     )) ~> horseDetailsBreedTarget",
+				"derivedColumn2 sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 0) ~> lookupCache"
+			]
+		}
+	}
+}

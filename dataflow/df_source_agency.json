@@ -1,0 +1,190 @@
+{
+	"name": "df_source_agency",
+	"properties": {
+		"folder": {
+			"name": "Source Stage Data Flows/referenceDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_agent",
+						"type": "DatasetReference"
+					},
+					"name": "agencySource"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_agency",
+						"type": "DatasetReference"
+					},
+					"name": "agencySourceLookup"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_agency",
+						"type": "DatasetReference"
+					},
+					"name": "agencyStaging"
+				}
+			],
+			"transformations": [
+				{
+					"name": "metadataflowlet",
+					"flowlet": {
+						"referenceName": "fl_source_addDefaultColumnFlowlet",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FL_batch": "1"
+						}
+					}
+				},
+				{
+					"name": "requiredSourceAgencyColumns"
+				},
+				{
+					"name": "derivedOtherRequiredColumns"
+				},
+				{
+					"name": "agencySurrogateKey"
+				},
+				{
+					"name": "requiredStagingAgencyColumns"
+				},
+				{
+					"name": "deriveAgencyName"
+				},
+				{
+					"name": "groupByAgencyName"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     DF_max_id as integer (1)",
+				"}",
+				"source(output(",
+				"          AgentCode as string,",
+				"          AgentName as string,",
+				"          GroupCode as string,",
+				"          AgentStatus as string,",
+				"          StartDate as date,",
+				"          EndDate as date,",
+				"          AgentOffice as string,",
+				"          RenewalNoticeDays as integer,",
+				"          AuditExclusion as string,",
+				"          AuditThreshold as decimal(8,0),",
+				"          IssuanceGroup as string,",
+				"          DefaultBusinessDivisionID as integer,",
+				"          DefaultPricingProductID as integer,",
+				"          OfficeID as integer,",
+				"          EMail as string,",
+				"          AgentAddress1 as string,",
+				"          AgentAddress2 as string,",
+				"          AgentAddress3 as string,",
+				"          AgentCity as string,",
+				"          AgentState as string,",
+				"          AgentZipCode as string,",
+				"          AgentPhone as string,",
+				"          AgentCounty as string,",
+				"          AgentContact as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> agencySource",
+				"source(output(",
+				"          AGENCY_ID as long,",
+				"          AGENCY_VID as long,",
+				"          AGENCY_GEN_ADDRESS_ID as long,",
+				"          AGENCY_CODE as string,",
+				"          AGENCY_NAME as string,",
+				"          AGENCY_STATUS as string,",
+				"          AGENCY_CATEGORY as string,",
+				"          DIRECT_BILL_FLAG_YN as string,",
+				"          TELEPHONE as string,",
+				"          FAX as string,",
+				"          EMAIL_ID as string,",
+				"          WEBSITE as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          ENTITY_TYPE as string,",
+				"          ENTITY_PARENT_ID as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> agencySourceLookup",
+				"derivedOtherRequiredColumns compose(mapParameter(",
+				"          FL_batch = 1",
+				"     ),",
+				"     composition: 'fl_source_addDefaultColumnFlowlet') ~> metadataflowlet@(output1)",
+				"agencySource select(mapColumn(",
+				"          AGENCY_CODE = AgentCode,",
+				"          GIVEN_AGENCY_NAME = AgentName,",
+				"          AGENCY_CATEGORY = GroupCode,",
+				"          AGENCY_STATUS = AgentStatus,",
+				"          EMAIL_ID = EMail,",
+				"          TELEPHONE = AgentPhone",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> requiredSourceAgencyColumns",
+				"agencySurrogateKey derive(ENTITY_TYPE = \"AGENCY\",",
+				"          AGENCY_ID = skey + $DF_max_id,",
+				"          AGENCY_VID = 1) ~> derivedOtherRequiredColumns",
+				"groupByAgencyName keyGenerate(output(skey as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> agencySurrogateKey",
+				"agencySourceLookup select(mapColumn(",
+				"          AGENCY_CODE",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> requiredStagingAgencyColumns",
+				"requiredSourceAgencyColumns derive(AGENCY_NAME = trim(GIVEN_AGENCY_NAME)) ~> deriveAgencyName",
+				"deriveAgencyName aggregate(groupBy(AGENCY_NAME),",
+				"     each(match(name!='AGENCY_NAME'), $$ = first($$))) ~> groupByAgencyName",
+				"metadataflowlet@output1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          AGENCY_ID as long,",
+				"          AGENCY_VID as long,",
+				"          AGENCY_GEN_ADDRESS_ID as long,",
+				"          AGENCY_CODE as string,",
+				"          AGENCY_NAME as string,",
+				"          AGENCY_STATUS as string,",
+				"          AGENCY_CATEGORY as string,",
+				"          DIRECT_BILL_FLAG_YN as string,",
+				"          TELEPHONE as string,",
+				"          FAX as string,",
+				"          EMAIL_ID as string,",
+				"          WEBSITE as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          ENTITY_TYPE as string,",
+				"          ENTITY_PARENT_ID as long",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> agencyStaging"
+			]
+		}
+	}
+}

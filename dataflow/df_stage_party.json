@@ -1,0 +1,176 @@
+{
+	"name": "df_stage_party",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows/referenceDataFlow"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_party",
+						"type": "DatasetReference"
+					},
+					"name": "partyStaging"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_party",
+						"type": "DatasetReference"
+					},
+					"name": "targetPartyLookup"
+				},
+				{
+					"dataset": {
+						"referenceName": "joinTableStageSQL",
+						"type": "DatasetReference"
+					},
+					"name": "policyPartyRoleJoin"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_party",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "deriveJson"
+				},
+				{
+					"name": "derivedNames"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "exists1"
+				},
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "lookup1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          PARTY_ID as long,",
+				"          PARTY_VID as long,",
+				"          NAME_PREFIX as string,",
+				"          FIRST_NAME as string,",
+				"          MIDDLE_NAME as string,",
+				"          LAST_NAME as string,",
+				"          FULL_NAME as string,",
+				"          DATE_OF_BIRTH as timestamp,",
+				"          GENDER as string,",
+				"          SSN as string,",
+				"          HIRE_DATE as timestamp,",
+				"          POLICYINATION_DATE as timestamp,",
+				"          EMAIL as string,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          PARTY_TYPE as string,",
+				"          PHYSICAL_GEN_ADDRESS_ID as long,",
+				"          HOME_PHONE_NUMBER as string,",
+				"          FAX_NUMBER as string,",
+				"          YEARS_WITH_EMPLOYER as integer,",
+				"          NAME_SUFFIX as string,",
+				"          MARITAL_STATUS as string,",
+				"          OCCUPATION as string,",
+				"          DOING_BUSINESS_AS as string,",
+				"          DECEASED_DATE as timestamp,",
+				"          IS_DECEASED_YN as string,",
+				"          GEN_ADDRESS_UNIQ_ID as long,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> partyStaging",
+				"source(output(",
+				"          party_id as integer,",
+				"          party_code as string,",
+				"          parententityid as string,",
+				"          json_data as string,",
+				"          bpa_party_code as string,",
+				"          bpa_party_id as string,",
+				"          party_name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> targetPartyLookup",
+				"source(output(",
+				"          PARTY_ID as long,",
+				"          ROLE_CODE as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select distinct prb.PARTY_ID, pr.ROLE_CODE from POL_POLICY_PARTY_ROLE_BRIDGE as prb join POL_PARTY_ROLE as pr on prb.ROLE_ID = pr.ROLE_ID where pr.ROLE_CODE = \\'INSURED\\'\\n',",
+				"     format: 'query') ~> policyPartyRoleJoin",
+				"derivedNames derive(party_code = 1,",
+				"          json_data = toString(@(partyTypeCode='person',\r",
+				"   name=@(\r",
+				"    fullName=derivedNames@full_name,\r",
+				"    givenName=derivedNames@first_name,\r",
+				"    surname=derivedNames@last_name\r",
+				"   ),\r",
+				"   person=@(birthDate=toString(toDate(toString(DATE_OF_BIRTH)))),\r",
+				"   partyStatus= 'active',\r",
+				"   partyRole= array(@(\r",
+				"    effectiveDate=toString(currentDate()),\r",
+				"    roleType='insured'\r",
+				"   )),\r",
+				"   languageCode=array('EN') \r",
+				")),",
+				"          party_name = derivedNames@full_name) ~> deriveJson",
+				"lookup1 derive(full_name = iif(isNull(FULL_NAME)||equals(trim(FULL_NAME),''), concatWS(' ', trim(FIRST_NAME), trim(MIDDLE_NAME), trim(LAST_NAME)), FULL_NAME),",
+				"          first_name = iif(isNull(FIRST_NAME)||equals(trim(FIRST_NAME),''), substringIndex(trim(FULL_NAME), ' ', size(split(trim(FULL_NAME), ' '))-1), FIRST_NAME),",
+				"          last_name = iif(isNull(LAST_NAME)||equals(trim(LAST_NAME),''), (iif(size(split(trim(FULL_NAME), ' '))==1, split(trim(FULL_NAME), ' ')[1], split(trim(FULL_NAME), ' ')[size(split(trim(FULL_NAME), ' '))] )), LAST_NAME)) ~> derivedNames",
+				"targetPartyLookup filter(isNull(bpa_party_code)) ~> filter1",
+				"partyStaging, policyPartyRoleJoin exists(policyPartyRoleJoin@PARTY_ID == partyStaging@PARTY_ID,",
+				"     negate:false,",
+				"     broadcast: 'auto')~> exists1",
+				"deriveJson alterRow(upsertIf(!isNull(partyStaging@PARTY_ID))) ~> alterRow1",
+				"exists1, filter1 lookup(partyStaging@PARTY_ID == targetPartyLookup@party_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          party_id as integer,",
+				"          party_code as string,",
+				"          parententityid as string,",
+				"          json_data as string,",
+				"          bpa_party_code as string,",
+				"          bpa_party_id as string,",
+				"          party_name as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['party_id'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          party_id = partyStaging@PARTY_ID,",
+				"          party_code,",
+				"          json_data,",
+				"          party_name",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,120 @@
+{
+	"name": "fl_emp_premium_calc",
+	"properties": {
+		"folder": {
+			"name": "utility/flowlet"
+		},
+		"type": "Flowlet",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "select8"
+				},
+				{
+					"name": "derivedColumn5"
+				},
+				{
+					"name": "derivedColumn6"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "select9"
+				},
+				{
+					"name": "select10"
+				},
+				{
+					"name": "select12"
+				},
+				{
+					"name": "targetPremiumDetails"
+				},
+				{
+					"name": "output1"
+				}
+			],
+			"scriptLines": [
+				"input(output(",
+				"          policy as string,",
+				"          amountItem as (appliesToCode as string, currencyCode as string, description as string, editableOnTransaction as string, isAggregate as string, isMtaImpacted as string, isRefundable as string, levelCode as string, maxValue as string, minValue as string, originalAmount as string, pricedAmount as string, pricedValue as string, sequenceNumber as string, subTypeCode as string, typeCode as string, value as string, valueType as string)",
+				"     ),",
+				"     order: 0,",
+				"     allowSchemaDrift: true) ~> targetPremiumDetails",
+				"targetPremiumDetails filter((amountItem.typeCode == 'premium' && amountItem.levelCode == 'section' && (amountItem.appliesToCode == 'SEC001' || amountItem.appliesToCode == 'SEC002')) || (amountItem.typeCode == 'tack_premium' && ((amountItem.levelCode == 'policy' && amountItem.appliesToCode == 'SEC000') || (amountItem.levelCode == 'section' && amountItem.appliesToCode == 'SEC002')))) ~> filter1",
+				"filter1 split(amountItem.appliesToCode == 'SEC001',",
+				"     amountItem.appliesToCode == 'SEC002' && amountItem.typeCode == 'tack_premium',",
+				"     amountItem.appliesToCode == 'SEC000',",
+				"     amountItem.appliesToCode == 'SEC002' && amountItem.typeCode == 'premium',",
+				"     disjoint: false) ~> split1@(section1, section2TrackPremium, section0, section2)",
+				"split1@section2TrackPremium derive(tack_premium = toDecimal(amountItem.originalAmount),",
+				"          section = amountItem.appliesToCode) ~> derivedColumn2",
+				"split1@section2 derive(premium = toDecimal(amountItem.originalAmount),",
+				"          section = amountItem.appliesToCode) ~> derivedColumn3",
+				"derivedColumn3, derivedColumn2 join(derivedColumn3@section == derivedColumn2@section",
+				"     && split1@section2@policy == split1@section2TrackPremium@policy,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'right')~> join1",
+				"join1 derive(section2_premium = premium - tack_premium,",
+				"          section = split1@section2@amountItem.appliesToCode) ~> derivedColumn4",
+				"derivedColumn4 select(mapColumn(",
+				"          section_premium = section2_premium,",
+				"          section,",
+				"          policy = split1@section2@policy",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select8",
+				"split1@section0 derive(section_premium = toDecimal(amountItem.originalAmount),",
+				"          section = amountItem.appliesToCode) ~> derivedColumn5",
+				"split1@section1 derive(section_premium = toDecimal(amountItem.originalAmount),",
+				"          section = amountItem.appliesToCode) ~> derivedColumn6",
+				"select10, select9, select8 union(byName: true)~> union1",
+				"derivedColumn5 select(mapColumn(",
+				"          section_premium,",
+				"          section,",
+				"          policy",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select9",
+				"derivedColumn6 select(mapColumn(",
+				"          section_premium,",
+				"          section,",
+				"          policy",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select10",
+				"union1 select(mapColumn(",
+				"          section_premium,",
+				"          section,",
+				"          policy",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select12",
+				"select12 output() ~> output1"
+			]
+		}
+	}
+}

@@ -1,0 +1,121 @@
+{
+	"name": "df_bpa_product_Ref",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "bpa_emp_product",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_BPA_limit",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "flatten2"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "surrogateKey1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          BroadLine as string,",
+				"          Sections as (Code as string, DisplayName as string, Description as string, LOB as string, SequenceNumber as integer, IsPrimary as boolean, IsMandatory as boolean, Coverages as (Code as string, DisplayName as string, CoverageType as string, Limit as (TypeCode as string, Min as double, Max as integer, ValueType as string, InputType as string, Name as string)[], Level as string, IsMandatory as boolean, IsDefault as boolean)[], IsSharedCarrier as boolean)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'singleDocument') ~> source2",
+				"source2 foldDown(unroll(Sections.Coverages.Limit, Sections.Coverages),",
+				"     mapColumn(",
+				"          BroadLine,",
+				"          Coverages = Sections.Coverages",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 derive(derviedCoverages = Coverages) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          coverageCode = derviedCoverages.Code,",
+				"          CoverageLimits = derviedCoverages.Limit",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 foldDown(unroll(CoverageLimits, CoverageLimits),",
+				"     mapColumn(",
+				"          coverageCode,",
+				"          CoverageLimits",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten2",
+				"flatten2 derive(CoverageLimits = CoverageLimits) ~> derivedColumn2",
+				"derivedColumn2 derive(secCode = coverageCode,",
+				"          limitName = CoverageLimits.Name,",
+				"          limitTypeCode = CoverageLimits.TypeCode,",
+				"          limitValueType = CoverageLimits.ValueType) ~> derivedColumn3",
+				"derivedColumn3 select(mapColumn(",
+				"          coverageCode,",
+				"          secCode,",
+				"          limitName,",
+				"          limitTypeCode,",
+				"          limitValueType",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select2 keyGenerate(output(limit_id as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"surrogateKey1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          limit_id as long,",
+				"          coverageCode as string,",
+				"          secCode as string,",
+				"          limitValueType as string,",
+				"          limitTypeCode as string,",
+				"          limitName as string,",
+				"          coverage_group_code as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

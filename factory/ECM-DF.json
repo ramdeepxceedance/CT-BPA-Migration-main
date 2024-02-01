@@ -1,0 +1,56 @@
+{
+	"name": "ECM-DF",
+	"properties": {
+		"globalParameters": {
+			"baseURL": {
+				"type": "string",
+				"value": "https://bpa-ecm-migration.chainthat.net"
+			},
+			"client_id": {
+				"type": "string",
+				"value": "adf-client"
+			},
+			"client_secret": {
+				"type": "string",
+				"value": "YhnmsBI7m2Z9SH30hjOIrR3IfaaI5w6k"
+			},
+			"policyPrefix": {
+				"type": "string",
+				"value": "EMP"
+			},
+			"policies": {
+				"type": "array",
+				"value": [
+					""
+				]
+			},
+			"tokenBaseURL": {
+				"type": "string",
+				"value": "https://bpa-ecm-migration.chainthat.net"
+			},
+			"access_token_policy": {
+				"type": "string",
+				"value": "''"
+			},
+			"baseURL_dev": {
+				"type": "string",
+				"value": "https://bpa-dev.chainthat.net"
+			},
+			"client_secret_dev": {
+				"type": "string",
+				"value": "2kh1EUMnubzioELMPRum40Mli9yJn4qt"
+			}
+		},
+		"globalConfigurations": {
+			"PipelineBillingEnabled": "false",
+			"factoryStagingLSReferenceName": "AzureBlobStorage1",
+			"factoryStagingLSType": "LinkedServiceReference"
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "5f8e0b45-607c-4c72-b1ee-ca79c6e60f3b",
+		"tenantId": "aba6ade5-a4a0-4328-b38a-0c4bd19156db"
+	}
+}

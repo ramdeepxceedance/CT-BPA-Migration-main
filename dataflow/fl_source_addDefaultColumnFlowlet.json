@@ -1,0 +1,40 @@
+{
+	"name": "fl_source_addDefaultColumnFlowlet",
+	"properties": {
+		"folder": {
+			"name": "Source Stage Data Flows/flowlet"
+		},
+		"type": "Flowlet",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "input1"
+				},
+				{
+					"name": "output1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     FL_batch as integer (1)",
+				"}",
+				"input(order: 0,",
+				"     allowSchemaDrift: true) ~> input1",
+				"input1 derive(IS_VALID_YN = \"Y\",",
+				"          VALID_START_DATE = currentTimestamp(),",
+				"          VALID_END_DATE = toTimestamp(\"9999-01-01 00:00:00\"),",
+				"          BATCH_ID = $FL_batch,",
+				"          UNIQUE_IDENTIFIER = uuid(),",
+				"          DELETED_YN = \"N\",",
+				"          BPAM_LAST_CREATED_DATE = currentTimestamp(),",
+				"          BPAM_LAST_MODIFIED_DATE = currentTimestamp()) ~> derivedColumn1",
+				"derivedColumn1 output() ~> output1"
+			]
+		}
+	}
+}

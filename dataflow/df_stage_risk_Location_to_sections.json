@@ -1,0 +1,382 @@
+{
+	"name": "df_stage_risk_Location_to_sections",
+	"properties": {
+		"folder": {
+			"name": "Target Stage Data Flows"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_stage_coverage",
+						"type": "DatasetReference"
+					},
+					"name": "targetCoverage"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_source_stage_coverage",
+						"type": "DatasetReference"
+					},
+					"name": "stgCoverage"
+				},
+				{
+					"dataset": {
+						"referenceName": "ECMBPA_COV_MAP",
+						"type": "DatasetReference"
+					},
+					"name": "srcCovergeBpaSectionMap"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_risk",
+						"type": "DatasetReference"
+					},
+					"name": "riskById"
+				},
+				{
+					"dataset": {
+						"referenceName": "targetSection",
+						"type": "DatasetReference"
+					},
+					"name": "section"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_location",
+						"type": "DatasetReference"
+					},
+					"name": "targetLocation"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "targetSection",
+						"type": "DatasetReference"
+					},
+					"name": "sectionTarget"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "lookup2"
+				},
+				{
+					"name": "splitCovCodeToIdentifyPartCov"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "aggregateRiskBySection"
+				},
+				{
+					"name": "lookupForRiskId"
+				},
+				{
+					"name": "riskJsonById"
+				},
+				{
+					"name": "lookup4"
+				},
+				{
+					"name": "replaceInsObjWithRiskJson"
+				},
+				{
+					"name": "unescape"
+				},
+				{
+					"name": "arrayStringCorrectionOpening"
+				},
+				{
+					"name": "arrayStringCorrectionClosing"
+				},
+				{
+					"name": "derivedColumn8"
+				},
+				{
+					"name": "derivedColumn9"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "onlyUpdateRiskJson"
+				},
+				{
+					"name": "onlyMatchedRiskWithSection"
+				},
+				{
+					"name": "riskByIdSelect"
+				},
+				{
+					"name": "derivedColumn10"
+				},
+				{
+					"name": "lookupByLocationId"
+				},
+				{
+					"name": "locationDerived"
+				},
+				{
+					"name": "derivedColumn11"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "derivedColumn12"
+				},
+				{
+					"name": "onlyPolicy"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "join1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     policyPrefix as string ('CFA')",
+				"}",
+				"source(output(",
+				"          coverage_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          coverage_code as string,",
+				"          risk_id as long,",
+				"          location_id as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from coverage',",
+				"     format: 'query') ~> targetCoverage",
+				"source(output(",
+				"          COVERAGE_ID as long,",
+				"          COVERAGE_VID as long,",
+				"          COVERAGE_CODE_ID as long,",
+				"          POLICY_ID as long,",
+				"          POLICY_OVID as long,",
+				"          COV_STATE_ID as long,",
+				"          COVERAGE_EFFECTIVE_DATE as timestamp,",
+				"          COVERAGE_EXPIRATION_DATE as timestamp,",
+				"          ASL_CODE as string,",
+				"          ASSL_CODE as string,",
+				"          ASL_CODE_GBL as string,",
+				"          ASSL_CODE_GBL as string,",
+				"          CLASSIFICATION_CODE_ID as long,",
+				"          CLASSIFICATION_CODE_OVID as long,",
+				"          COVERAGE_CODE as string,",
+				"          RETROACTIVE_DATE as timestamp,",
+				"          IS_VALID_YN as string,",
+				"          VALID_START_DATE as timestamp,",
+				"          VALID_END_DATE as timestamp,",
+				"          BATCH_ID as long,",
+				"          UNIQUE_IDENTIFIER as string,",
+				"          DELETED_YN as string,",
+				"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+				"          BPAM_LAST_CREATED_DATE as timestamp,",
+				"          SOURCE_KEY as string,",
+				"          DATA_HASH as binary",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: '  select * from POL_COVERAGE ',",
+				"     format: 'query') ~> stgCoverage",
+				"source(output(",
+				"          COV_SEQ as string,",
+				"          BPA_SECTION_CODE as string,",
+				"          COVERAGE_CODE as string,",
+				"          COVERAGE_CODE_DES as string,",
+				"          BPA_COVERAGE_CODES as string,",
+				"          BPA_COVERAGES as string,",
+				"          COVERAGES as string,",
+				"          BPA_PRODUCT_CODE as string,",
+				"          SI_NO as string,",
+				"          id as long,",
+				"          BPA_SEC_NAME as string,",
+				"          SOURCE_PRODUCT_CODE as string,",
+				"          bpa_coverage_group as string,",
+				"          bpa_coverage_level as string,",
+				"          bpa_coverage_type as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> srcCovergeBpaSectionMap",
+				"source(output(",
+				"          risk_id as integer,",
+				"          policy_id as integer,",
+				"          json_data as string,",
+				"          location_id as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from risk ',",
+				"     format: 'query') ~> riskById",
+				"source(output(",
+				"          section_id as integer,",
+				"          policy_id as integer,",
+				"          coverage_id as integer,",
+				"          location_id as integer,",
+				"          limit_id as integer,",
+				"          deductible_id as integer,",
+				"          insurableobject_id as integer,",
+				"          json_data as string,",
+				"          extendedattributes as string,",
+				"          section_code as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from bpa_section ',",
+				"     format: 'query') ~> section",
+				"source(output(",
+				"          location_id as integer,",
+				"          policy_id as integer,",
+				"          address_id as integer,",
+				"          json_data as string,",
+				"          extendedattributes as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> targetLocation",
+				"source(output(",
+				"          policy_id as integer,",
+				"          policy_number as string,",
+				"          json_data as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"targetCoverage, stgCoverage lookup(targetCoverage@coverage_id == stgCoverage@COVERAGE_ID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"splitCovCodeToIdentifyPartCov, derivedColumn2 lookup(CoverageCode == SRC_COVERAGE",
+				"     && CoverageSeq == SRC_COVERAGE_SEQ,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup2",
+				"join1 derive(CoverageCode = split(targetCoverage@coverage_code,'-')[4],",
+				"          CoverageSeq = split(targetCoverage@coverage_code,'-')[5],",
+				"          lob = split(targetCoverage@coverage_code,'-')[3]) ~> splitCovCodeToIdentifyPartCov",
+				"srcCovergeBpaSectionMap derive(SRC_COVERAGE_SEQ = COV_SEQ,",
+				"          SRC_COVERAGE = COVERAGE_CODE) ~> derivedColumn2",
+				"filter1 aggregate(groupBy(targetCoverage@policy_id,",
+				"          BPA_SECTION_CODE),",
+				"     insurableObject = collect(riskJson),",
+				"          location = collect(locationJson)) ~> aggregateRiskBySection",
+				"lookup2, riskByIdSelect lookup(stgCoverage@POLICY_ID == riskByIdSelect@policy_id",
+				"     && targetCoverage@risk_id === riskByIdSelect@risk_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupForRiskId",
+				"riskById derive(riskJson = unescape(json_data,'json')) ~> riskJsonById",
+				"derivedColumn10, section lookup(aggregateRiskBySection@policy_id == section@policy_id",
+				"     && BPA_SECTION_CODE == section_code,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup4",
+				"derivedColumn11 derive(json_data = replace(json_data,'\"insurableObject\":[]',concat('\"insurableObject\":',toString(insurableObject)))) ~> replaceInsObjWithRiskJson",
+				"replaceInsObjWithRiskJson derive(json_data = unescape(json_data, 'json')) ~> unescape",
+				"unescape derive(json_data = replace(json_data,'\"[','[')) ~> arrayStringCorrectionOpening",
+				"arrayStringCorrectionOpening derive(json_data = replace(json_data,']\"',']')) ~> arrayStringCorrectionClosing",
+				"arrayStringCorrectionClosing derive(json_data = replace(json_data,'\"{','{')) ~> derivedColumn8",
+				"derivedColumn8 derive(json_data = replace(json_data,'}\"','}')) ~> derivedColumn9",
+				"derivedColumn9 select(mapColumn(",
+				"          section_id,",
+				"          policy_id = section@policy_id,",
+				"          coverage_id,",
+				"          location_id,",
+				"          limit_id,",
+				"          deductible_id,",
+				"          insurableobject_id,",
+				"          json_data,",
+				"          extendedattributes,",
+				"          section_code",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 alterRow(updateIf(!isNull(policy_id)&&!isNull(policy_id))) ~> onlyUpdateRiskJson",
+				"lookup4 filter(!isNull(section_id)) ~> onlyMatchedRiskWithSection",
+				"riskJsonById select(mapColumn(",
+				"          risk_id,",
+				"          policy_id,",
+				"          location_id,",
+				"          riskJson",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> riskByIdSelect",
+				"aggregateRiskBySection derive(insurableObject = distinct(insurableObject),",
+				"          location = distinct(location)) ~> derivedColumn10",
+				"lookupForRiskId, locationDerived lookup(stgCoverage@POLICY_ID == targetLocation@policy_id",
+				"     && targetCoverage@location_id == locationDerived@location_id,",
+				"     multiple: false,",
+				"     pickup: 'first',",
+				"     asc(locationDerived@location_id, true),",
+				"     broadcast: 'auto')~> lookupByLocationId",
+				"targetLocation derive(location_id = location_id,",
+				"          locationJson = json_data) ~> locationDerived",
+				"onlyMatchedRiskWithSection derive(json_data = replace(json_data,'\"location\":[]',concat('\"location\":',toString(location)))) ~> derivedColumn11",
+				"lookupByLocationId filter(BPA_SECTION_CODE != 'SEC000') ~> filter1",
+				"source1 derive(targetPolicyID = policy_id,",
+				"          policyPRefixTemp = substring(policy_number, 1, 3) ) ~> derivedColumn12",
+				"filter2 select(mapColumn(",
+				"          policy_number,",
+				"          targetPolicyID",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> onlyPolicy",
+				"derivedColumn12 filter(policyPRefixTemp == $policyPrefix) ~> filter2",
+				"lookup1, onlyPolicy join(stgCoverage@POLICY_ID == targetPolicyID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"onlyUpdateRiskJson sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          section_id as integer,",
+				"          policy_id as integer,",
+				"          coverage_id as integer,",
+				"          location_id as integer,",
+				"          limit_id as integer,",
+				"          deductible_id as integer,",
+				"          insurableobject_id as integer,",
+				"          json_data as string,",
+				"          extendedattributes as string,",
+				"          section_code as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:true,",
+				"     keys:['policy_id','section_id','section_code'],",
+				"     skipKeyWrites:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sectionTarget"
+			]
+		}
+	}
+}
