@@ -1,0 +1,12 @@
+{
+	"name": "postgresTest",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzurePostgreSql",
+		"typeProperties": {
+			"connectionString": "host=bpa-ecm-migration.postgres.database.azure.com;port=5432;database=DM_Stage_Target;uid=db_admin;encryptionmethod=1;validateservercertificate=0",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQEE1N0E3NEY3LTFGQUItNDAxNC05NTRCLTAxNDIwM0Y4MEFCMl81ZGIwOGUxNi0wYWE2LTQwZjYtYmVhZC1lYWQ1MTIzYjk1NGQiDQp9"
+		}
+	}
+}

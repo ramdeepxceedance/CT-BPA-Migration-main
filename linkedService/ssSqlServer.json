@@ -1,0 +1,29 @@
+{
+	"name": "ssSqlServer",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"dbUrl": {
+				"type": "string",
+				"defaultValue": "20.84.69.215"
+			},
+			"dbName": {
+				"type": "string",
+				"defaultValue": "DM_Source_Stage"
+			},
+			"dbUsername": {
+				"type": "string",
+				"defaultValue": "db_admin"
+			},
+			"dbPassword": {
+				"type": "string",
+				"defaultValue": "ProVT#2D1!@C"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Data Source=@{linkedService().dbUrl};Initial Catalog=@{linkedService().dbName};User ID=@{linkedService().dbUsername};Password=@{linkedService().dbPassword}"
+		}
+	}
+}
