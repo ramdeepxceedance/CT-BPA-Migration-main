@@ -1,0 +1,127 @@
+{
+	"name": "pl_source_policy_txn",
+	"properties": {
+		"activities": [
+			{
+				"name": "pol_txn",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_source_policy_txn",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							},
+							"policies": {
+								"value": "@pipeline().globalParameters.policies",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "pol_txn_bridge",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "pol_txn",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_source_policy_tx_bridge",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							},
+							"policies": {
+								"value": "@pipeline().globalParameters.policies",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "pol_premium",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "pol_txn_bridge",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_source_policy_premium",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							},
+							"policies": {
+								"value": "@pipeline().globalParameters.policies",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Source Data Movement/ecm/pipelien_txn"
+		},
+		"annotations": []
+	}
+}

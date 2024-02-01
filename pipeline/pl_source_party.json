@@ -1,0 +1,84 @@
+{
+	"name": "pl_source_party",
+	"properties": {
+		"activities": [
+			{
+				"name": "Party Data flow",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Party MaxId Lookup",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_source_party",
+						"type": "DataFlowReference",
+						"parameters": {
+							"DF_batch": {
+								"value": "@variables('BatchId')",
+								"type": "Expression"
+							},
+							"DF_max_id": {
+								"value": "@activity('Party MaxId Lookup').output.firstRow.maxId",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Party MaxId Lookup",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "SELECT isnull(MAX(PARTY_ID), 0) as maxId\nFROM dbo.POL_PARTY",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_source_stage_party",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			}
+		],
+		"variables": {
+			"BatchId": {
+				"type": "Integer",
+				"defaultValue": 1
+			}
+		},
+		"folder": {
+			"name": "Source Data Movement/ecm/pipeline_reference"
+		},
+		"annotations": []
+	}
+}

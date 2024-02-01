@@ -1,0 +1,71 @@
+{
+	"name": "pl_api_token_only",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get token",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{pipeline().globalParameters.tokenBaseURL}/auth/realms/ecm/protocol/openid-connect/token",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/x-www-form-urlencoded"
+					},
+					"body": {
+						"value": "grant_type=client_credentials&client_id=@{pipeline().globalParameters.client_id}&client_secret=@{pipeline().globalParameters.client_secret}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set access token",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "access_token",
+					"value": {
+						"value": "@{activity('Get token').output.access_token}",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"access_token": {
+				"type": "String"
+			},
+			"continueLoop": {
+				"type": "Boolean",
+				"defaultValue": false
+			}
+		},
+		"folder": {
+			"name": "Target Data Movement"
+		},
+		"annotations": []
+	}
+}

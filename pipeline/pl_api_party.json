@@ -1,0 +1,158 @@
+{
+	"name": "pl_api_party",
+	"properties": {
+		"activities": [
+			{
+				"name": "Target Party Lookup",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzurePostgreSqlSource",
+						"query": "select party_id,json_data from partyidentity where bpa_party_code is null",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_stage_party",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Iterate Party JSON",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Target Party Lookup').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Create Party",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@{pipeline().globalParameters.baseURL}/party-api/submitPartyInformations/v1/party",
+									"type": "Expression"
+								},
+								"method": "POST",
+								"headers": {
+									"Authorization": {
+										"value": "Bearer @{activity('Get token').output.access_token}",
+										"type": "Expression"
+									},
+									"Content-Type": "application/json"
+								},
+								"body": {
+									"value": "@json(replace('{\"messageInformation\":{\"sender\":\"adfclient\",\"userInfo\":{\"partyDetails\":[{\"partyCode\":\"\",\"partyRole\":\"\"}],\"userName\":\"Viswa\"},\"businessPurposeTypeCode\":\"xyz\",\"trackingNumber\":\"09cbf4b4-2b59-f42c-3ce2-e8c34e737398\"},\"party\":[dynamicData]', 'dynamicData' , string(item().json_data)))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Update Party",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Create Party",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzurePostgreSqlSource",
+									"query": {
+										"value": "update partyidentity set bpa_party_id='@{activity('Create Party').output.success[0].partyId}', bpa_party_code='@{activity('Create Party').output.success[0].partyCode}', party_name='@{activity('Create Party').output.success[0].fullName}' where party_id=@{string(item().party_id)};\n\nselect  * from partyidentity limit 1\n",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_stage_party",
+									"type": "DatasetReference"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Get token",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Target Party Lookup",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{pipeline().globalParameters.baseURL}/auth/realms/ecm/protocol/openid-connect/token\n",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/x-www-form-urlencoded"
+					},
+					"body": {
+						"value": "grant_type=client_credentials&client_id=@{pipeline().globalParameters.client_id}&client_secret=@{pipeline().globalParameters.client_secret}",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"concurrency": 4,
+		"folder": {
+			"name": "Target Data Movement"
+		},
+		"annotations": []
+	}
+}

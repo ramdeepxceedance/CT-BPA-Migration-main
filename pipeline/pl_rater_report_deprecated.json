@@ -1,0 +1,208 @@
+{
+	"name": "pl_rater_report_deprecated",
+	"properties": {
+		"activities": [
+			{
+				"name": "QuoteInfo Lookup",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzurePostgreSqlSource",
+						"query": {
+							"value": "@concat( 'select policy_number , quote_number, quote, policy_id from quote_info where policy_id BETWEEN ',string(pipeline().parameters.lb) ,' and ',string(pipeline().parameters.hb))",
+							"type": "Expression"
+						},
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_target_quoteInfo",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Iterate QuoteInfo JSON",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('QuoteInfo Lookup').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 50,
+					"activities": [
+						{
+							"name": "Calculate Premium",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"method": "POST",
+								"headers": {
+									"Authorization": {
+										"value": "Bearer @{activity('Get token').output.access_token}",
+										"type": "Expression"
+									},
+									"Content-Type": "application/json"
+								},
+								"url": {
+									"value": "@{pipeline().globalParameters.baseURL}/policyadmin-api/calculateRatedValues/v1/quote/item().quote_number",
+									"type": "Expression"
+								},
+								"body": {
+									"value": "@json(replace('{\"messageInformation\":{\"sender\":\"adfclient\",\"userInfo\":{\"partyDetails\":[{\"partyCode\":\"\",\"partyRole\":\"\"}],\"userName\":\"Viswa\"},\"businessPurposeTypeCode\":\"xyz\",\"trackingNumber\":\"09cbf4b4-2b59-f42c-3ce2-e8c34e737398\"},\"quote\":dynamicData', 'dynamicData' , string(item().quote)))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Lookup1",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Calculate Premium",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzurePostgreSqlSource",
+									"query": {
+										"value": "update quote_info set status='success', response='@{activity('Calculate Premium').output.riskDetail}' where policy_id=@{string(item().policy_id)};\n\nselect * from quote_info limit 1;",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_target_quoteInfo",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Lookup2",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Calculate Premium",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzurePostgreSqlSource",
+									"query": {
+										"value": "update quote_info set status='failed', response='@{activity('Calculate Premium').output.messageInformation}' where policy_id=@{string(item().policy_id)};\n\nselect * from quote_info limit 1;",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_target_quoteInfo",
+									"type": "DatasetReference"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Get token",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "QuoteInfo Lookup",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/x-www-form-urlencoded"
+					},
+					"url": {
+						"value": "@{pipeline().globalParameters.baseURL}/auth/realms/ecm/protocol/openid-connect/token\n",
+						"type": "Expression"
+					},
+					"body": {
+						"value": "grant_type=client_credentials&client_id=@{pipeline().globalParameters.client_id}&client_secret=@{pipeline().globalParameters.client_secret}",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"lb": {
+				"type": "int"
+			},
+			"hb": {
+				"type": "int"
+			}
+		},
+		"variables": {
+			"policy_id": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "utility"
+		},
+		"annotations": []
+	}
+}

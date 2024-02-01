@@ -1,0 +1,403 @@
+{
+	"name": "pl_api_policy",
+	"properties": {
+		"activities": [
+			{
+				"name": "Target Policy Lookup",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzurePostgreSqlSource",
+						"query": {
+							"value": "@concat( 'SELECT * FROM POLICY where policy_id BETWEEN ',string(pipeline().parameters.lb) ,' and ',string(pipeline().parameters.hb))",
+							"type": "Expression"
+						},
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_stage_policy",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Iterate Policy JSON",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Set access token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Target Policy Lookup').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 50,
+					"activities": [
+						{
+							"name": "Create Policy",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@{pipeline().globalParameters.baseURL}/policyadmin-api/initiateRenewal/v1/renewal",
+									"type": "Expression"
+								},
+								"connectVia": {
+									"referenceName": "integrationRuntime2-selfhosted",
+									"type": "IntegrationRuntimeReference"
+								},
+								"method": "POST",
+								"headers": {
+									"Authorization": {
+										"value": "Bearer @{variables('access_token')}",
+										"type": "Expression"
+									},
+									"Content-Type": "application/json"
+								},
+								"body": {
+									"value": "@json(replace(concat('{\"messageInformation\": {\n        \"businessPurposeTypeCode\": \"RWL\",\n        \"trackingNumber\": \"ed5c2e08-7714-446c-84d1-0f67a7964593\",\n        \"messageStatus\": {\n            \"statusCode\": 200,\n            \"statusDescription\": \"Policy created \",\n            \"successStatusCode\": \"200\"\n        },\n        \"userInfo\": {\n            \"userName\": \"policyadmin\"\n        },\n        \"userJourneyType\": \"empty\"\n    },\n    \"policy\": dynamicData,\n    \"renewalOf\":\"', string(item().policy_number),'\",\n    \"sourcePolicyEffectiveDate\": \"2023-12-02\",\n    \"sourcePolicyExpirationDate\": \"2023-12-31\",\n    \"typeCode\": \"MANUAL\",\n    \"renewalTriggerInDays\": 60 }'), 'dynamicData' , string(item().json_data)))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Update Succeed Policy in Tracker",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Create Policy",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzurePostgreSqlSource",
+									"query": {
+										"value": "insert into policy_tracker(policy_id, policy_number, bpa_tracking_number, status, bpa_tenant_id, response_description) \nvalues(@{string(item().policy_id)},'@{string(item().policy_number)}', '@{activity('Create Policy').output.messageInformation.trackingNumber}','@{activity('Create Policy').output.messageInformation.messageStatus.statusCode}', '@{activity('Create Policy').output.messageInformation.userInfo.tenantId}', '@{activity('Create Policy').output.messageInformation.messageStatus.statusDescription}');\n\nselect * from policy_tracker limit 1",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_stage_policytracker",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Update Failed Policy in Tracker",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Create Policy",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzurePostgreSqlSource",
+									"query": {
+										"value": "insert into policy_tracker(policy_id, policy_number, bpa_tracking_number, status, response_description) \nvalues(@{string(item().policy_id)},'@{string(item().policy_number)}', '@{activity('Create Policy').output.messageInformation.trackingNumber}','@{activity('Create Policy').output.messageInformation.messageStatus.statusCode}', '@{activity('Create Policy').output.messageInformation.messageStatus.errors}');\n\nselect * from policy_tracker limit 1",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_stage_policytracker",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Lookup1",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Update Failed Policy in Tracker",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzurePostgreSqlSource",
+									"query": {
+										"value": "insert into policy_tracker(policy_id, policy_number, status, response_description) \nvalues(@{string(item().policy_id)},'@{string(item().policy_number)}','400', '@{activity('Create Policy').output.messageInformation}');\n\nselect * from policy_tracker limit 1",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_stage_policytracker",
+									"type": "DatasetReference"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Get token",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Target Policy Lookup",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@{pipeline().globalParameters.baseURL}/auth/realms/ecm/protocol/openid-connect/token",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "integrationRuntime2-selfhosted",
+						"type": "IntegrationRuntimeReference"
+					},
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/x-www-form-urlencoded"
+					},
+					"body": {
+						"value": "grant_type=client_credentials&client_id=@{pipeline().globalParameters.client_id}&client_secret=@{pipeline().globalParameters.client_secret}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set access token",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "access_token",
+					"value": {
+						"value": "@{activity('Get token').output.access_token}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Stop Refreshing Token",
+				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Iterate Policy JSON",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "continueLoop",
+					"value": true
+				}
+			},
+			{
+				"name": "Refresh token",
+				"type": "Until",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "Set access token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@variables('continueLoop')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Get new token",
+							"type": "WebActivity",
+							"dependsOn": [
+								{
+									"activity": "Wait",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@{pipeline().globalParameters.baseURL}/auth/realms/ecm/protocol/openid-connect/token\n",
+									"type": "Expression"
+								},
+								"method": "POST",
+								"headers": {
+									"Content-Type": "application/x-www-form-urlencoded"
+								},
+								"body": {
+									"value": "grant_type=client_credentials&client_id=@{pipeline().globalParameters.client_id}&client_secret=@{pipeline().globalParameters.client_secret}",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Wait",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						},
+						{
+							"name": "Set new token",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get new token",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "access_token",
+								"value": {
+									"value": "@{activity('Get new token').output.access_token}",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"parameters": {
+			"lb": {
+				"type": "int",
+				"defaultValue": 1
+			},
+			"hb": {
+				"type": "int",
+				"defaultValue": 4
+			}
+		},
+		"variables": {
+			"access_token": {
+				"type": "String"
+			},
+			"continueLoop": {
+				"type": "Boolean",
+				"defaultValue": false
+			},
+			"lowerBound": {
+				"type": "Integer"
+			},
+			"higherBound": {
+				"type": "Integer"
+			},
+			"round": {
+				"type": "Integer"
+			}
+		},
+		"folder": {
+			"name": "Target Data Movement"
+		},
+		"annotations": []
+	}
+}

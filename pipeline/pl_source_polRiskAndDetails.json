@@ -1,0 +1,191 @@
+{
+	"name": "pl_source_polRiskAndDetails",
+	"properties": {
+		"activities": [
+			{
+				"name": "Switch1",
+				"type": "Switch",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@pipeline().globalParameters.policyPrefix",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "EMP",
+							"activities": [
+								{
+									"name": "empRisk",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_source_policy_risk_emp",
+											"type": "DataFlowReference",
+											"parameters": {
+												"policyPrefix": {
+													"value": "'@{pipeline().globalParameters.policyPrefix}'",
+													"type": "Expression"
+												},
+												"policies": {
+													"value": "@pipeline().globalParameters.policies",
+													"type": "Expression"
+												}
+											}
+										},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										},
+										"traceLevel": "Fine"
+									}
+								},
+								{
+									"name": "empRiskDetails",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "empRisk",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_source_empInsObj",
+											"type": "DataFlowReference",
+											"parameters": {
+												"policyPrefix": {
+													"value": "'@{pipeline().globalParameters.policyPrefix}'",
+													"type": "Expression"
+												},
+												"policies": {
+													"value": "@pipeline().globalParameters.policies",
+													"type": "Expression"
+												}
+											}
+										},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										},
+										"traceLevel": "Fine"
+									}
+								}
+							]
+						},
+						{
+							"value": "CFA",
+							"activities": [
+								{
+									"name": "cfaRisk",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_source_policy_risk_cfa",
+											"type": "DataFlowReference",
+											"parameters": {
+												"policyPrefix": {
+													"value": "'@{pipeline().globalParameters.policyPrefix}'",
+													"type": "Expression"
+												},
+												"policies": {
+													"value": "@pipeline().globalParameters.policies",
+													"type": "Expression"
+												}
+											}
+										},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										},
+										"traceLevel": "Fine"
+									}
+								},
+								{
+									"name": "cfaRiskDetails",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [
+										{
+											"activity": "cfaRisk",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "df_source_cfaInsObj",
+											"type": "DataFlowReference",
+											"parameters": {
+												"policyPrefix": {
+													"value": "'@{pipeline().globalParameters.policyPrefix}'",
+													"type": "Expression"
+												},
+												"policies": {
+													"value": "@pipeline().globalParameters.policies",
+													"type": "Expression"
+												}
+											}
+										},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										},
+										"traceLevel": "Fine"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"productCode": {
+				"type": "string",
+				"defaultValue": "\"emp\""
+			}
+		},
+		"folder": {
+			"name": "Source Data Movement/ecm/pipelien_txn"
+		},
+		"annotations": []
+	}
+}

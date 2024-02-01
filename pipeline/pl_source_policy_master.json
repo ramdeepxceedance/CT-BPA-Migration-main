@@ -1,0 +1,164 @@
+{
+	"name": "pl_source_policy_master",
+	"properties": {
+		"activities": [
+			{
+				"name": "polPolicy",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_source_policy",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "insurableObjPipeline",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Policy PartyRole",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_source_polRiskAndDetails",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "locationpipeline",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "insurableObjPipeline",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_source_location",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "coveragePipeline",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "locationpipeline",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_source_coverage_coverageext",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "riskBridge",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "coveragePipeline",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_source_loc_risk_bridge",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "txn premiums",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "riskBridge",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_source_policy_txn",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Policy PartyRole",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "polPolicy",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_source_policy_partyrole_bridge",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "tx and limits",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "txn premiums",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_source_tx_limits",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"folder": {
+			"name": "Source Data Movement/ecm/pipleline_master"
+		},
+		"annotations": []
+	}
+}

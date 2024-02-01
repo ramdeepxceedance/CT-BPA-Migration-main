@@ -1,0 +1,171 @@
+{
+	"name": "pl_Target_policy_master",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Set round",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@range(variables('lowerBound'), variables('round'))",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "policyRun",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl_api_policy",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"lb": {
+										"value": "@variables('lowerBound')",
+										"type": "Expression"
+									},
+									"hb": {
+										"value": "@variables('higherBound')",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "update lowerbound",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "policyRun",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "lowerBound",
+								"value": {
+									"value": "@variables('higherBound')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "update higherbound",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "update lowerbound",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "higherBound",
+								"value": {
+									"value": "@add(variables('lowerBound'),500)",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Set lowerBound",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "lowerBound",
+					"value": 1
+				}
+			},
+			{
+				"name": "Set higherbound",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set lowerBound",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "higherBound",
+					"value": 500
+				}
+			},
+			{
+				"name": "Set round",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set higherbound",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "round",
+					"value": 18
+				}
+			}
+		],
+		"variables": {
+			"higherBound": {
+				"type": "Integer"
+			},
+			"round": {
+				"type": "Integer"
+			},
+			"lowerBound": {
+				"type": "Integer"
+			}
+		},
+		"folder": {
+			"name": "Target Data Movement"
+		},
+		"annotations": []
+	}
+}

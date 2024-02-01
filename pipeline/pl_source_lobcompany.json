@@ -1,0 +1,118 @@
+{
+	"name": "pl_source_lobcompany",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lob Company Data Flow",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "lob max id Lookup",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "company max id Lookup",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_source_lobcompany",
+						"type": "DataFlowReference",
+						"parameters": {
+							"DF_batch": {
+								"value": "@variables('BatchId')",
+								"type": "Expression"
+							},
+							"DF_lob_max_id": {
+								"value": "@activity('lob max id Lookup').output.firstRow.maxId",
+								"type": "Expression"
+							},
+							"DF_company_max_id": {
+								"value": "@activity('company max id Lookup').output.firstRow.maxId",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "lob max id Lookup",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "SELECT isnull(MAX(LOB_ID), 0) as maxId\nFROM dbo.POL_LOB",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_source_stage_lob",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "company max id Lookup",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "SELECT isnull(MAX(COMPANY_ID), 0) as maxId\nFROM dbo.CO_COMPANY",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_source_stage_company",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"variables": {
+			"BatchId": {
+				"type": "Integer",
+				"defaultValue": 1
+			}
+		},
+		"folder": {
+			"name": "Source Data Movement/ecm/pipeline_reference"
+		},
+		"annotations": []
+	}
+}

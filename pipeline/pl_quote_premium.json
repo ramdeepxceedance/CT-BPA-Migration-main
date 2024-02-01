@@ -1,0 +1,417 @@
+{
+	"name": "pl_quote_premium",
+	"properties": {
+		"activities": [
+			{
+				"name": "Policy Lookup",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzurePostgreSqlSource",
+						"query": {
+							"value": "@concat( 'select policy_id, policy_number from policy_tracker where status= ''', '200',  ''' and policy_id BETWEEN ',string(pipeline().parameters.lb) ,' and ',string(pipeline().parameters.hb))",
+							"type": "Expression"
+						},
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "joinTablePostgres",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Get token",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Policy Lookup",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/x-www-form-urlencoded"
+					},
+					"url": {
+						"value": "@{pipeline().globalParameters.baseURL}/auth/realms/ecm/protocol/openid-connect/token\n",
+						"type": "Expression"
+					},
+					"body": {
+						"value": "grant_type=client_credentials&client_id=@{pipeline().globalParameters.client_id}&client_secret=@{pipeline().globalParameters.client_secret}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Iterate QuoteInfo JSON",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Policy Lookup').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 50,
+					"activities": [
+						{
+							"name": "Search Policy By RenewalOf",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"method": "POST",
+								"headers": {
+									"Authorization": {
+										"value": "Bearer @{activity('Get token').output.access_token}",
+										"type": "Expression"
+									},
+									"Content-Type": "application/json"
+								},
+								"url": {
+									"value": "@{pipeline().globalParameters.baseURL}/policyadmin-api/searchPolicyInformation/v1/policy",
+									"type": "Expression"
+								},
+								"body": {
+									"value": "@json(replace('{\"searchParams\":\"renewalOf:dynamicData\"}', 'dynamicData' , string(item().policy_number)))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Lookup2",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Search Policy By RenewalOf",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzurePostgreSqlSource",
+									"query": {
+										"value": "INSERT INTO quote_info (policy_id, status, api_stage, response)\nVALUES (@{string(item().policy_id)}, 'failed', 'Search Policy By RenewalOf', '@{activity('Search Policy By RenewalOf').output.messageInformation}');\n\nselect * from quote_info limit 1;\n",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_target_quoteInfo",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "SearchQuote",
+							"type": "WebActivity",
+							"dependsOn": [
+								{
+									"activity": "Search Policy By RenewalOf",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"method": "POST",
+								"headers": {
+									"Authorization": {
+										"value": "Bearer @{activity('Get token').output.access_token}",
+										"type": "Expression"
+									},
+									"Content-Type": "application/json"
+								},
+								"url": {
+									"value": "@{pipeline().globalParameters.baseURL}/policyadmin-api/searchQuote/v1/quote",
+									"type": "Expression"
+								},
+								"body": {
+									"value": "@json(replace('{\"searchParams\":\"referenceNumber:*dynamicData*\"}', 'dynamicData' , activity('Search Policy By RenewalOf').output.policy[0].referenceNumber))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Retrieve QuoteInfo",
+							"type": "WebActivity",
+							"dependsOn": [
+								{
+									"activity": "SearchQuote",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"method": "GET",
+								"headers": {
+									"Authorization": {
+										"value": "Bearer @{activity('Get token').output.access_token}",
+										"type": "Expression"
+									},
+									"Content-Type": "application/json"
+								},
+								"url": {
+									"value": "@{pipeline().globalParameters.baseURL}/policyadmin-api/retrieveQuoteInformation/v1/quote/@{activity('SearchQuote').output.quote[0].quoteNumber}?identifierType=number",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Lookup3",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "SearchQuote",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzurePostgreSqlSource",
+									"query": {
+										"value": "INSERT INTO quote_info (policy_id, policy_reference, status, api_stage, response)\nVALUES (@{string(item().policy_id)}, '@{activity('Search Policy By RenewalOf').output.policy[0].referenceNumber}', 'failed', 'Search Quote', '@{activity('SearchQuote').output.messageInformation}');\n\nselect * from quote_info limit 1;",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_target_quoteInfo",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Lookup4",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Retrieve QuoteInfo",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzurePostgreSqlSource",
+									"query": {
+										"value": "INSERT INTO quote_info (policy_id, policy_reference, quote_number, status, api_stage, response)\nVALUES (@{string(item().policy_id)}, '@{activity('Search Policy By RenewalOf').output.policy[0].referenceNumber}', '@{activity('SearchQuote').output.quote[0].quoteNumber}','failed', 'Retrieve QuoteInfo', '@{activity('Retrieve QuoteInfo').output.messageInformation}');\n\nselect * from quote_info limit 1;",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_target_quoteInfo",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Lookup5",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Calculate Premium",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzurePostgreSqlSource",
+									"query": {
+										"value": "INSERT INTO quote_info (policy_id, policy_number, policy_reference, quote_number, status, api_stage, quote, response)\nVALUES (@{string(item().policy_id)}, '@{string(item().policy_number)}', '@{activity('Search Policy By RenewalOf').output.policy[0].referenceNumber}', '@{activity('SearchQuote').output.quote[0].quoteNumber}','success', 'Calculate Premium', '@{replace(string(activity('Retrieve QuoteInfo').output.quote), '''', '')}', '@{replace(string(activity('Calculate Premium').output.riskDetail), '''', '')}');\n\nselect * from quote_info limit 1;\n\n",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_target_quoteInfo",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Calculate Premium",
+							"type": "WebActivity",
+							"dependsOn": [
+								{
+									"activity": "Retrieve QuoteInfo",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"method": "POST",
+								"headers": {
+									"Authorization": {
+										"value": "Bearer @{activity('Get token').output.access_token}",
+										"type": "Expression"
+									},
+									"Content-Type": "application/json"
+								},
+								"url": {
+									"value": "@{pipeline().globalParameters.baseURL}/policyadmin-api/calculateRatedValues/v1/quote/@{activity('SearchQuote').output.quote[0].quoteNumber}",
+									"type": "Expression"
+								},
+								"body": {
+									"value": "@json(replace('{\"messageInformation\":{\"sender\":\"adfclient\",\"userInfo\":{\"partyDetails\":[{\"partyCode\":\"\",\"partyRole\":\"\"}],\"userName\":\"Viswa\"},\"businessPurposeTypeCode\":\"xyz\",\"trackingNumber\":\"09cbf4b4-2b59-f42c-3ce2-e8c34e737398\"},\"quote\":dynamicData', 'dynamicData' , string(activity('Retrieve QuoteInfo').output.quote)))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Lookup6",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Calculate Premium",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzurePostgreSqlSource",
+									"query": {
+										"value": "INSERT INTO quote_info (policy_id, policy_number, policy_reference, quote_number, status, api_stage, quote, response)\nVALUES (@{string(item().policy_id)}, '@{string(item().policy_number)}', '@{activity('Search Policy By RenewalOf').output.policy[0].referenceNumber}', '@{activity('SearchQuote').output.quote[0].quoteNumber}','failed', 'Calculate Premium', '@{activity('Retrieve QuoteInfo').output.quote}', '@{replace(string(activity('Calculate Premium').output.messageInformation), '''', '')}');\n\nselect * from quote_info limit 1;",
+										"type": "Expression"
+									},
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_target_quoteInfo",
+									"type": "DatasetReference"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"lb": {
+				"type": "int",
+				"defaultValue": 617
+			},
+			"hb": {
+				"type": "int",
+				"defaultValue": 617
+			}
+		},
+		"folder": {
+			"name": "utility/rating"
+		},
+		"annotations": []
+	}
+}

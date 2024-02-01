@@ -1,0 +1,125 @@
+{
+	"name": "pl_source_tx_limits",
+	"properties": {
+		"activities": [
+			{
+				"name": "limit2",
+				"type": "ExecuteDataFlow",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_source_POL_TX_LIMIT2",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "limit1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "limit2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_source_POL_TX_LIMIT1",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							},
+							"policies": {
+								"value": "@pipeline().globalParameters.policies",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "POL_TX_Deductible_DF",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "limit1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_source_POL_TX_Deductible",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							},
+							"policies": {
+								"value": "@pipeline().globalParameters.policies",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Source Data Movement/ecm/pipelien_txn"
+		},
+		"annotations": []
+	}
+}

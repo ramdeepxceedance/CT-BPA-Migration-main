@@ -1,0 +1,35 @@
+{
+	"name": "pl_source_bpa_cov_mapping",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_coverage_BPA_mapping",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_stage_ecm_bpa_cov_mapping",
+						"type": "DataFlowReference"
+					},
+					"integrationRuntime": {
+						"referenceName": "integrationRuntime2-selfhosted",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Source Data Movement/ecm/pipeline_reference"
+		},
+		"annotations": []
+	}
+}

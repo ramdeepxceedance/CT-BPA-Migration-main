@@ -1,0 +1,86 @@
+{
+	"name": "pl_compare_premium",
+	"properties": {
+		"activities": [
+			{
+				"name": "Compare Premium - Risk",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_target_premiumComparison_risk",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							},
+							"policies": {
+								"value": "@pipeline().globalParameters.policies",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Compare Premium - Policy",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Compare Premium - Risk",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_target_premiumComparison_policy",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							},
+							"policies": {
+								"value": "@pipeline().globalParameters.policies",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "utility/rating"
+		},
+		"annotations": []
+	}
+}

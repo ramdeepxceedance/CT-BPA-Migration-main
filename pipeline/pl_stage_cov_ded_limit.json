@@ -1,0 +1,407 @@
+{
+	"name": "pl_stage_cov_ded_limit",
+	"properties": {
+		"activities": [
+			{
+				"name": "targetCoverages",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Set locationCode",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_stage_riskLevel_coverages",
+						"type": "DataFlowReference",
+						"parameters": {
+							"isLimitUpdateOnly": "false()",
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							},
+							"locationState": {
+								"value": "'@{variables('locationState')}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "addLimitToCoverages",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "targetdeductible",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_addLimit_to_risk_level_coverage",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "limitRiskLevel",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_stage_covLimit_risk_level_cov",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							},
+							"locationCode": {
+								"value": "'@{variables('locationCode')}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "targetdeductible",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "limitPolicyLevel",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_stage_Deductible",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "onlyPolicyLevelCoverages",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "targetCoverages",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_stage_policyLevel_coverages",
+						"type": "DataFlowReference",
+						"parameters": {
+							"isLimitUpdateOnlyForPolicy": "false()",
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							},
+							"locationState": {
+								"value": "'@{variables('locationState')}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "limitsToPolicyLevelCoverages",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "addLimitToCoverages",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_addLimit_to_policy_level_coverage",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "limitPolicyLevel",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "limitRiskLevel",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_stage_covLimit_policy_level",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							},
+							"locationCode": "'MT'"
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "updateDeductibleToRiskLevelCoverages",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "limitsToPolicyLevelCoverages",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_addDeductible_to_risk_level_coverage",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "updateDeductibleToPolicyCoverages",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "updateDeductibleToRiskLevelCoverages",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_addDeductible_to_policy_level_coverage",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "locaitonState",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "locationState",
+					"value": "Montana"
+				}
+			},
+			{
+				"name": "Set locationCode",
+				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "locaitonState",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "locationCode",
+					"value": "'MT'"
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "onlyPolicyLevelCoverages",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "locationCode",
+					"value": "MT"
+				}
+			}
+		],
+		"variables": {
+			"isLimitUpdateOnly": {
+				"type": "Boolean"
+			},
+			"limiPolicyLevelOnly": {
+				"type": "Boolean"
+			},
+			"locationState": {
+				"type": "String"
+			},
+			"locationCode": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Staging Data Movement"
+		},
+		"annotations": []
+	}
+}

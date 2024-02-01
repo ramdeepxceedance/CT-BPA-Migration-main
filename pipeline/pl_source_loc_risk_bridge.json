@@ -1,0 +1,45 @@
+{
+	"name": "pl_source_loc_risk_bridge",
+	"properties": {
+		"activities": [
+			{
+				"name": "df_risk_location_bridge",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_source_location_risk_bridege",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policies": {
+								"value": "@pipeline().globalParameters.policies",
+								"type": "Expression"
+							},
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Source Data Movement/ecm/pipelien_txn"
+		},
+		"annotations": []
+	}
+}

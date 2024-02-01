@@ -1,0 +1,45 @@
+{
+	"name": "pl_target_quoteinfo_deprecated",
+	"properties": {
+		"activities": [
+			{
+				"name": "quoteInfo",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_target_quoteInfo_deprecated",
+						"type": "DataFlowReference",
+						"parameters": {
+							"policyPrefix": {
+								"value": "'@{pipeline().globalParameters.policyPrefix}'",
+								"type": "Expression"
+							},
+							"policies": {
+								"value": "@pipeline().globalParameters.policies",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "utility"
+		},
+		"annotations": []
+	}
+}
