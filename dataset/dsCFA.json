@@ -1,0 +1,85 @@
+{
+	"name": "dsCFA",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "CFA"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "coverages_BPA_MetaV2.xlsx",
+				"container": "migration"
+			},
+			"sheetIndex": 0,
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "SI_NO",
+				"type": "String"
+			},
+			{
+				"name": "id",
+				"type": "String"
+			},
+			{
+				"name": "COVERAGE_CODE",
+				"type": "String"
+			},
+			{
+				"name": "COV_SEQ",
+				"type": "String"
+			},
+			{
+				"name": "COVERAGE_CODE_DES",
+				"type": "String"
+			},
+			{
+				"name": "COVERAGES",
+				"type": "String"
+			},
+			{
+				"name": "BPA_COVERAGE_CODES",
+				"type": "String"
+			},
+			{
+				"name": "BPA_SECTION_CODE",
+				"type": "String"
+			},
+			{
+				"name": "BPA_SEC_NAME",
+				"type": "String"
+			},
+			{
+				"name": "BPA_COVERAGES",
+				"type": "String"
+			},
+			{
+				"name": "BPA Coverage Groups",
+				"type": "String"
+			},
+			{
+				"name": "BPA Coverage Type",
+				"type": "String"
+			},
+			{
+				"name": "BPA_PRODUCT_CODE",
+				"type": "String"
+			},
+			{
+				"name": "SOURCE_PRODUCT_CODE",
+				"type": "String"
+			},
+			{
+				"name": "coverage_level",
+				"type": "String"
+			}
+		]
+	}
+}

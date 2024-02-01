@@ -1,0 +1,107 @@
+{
+	"name": "ECMBPA_COV_MAP",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "postgresTest",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": [
+			{
+				"name": "COV_SEQ",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "BPA_SECTION_CODE",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "COVERAGE_CODE",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "COVERAGE_CODE_DES",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "BPA_COVERAGE_CODES",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "BPA_COVERAGES",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "COVERAGES",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "BPA_PRODUCT_CODE",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "SI_NO",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "id",
+				"type": "bigint",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "BPA_SEC_NAME",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "SOURCE_PRODUCT_CODE",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "bpa_coverage_group",
+				"type": "character varying",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "bpa_coverage_level",
+				"type": "character varying",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "bpa_coverage_type",
+				"type": "character varying",
+				"precision": 0,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "public",
+			"table": "ecm_bpa_cov_mapping"
+		}
+	}
+}

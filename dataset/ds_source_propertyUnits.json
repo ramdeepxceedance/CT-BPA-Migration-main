@@ -1,0 +1,343 @@
+{
+	"name": "ds_source_propertyUnits",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "PolicyPrefix",
+				"type": "char"
+			},
+			{
+				"name": "Policy",
+				"type": "varchar"
+			},
+			{
+				"name": "Policy_Sequence",
+				"type": "varchar"
+			},
+			{
+				"name": "RowStatus",
+				"type": "char"
+			},
+			{
+				"name": "EffectiveDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ExpirationDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "LocationNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationUnitNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "UnitType/ModificationType",
+				"type": "varchar"
+			},
+			{
+				"name": "YearBuild",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "UnitValue",
+				"type": "decimal",
+				"precision": 13,
+				"scale": 0
+			},
+			{
+				"name": "SquareFootage",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "RiskUseCode",
+				"type": "char"
+			},
+			{
+				"name": "Occupancy",
+				"type": "char"
+			},
+			{
+				"name": "RoofTypeCode",
+				"type": "varchar"
+			},
+			{
+				"name": "RoofYear",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "Make",
+				"type": "varchar"
+			},
+			{
+				"name": "Model",
+				"type": "varchar"
+			},
+			{
+				"name": "SerialNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "UnitWidth",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "RiskType",
+				"type": "char"
+			},
+			{
+				"name": "UnitLength",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "PurchasePrice",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 0
+			},
+			{
+				"name": "PurchaseDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "NewUsed",
+				"type": "char"
+			},
+			{
+				"name": "ProtectionClass",
+				"type": "varchar"
+			},
+			{
+				"name": "NumberOfSections",
+				"type": "decimal",
+				"precision": 1,
+				"scale": 0
+			},
+			{
+				"name": "AppraisalYear",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "AppraisedValue",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 0
+			},
+			{
+				"name": "ConstructionTypeCode",
+				"type": "varchar"
+			},
+			{
+				"name": "ParkCode",
+				"type": "char"
+			},
+			{
+				"name": "OrdinanceLawPercent",
+				"type": "decimal",
+				"precision": 5,
+				"scale": 2
+			},
+			{
+				"name": "PropertyLossScore",
+				"type": "varchar"
+			},
+			{
+				"name": "ProtectedRiskFlag",
+				"type": "char"
+			},
+			{
+				"name": "PreferredRiskFlag",
+				"type": "char"
+			},
+			{
+				"name": "ReplaceOrFullRepair",
+				"type": "char"
+			},
+			{
+				"name": "MineSubsidenceFlag",
+				"type": "char"
+			},
+			{
+				"name": "NumberOfStories",
+				"type": "decimal",
+				"precision": 3,
+				"scale": 0
+			},
+			{
+				"name": "InZoneFlag",
+				"type": "char"
+			},
+			{
+				"name": "BasicFlag",
+				"type": "char"
+			},
+			{
+				"name": "DwellingUnits",
+				"type": "char"
+			},
+			{
+				"name": "ElectricSystemTypeCode",
+				"type": "char"
+			},
+			{
+				"name": "PlumbingSystemTypeCode",
+				"type": "char"
+			},
+			{
+				"name": "ExtentOfRoofUpdateCode",
+				"type": "char"
+			},
+			{
+				"name": "ElectricSystemYear",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "ExtentOfElectricSystemUpdate",
+				"type": "char"
+			},
+			{
+				"name": "PlumbingSystemYear",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "ExtentOfPlumbingSystemUpdate",
+				"type": "char"
+			},
+			{
+				"name": "HeatingSystemYear",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "ExtentOfHeatingSystemUpdate",
+				"type": "char"
+			},
+			{
+				"name": "MilesToFireDepartmentCode",
+				"type": "char"
+			},
+			{
+				"name": "FeetToHydrantCode",
+				"type": "char"
+			},
+			{
+				"name": "UnitDescription",
+				"type": "varchar"
+			},
+			{
+				"name": "InflationGuardPercent",
+				"type": "decimal",
+				"precision": 6,
+				"scale": 3
+			},
+			{
+				"name": "NumberOfHouseholds",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "AnimalUseCode",
+				"type": "char"
+			},
+			{
+				"name": "AnimalOtherUse",
+				"type": "varchar"
+			},
+			{
+				"name": "LeaseFlag",
+				"type": "char"
+			},
+			{
+				"name": "ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DataSource",
+				"type": "char"
+			},
+			{
+				"name": "FirelineScore",
+				"type": "varchar"
+			},
+			{
+				"name": "FirelineStatus",
+				"type": "varchar"
+			},
+			{
+				"name": "FirelineDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "AnimalDOB",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "AnimalName",
+				"type": "varchar"
+			},
+			{
+				"name": "AnimalBreed",
+				"type": "varchar"
+			},
+			{
+				"name": "AnimalBreedOtherDescription",
+				"type": "varchar"
+			},
+			{
+				"name": "AnimalSireName",
+				"type": "varchar"
+			},
+			{
+				"name": "AnimalDamName",
+				"type": "varchar"
+			},
+			{
+				"name": "AnimalSex",
+				"type": "varchar"
+			},
+			{
+				"name": "DW_InsertDate",
+				"type": "date"
+			},
+			{
+				"name": "CoveragePart",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "PolicyPropertyUnit_P"
+		}
+	}
+}

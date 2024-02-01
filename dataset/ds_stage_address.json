@@ -1,0 +1,38 @@
+{
+	"name": "ds_stage_address",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_DM_Stage_Target",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Stage"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": [
+			{
+				"name": "address_id",
+				"type": "integer",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "json_data",
+				"type": "json",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "extendedattributes",
+				"type": "json",
+				"precision": 0,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "public",
+			"table": "address"
+		}
+	}
+}

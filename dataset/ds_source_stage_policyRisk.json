@@ -1,0 +1,111 @@
+{
+	"name": "ds_source_stage_policyRisk",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "RISK_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "RISK_VID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "RISK_NUMBER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "POLICY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "RISK_IS_ACTIVE_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "RISK_EFF_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "RISK_EXP_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "IS_VALID_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "VALID_START_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "VALID_END_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "RISK_TYPE_CD",
+				"type": "nvarchar"
+			},
+			{
+				"name": "RISK_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "UNIQUE_IDENTIFIER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DELETED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "BPAM_LAST_MODIFIED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BPAM_LAST_CREATED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "POL_RISK"
+		}
+	}
+}

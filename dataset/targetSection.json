@@ -1,0 +1,77 @@
+{
+	"name": "targetSection",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_DM_Stage_Target",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": [
+			{
+				"name": "section_id",
+				"type": "integer",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "policy_id",
+				"type": "integer",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "coverage_id",
+				"type": "integer",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "location_id",
+				"type": "integer",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "limit_id",
+				"type": "integer",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "deductible_id",
+				"type": "integer",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "insurableobject_id",
+				"type": "integer",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "json_data",
+				"type": "jsonb",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "extendedattributes",
+				"type": "json",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "section_code",
+				"type": "character varying",
+				"precision": 0,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "public",
+			"table": "bpa_section"
+		}
+	}
+}

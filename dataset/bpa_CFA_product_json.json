@@ -1,0 +1,113 @@
+{
+	"name": "bpa_CFA_product_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "CFA"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "CFA1_1.0.417.json",
+				"container": "migration"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"BroadLine": {
+					"type": "string"
+				},
+				"Sections": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"Code": {
+								"type": "string"
+							},
+							"DisplayName": {
+								"type": "string"
+							},
+							"Description": {
+								"type": "string"
+							},
+							"LOB": {
+								"type": "string"
+							},
+							"SequenceNumber": {
+								"type": "integer"
+							},
+							"IsPrimary": {
+								"type": "boolean"
+							},
+							"IsMandatory": {
+								"type": "boolean"
+							},
+							"Coverages": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"Code": {
+											"type": "string"
+										},
+										"DisplayName": {
+											"type": "string"
+										},
+										"CoverageType": {
+											"type": "string"
+										},
+										"Limit": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"TypeCode": {
+														"type": "string"
+													},
+													"Min": {
+														"type": "number"
+													},
+													"Max": {
+														"type": "integer"
+													},
+													"ValueType": {
+														"type": "string"
+													},
+													"InputType": {
+														"type": "string"
+													},
+													"Name": {
+														"type": "string"
+													}
+												}
+											}
+										},
+										"Level": {
+											"type": "string"
+										},
+										"IsMandatory": {
+											"type": "boolean"
+										},
+										"IsDefault": {
+											"type": "boolean"
+										}
+									}
+								}
+							},
+							"IsSharedCarrier": {
+								"type": "boolean"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

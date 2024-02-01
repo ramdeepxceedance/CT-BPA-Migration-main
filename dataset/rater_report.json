@@ -1,0 +1,43 @@
+{
+	"name": "rater_report",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "migration"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Code",
+				"type": "String"
+			},
+			{
+				"name": "Description",
+				"type": "String"
+			},
+			{
+				"name": "SubCode",
+				"type": "String"
+			},
+			{
+				"name": "Order",
+				"type": "String"
+			},
+			{
+				"name": "ExtendedAttributes",
+				"type": "String"
+			}
+		]
+	}
+}

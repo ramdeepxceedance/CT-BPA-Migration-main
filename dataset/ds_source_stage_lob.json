@@ -1,0 +1,74 @@
+{
+	"name": "ds_source_stage_lob",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "LOB_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LOB_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LOB_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LOB_DESCRIPTION",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LOB_IS_VALID_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "LOB_VALID_START_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "LOB_VALID_END_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "UNIQUE_IDENTIFIER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DELETED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "BPAM_LAST_MODIFIED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BPAM_LAST_CREATED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "POL_LOB"
+		}
+	}
+}

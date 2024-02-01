@@ -1,0 +1,12 @@
+{
+	"name": "joinTablePostgres",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_DM_Stage_Target",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": []
+	}
+}

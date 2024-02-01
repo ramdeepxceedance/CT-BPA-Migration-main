@@ -1,0 +1,117 @@
+{
+	"name": "ds_source_party",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "Policy",
+				"type": "varchar"
+			},
+			{
+				"name": "Policy_Sequence",
+				"type": "varchar"
+			},
+			{
+				"name": "EffectiveDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ExpirationDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "LocationNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationUnitNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "InsuredNumber",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "InsuredType",
+				"type": "char"
+			},
+			{
+				"name": "InsuredSubType",
+				"type": "char"
+			},
+			{
+				"name": "FirstName",
+				"type": "varchar"
+			},
+			{
+				"name": "MiddleName",
+				"type": "varchar"
+			},
+			{
+				"name": "LastName",
+				"type": "varchar"
+			},
+			{
+				"name": "NameSuffix",
+				"type": "varchar"
+			},
+			{
+				"name": "CorporateName",
+				"type": "varchar"
+			},
+			{
+				"name": "AlternateName",
+				"type": "varchar"
+			},
+			{
+				"name": "MailingAddress1",
+				"type": "varchar"
+			},
+			{
+				"name": "MailingAddress2",
+				"type": "varchar"
+			},
+			{
+				"name": "MailingCity",
+				"type": "varchar"
+			},
+			{
+				"name": "MailingZipCode",
+				"type": "varchar"
+			},
+			{
+				"name": "DOB",
+				"type": "date"
+			},
+			{
+				"name": "Relationship",
+				"type": "char"
+			},
+			{
+				"name": "ExcludedDate",
+				"type": "date"
+			},
+			{
+				"name": "DW_InsertDate",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Additional_Insured"
+		}
+	}
+}

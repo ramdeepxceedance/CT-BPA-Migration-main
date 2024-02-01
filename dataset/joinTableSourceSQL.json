@@ -1,0 +1,12 @@
+{
+	"name": "joinTableSourceSQL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	}
+}

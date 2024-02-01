@@ -1,0 +1,69 @@
+{
+	"name": "ds_ecm_state_code",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "StateCode",
+				"type": "char"
+			},
+			{
+				"name": "StateAbbreviation",
+				"type": "char"
+			},
+			{
+				"name": "StateName",
+				"type": "varchar"
+			},
+			{
+				"name": "WCTypeOfLossGroupCode",
+				"type": "varchar"
+			},
+			{
+				"name": "QuickRaterStateID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "AutoDoNotRenewDays",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "AutoConditionalRenewalNoticeDays",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "AutoUMLimitFlag",
+				"type": "char"
+			},
+			{
+				"name": "AutoStateBand",
+				"type": "char"
+			},
+			{
+				"name": "AutoRegionID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "StateTypeCode",
+				"type": "char"
+			},
+			{
+				"name": "FIPSStateCode",
+				"type": "char"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "dimState"
+		}
+	}
+}

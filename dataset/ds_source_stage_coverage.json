@@ -1,0 +1,140 @@
+{
+	"name": "ds_source_stage_coverage",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "COVERAGE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "COVERAGE_VID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "COVERAGE_CODE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "COV_STATE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "COVERAGE_EFFECTIVE_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "COVERAGE_EXPIRATION_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "ASL_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ASSL_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ASL_CODE_GBL",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ASSL_CODE_GBL",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CLASSIFICATION_CODE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "CLASSIFICATION_CODE_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "COVERAGE_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "RETROACTIVE_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "IS_VALID_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "VALID_START_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "VALID_END_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "UNIQUE_IDENTIFIER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DELETED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "BPAM_LAST_MODIFIED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BPAM_LAST_CREATED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "POL_COVERAGE"
+		}
+	}
+}

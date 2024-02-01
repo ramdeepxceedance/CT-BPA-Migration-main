@@ -1,0 +1,162 @@
+{
+	"name": "ds_source_PolicyAutoUnit",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "PolicyPrefix",
+				"type": "char"
+			},
+			{
+				"name": "Policy",
+				"type": "varchar"
+			},
+			{
+				"name": "Policy_Sequence",
+				"type": "varchar"
+			},
+			{
+				"name": "RowStatus",
+				"type": "char"
+			},
+			{
+				"name": "EffectiveDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ExpirationDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "LocationNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationUnitNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "UnitType/ModificationType",
+				"type": "varchar"
+			},
+			{
+				"name": "YearBuild",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "UnitValue",
+				"type": "decimal",
+				"precision": 13,
+				"scale": 0
+			},
+			{
+				"name": "RiskUseCode",
+				"type": "char"
+			},
+			{
+				"name": "Make",
+				"type": "varchar"
+			},
+			{
+				"name": "Model",
+				"type": "varchar"
+			},
+			{
+				"name": "UnitWidth",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "ISOClassCode",
+				"type": "varchar"
+			},
+			{
+				"name": "RiskType",
+				"type": "char"
+			},
+			{
+				"name": "UnitLength",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "PurchaseDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "AppraisalYear",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "UnitDescription",
+				"type": "varchar"
+			},
+			{
+				"name": "AnimalUseCode",
+				"type": "char"
+			},
+			{
+				"name": "LeaseFlag",
+				"type": "char"
+			},
+			{
+				"name": "AppraisalFlag",
+				"type": "char"
+			},
+			{
+				"name": "RegistrationState",
+				"type": "char"
+			},
+			{
+				"name": "VehicleID",
+				"type": "varchar"
+			},
+			{
+				"name": "EngineDisplacement",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "FuelTypeCode",
+				"type": "varchar"
+			},
+			{
+				"name": "Layup",
+				"type": "char"
+			},
+			{
+				"name": "ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DataSource",
+				"type": "char"
+			},
+			{
+				"name": "DW_InsertDate",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "PolicyAutoUnit_P"
+		}
+	}
+}

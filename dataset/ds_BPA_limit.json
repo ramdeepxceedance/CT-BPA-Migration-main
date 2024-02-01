@@ -1,0 +1,59 @@
+{
+	"name": "ds_BPA_limit",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_DM_Stage_Target",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": [
+			{
+				"name": "limit_id",
+				"type": "bigint",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "coverageCode",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "secCode",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "limitValueType",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "limitTypeCode",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "limitName",
+				"type": "text",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "coverage_group_code",
+				"type": "character varying",
+				"precision": 0,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "public",
+			"table": "bpa_limit_detail"
+		}
+	}
+}

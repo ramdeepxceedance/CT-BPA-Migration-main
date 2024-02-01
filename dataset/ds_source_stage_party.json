@@ -1,0 +1,151 @@
+{
+	"name": "ds_source_stage_party",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "PARTY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PARTY_VID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "NAME_PREFIX",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FIRST_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "MIDDLE_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LAST_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FULL_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DATE_OF_BIRTH",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "GENDER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SSN",
+				"type": "nvarchar"
+			},
+			{
+				"name": "HIRE_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "POLICYINATION_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "EMAIL",
+				"type": "nvarchar"
+			},
+			{
+				"name": "IS_VALID_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "VALID_START_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "VALID_END_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "PARTY_TYPE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PHYSICAL_GEN_ADDRESS_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "HOME_PHONE_NUMBER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FAX_NUMBER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "YEARS_WITH_EMPLOYER",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "NAME_SUFFIX",
+				"type": "nvarchar"
+			},
+			{
+				"name": "MARITAL_STATUS",
+				"type": "nvarchar"
+			},
+			{
+				"name": "OCCUPATION",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DOING_BUSINESS_AS",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DECEASED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "IS_DECEASED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "GEN_ADDRESS_UNIQ_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "POL_PARTY"
+		}
+	}
+}

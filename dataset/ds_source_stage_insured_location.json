@@ -1,0 +1,120 @@
+{
+	"name": "ds_source_stage_insured_location",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "LOCATION_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LOCATION_VID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LOCATION_IS_ACTIVE_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "LOCATION_EFF_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "LOCATION_EXP_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "IS_VALID_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "VALID_START_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "VALID_END_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "IS_PRIMARY_LOCATION_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "IS_FALSE_ADDRESS",
+				"type": "nchar"
+			},
+			{
+				"name": "PROTECTION_CLASS",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FIRE_DISTRICT_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "UNIQUE_IDENTIFIER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DELETED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "BPAM_LAST_MODIFIED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BPAM_LAST_CREATED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "GEN_ADDRESS_UNIQ_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "POL_INSURED_LOCATION"
+		}
+	}
+}

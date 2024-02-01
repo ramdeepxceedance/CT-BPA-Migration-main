@@ -1,0 +1,621 @@
+{
+	"name": "ds_source_policyCoverage",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "Policy",
+				"type": "varchar"
+			},
+			{
+				"name": "Policy_Sequence",
+				"type": "varchar"
+			},
+			{
+				"name": "ARICLOB",
+				"type": "char"
+			},
+			{
+				"name": "ARICGroupCode",
+				"type": "char"
+			},
+			{
+				"name": "Description",
+				"type": "char"
+			},
+			{
+				"name": "Product",
+				"type": "char"
+			},
+			{
+				"name": "ARICCoverageCode",
+				"type": "varchar"
+			},
+			{
+				"name": "ARICCoverageDescription",
+				"type": "varchar"
+			},
+			{
+				"name": "EndorsementNumber",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "LocationNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationUnitNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "BuildingNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationName",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationAddress1",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationAddress2",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationAddress3",
+				"type": "varchar"
+			},
+			{
+				"name": "Occupancy",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationCity",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationZipCode",
+				"type": "char"
+			},
+			{
+				"name": "LocationCounty",
+				"type": "varchar"
+			},
+			{
+				"name": "Territory",
+				"type": "char"
+			},
+			{
+				"name": "ConstructionCode",
+				"type": "char"
+			},
+			{
+				"name": "ConstructionYear",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "NumberOfFloors",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ProtectionClass",
+				"type": "char"
+			},
+			{
+				"name": "GEOLatitude",
+				"type": "decimal",
+				"precision": 11,
+				"scale": 8
+			},
+			{
+				"name": "GEOLongitude",
+				"type": "decimal",
+				"precision": 11,
+				"scale": 8
+			},
+			{
+				"name": "CauseOfLoss",
+				"type": "char"
+			},
+			{
+				"name": "BCEGClassCode",
+				"type": "char"
+			},
+			{
+				"name": "CoverageForm",
+				"type": "varchar"
+			},
+			{
+				"name": "DesignatedPremisis",
+				"type": "varchar"
+			},
+			{
+				"name": "WindIndicatorFlag",
+				"type": "char"
+			},
+			{
+				"name": "PurchaseCost",
+				"type": "decimal",
+				"precision": 8,
+				"scale": 2
+			},
+			{
+				"name": "dbo",
+				"type": "char"
+			},
+			{
+				"name": "CoInsuranceBuilding",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CoInsurancePersonalProperty",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CoInsuranceBodilyInjury",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CountryCode",
+				"type": "char"
+			},
+			{
+				"name": "MunicipalityCode",
+				"type": "varchar"
+			},
+			{
+				"name": "ParkName",
+				"type": "varchar"
+			},
+			{
+				"name": "CountyCode",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "NumberParkSpaces",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "NumberOfAcres",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "OwnOrRent",
+				"type": "char"
+			},
+			{
+				"name": "ResidenceTypeCode",
+				"type": "char"
+			},
+			{
+				"name": "LocationZone",
+				"type": "varchar"
+			},
+			{
+				"name": "ARICCoverageSequence",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CoveragePart",
+				"type": "char"
+			},
+			{
+				"name": "CoverageAddDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CoverageDescription",
+				"type": "char"
+			},
+			{
+				"name": "CoverageInternalCode",
+				"type": "char"
+			},
+			{
+				"name": "CoverageAbbreviation",
+				"type": "char"
+			},
+			{
+				"name": "CoveragePartSequence",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CoverageISOLine",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CoverageCATCode",
+				"type": "char"
+			},
+			{
+				"name": "CoverageLine4",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CoverageAddUser",
+				"type": "char"
+			},
+			{
+				"name": "CoverageUpdateDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CoverageUpdateUser",
+				"type": "char"
+			},
+			{
+				"name": "CoverageLineFlag",
+				"type": "char"
+			},
+			{
+				"name": "LocationState",
+				"type": "char"
+			},
+			{
+				"name": "ISOClassCode",
+				"type": "varchar"
+			},
+			{
+				"name": "RetroEndorsementNumber",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PolicyPrefix",
+				"type": "char"
+			},
+			{
+				"name": "EffectiveDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "Policy_Accounting_date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ExpirationDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CancelDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CancelReason",
+				"type": "varchar"
+			},
+			{
+				"name": "CancelReasonDescription",
+				"type": "varchar"
+			},
+			{
+				"name": "PolicyTermMonths",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "InsuredName",
+				"type": "varchar"
+			},
+			{
+				"name": "InsuredAddress1",
+				"type": "varchar"
+			},
+			{
+				"name": "InsuredAddress2",
+				"type": "varchar"
+			},
+			{
+				"name": "InsuredCity",
+				"type": "varchar"
+			},
+			{
+				"name": "InsuredState",
+				"type": "char"
+			},
+			{
+				"name": "InsuredZipCode",
+				"type": "varchar"
+			},
+			{
+				"name": "CompanyCode",
+				"type": "char"
+			},
+			{
+				"name": "CompanyName",
+				"type": "varchar"
+			},
+			{
+				"name": "GroupName",
+				"type": "varchar"
+			},
+			{
+				"name": "GBLICompanyCode",
+				"type": "char"
+			},
+			{
+				"name": "AgentCode",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentName",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentOffice",
+				"type": "varchar"
+			},
+			{
+				"name": "GroupCode",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentCity",
+				"type": "varchar"
+			},
+			{
+				"name": "EMail",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentPhone",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentCounty",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentZipCode",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentAddress1",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentAddress2",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentState",
+				"type": "varchar"
+			},
+			{
+				"name": "SubProducerNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "SubProducerCode",
+				"type": "varchar"
+			},
+			{
+				"name": "SubProducerName",
+				"type": "varchar"
+			},
+			{
+				"name": "SubproducerState",
+				"type": "varchar"
+			},
+			{
+				"name": "SubProducerType",
+				"type": "varchar"
+			},
+			{
+				"name": "ProductCode",
+				"type": "char"
+			},
+			{
+				"name": "ProductCodeDescription",
+				"type": "varchar"
+			},
+			{
+				"name": "PreviousPolicy",
+				"type": "varchar"
+			},
+			{
+				"name": "OriginalPolicyYear",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "NonRenewalReason",
+				"type": "char"
+			},
+			{
+				"name": "NonRenewalNoticeDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "DatabaseCode",
+				"type": "char"
+			},
+			{
+				"name": "Policy_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "MinimumPremium",
+				"type": "decimal",
+				"precision": 13,
+				"scale": 0
+			},
+			{
+				"name": "POlicy_Receive_date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "MasterPolicy",
+				"type": "varchar"
+			},
+			{
+				"name": "BillingType",
+				"type": "char"
+			},
+			{
+				"name": "RowStatus",
+				"type": "char"
+			},
+			{
+				"name": "OriginalInceptionDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "MultiplePolicyFlag",
+				"type": "char"
+			},
+			{
+				"name": "ARICBusinessUnit",
+				"type": "char"
+			},
+			{
+				"name": "HonorCurrentRateFlag",
+				"type": "char"
+			},
+			{
+				"name": "FarmType",
+				"type": "char"
+			},
+			{
+				"name": "PrimaryPremiumStateCode",
+				"type": "char"
+			},
+			{
+				"name": "StateName",
+				"type": "varchar"
+			},
+			{
+				"name": "Policy_Insert_Date",
+				"type": "date"
+			},
+			{
+				"name": "BillingSystem",
+				"type": "varchar"
+			},
+			{
+				"name": "Cov_effective_Date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "Cov_Expiry_Date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ReceivedDate",
+				"type": "date"
+			},
+			{
+				"name": "CoverageArrayNumber",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "LiabilityFlag",
+				"type": "char"
+			},
+			{
+				"name": "ExperienceModFactor",
+				"type": "decimal",
+				"precision": 7,
+				"scale": 4
+			},
+			{
+				"name": "Exposure",
+				"type": "decimal",
+				"precision": 8,
+				"scale": 0
+			},
+			{
+				"name": "TaxFeeSurchargeFlag",
+				"type": "char"
+			},
+			{
+				"name": "CancelReinstateFlag",
+				"type": "char"
+			},
+			{
+				"name": "ReleasedFlag",
+				"type": "char"
+			},
+			{
+				"name": "ReleaseDate",
+				"type": "date"
+			},
+			{
+				"name": "Rate",
+				"type": "decimal",
+				"precision": 12,
+				"scale": 6
+			},
+			{
+				"name": "PremiumStateCode",
+				"type": "varchar"
+			},
+			{
+				"name": "Coverage_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Coverage_accounting_date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "Coverage_Insert_Date",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Policy_Coverage"
+		}
+	}
+}

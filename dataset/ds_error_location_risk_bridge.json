@@ -1,0 +1,16 @@
+{
+	"name": "ds_error_location_risk_bridge",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "RISK_LOCATION_ERROR"
+		}
+	}
+}

@@ -1,0 +1,67 @@
+{
+	"name": "StgLookUpType",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "LOOKUP_TYPE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LOOKUP_TYPE_DOMAIN",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "DELETED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "IS_VALID_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "VALID_START_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "VALID_END_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BPAM_LAST_MODIFIED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BPAM_LAST_CREATED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "REF_LOOKUP_TYPE"
+		}
+	}
+}

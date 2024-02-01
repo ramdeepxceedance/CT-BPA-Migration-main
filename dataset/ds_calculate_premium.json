@@ -1,0 +1,26 @@
+{
+	"name": "ds_calculate_premium",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RestService2",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"baseURL": {
+				"type": "string"
+			},
+			"domain": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "rest"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": "/policyadmin-api/calculateRatedValues/v1/quote"
+		},
+		"schema": []
+	}
+}

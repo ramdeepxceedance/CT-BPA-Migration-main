@@ -1,0 +1,122 @@
+{
+	"name": "ds_source_agent",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "AgentCode",
+				"type": "char"
+			},
+			{
+				"name": "AgentName",
+				"type": "varchar"
+			},
+			{
+				"name": "GroupCode",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentStatus",
+				"type": "varchar"
+			},
+			{
+				"name": "StartDate",
+				"type": "date"
+			},
+			{
+				"name": "EndDate",
+				"type": "date"
+			},
+			{
+				"name": "AgentOffice",
+				"type": "varchar"
+			},
+			{
+				"name": "RenewalNoticeDays",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "AuditExclusion",
+				"type": "char"
+			},
+			{
+				"name": "AuditThreshold",
+				"type": "decimal",
+				"precision": 8,
+				"scale": 0
+			},
+			{
+				"name": "IssuanceGroup",
+				"type": "varchar"
+			},
+			{
+				"name": "DefaultBusinessDivisionID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "DefaultPricingProductID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "OfficeID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "EMail",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentAddress1",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentAddress2",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentAddress3",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentCity",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentState",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentZipCode",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentPhone",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentCounty",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentContact",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "dimAgent"
+		}
+	}
+}

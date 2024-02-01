@@ -1,0 +1,147 @@
+{
+	"name": "ds_source_stage_coverageExt",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "COVERAGE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "COVERAGE_VID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "ARICCoverageSequence",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ARICTaxFeeSurchargeFlag",
+				"type": "varchar"
+			},
+			{
+				"name": "PropertyOrCasualty",
+				"type": "varchar"
+			},
+			{
+				"name": "ARICGroupCode",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationState",
+				"type": "varchar"
+			},
+			{
+				"name": "ARICLOB",
+				"type": "varchar"
+			},
+			{
+				"name": "CoverageInternalCode",
+				"type": "varchar"
+			},
+			{
+				"name": "CoverageAbbreviation",
+				"type": "varchar"
+			},
+			{
+				"name": "CoverageDescription",
+				"type": "varchar"
+			},
+			{
+				"name": "CoverageArrayNumber",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CoveragePartSequence",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CoveragePart",
+				"type": "varchar"
+			},
+			{
+				"name": "CoverageISOLine",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CoverageCATCode",
+				"type": "varchar"
+			},
+			{
+				"name": "CoverageFullyEarned",
+				"type": "varchar"
+			},
+			{
+				"name": "LiabilityFlag",
+				"type": "varchar"
+			},
+			{
+				"name": "CoverageLine4",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CoverageEffectiveDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CoverageExpirationDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CoverageAddDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CoverageAddUser",
+				"type": "varchar"
+			},
+			{
+				"name": "CoverageUpdateDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CoverageUpdateUser",
+				"type": "varchar"
+			},
+			{
+				"name": "CoverageLineFlag",
+				"type": "varchar"
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "POL_COVERAGE_EXT"
+		}
+	}
+}

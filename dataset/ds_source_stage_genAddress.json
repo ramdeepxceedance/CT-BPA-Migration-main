@@ -1,0 +1,87 @@
+{
+	"name": "ds_source_stage_genAddress",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "GEN_ADDRESS_UNIQ_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "ADDRESS_STREET1",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ADDRESS_STREET2",
+				"type": "nvarchar"
+			},
+			{
+				"name": "COUNTY_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "COUNTY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ADDRESS_CITY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ADD_DESCRIPTION",
+				"type": "nvarchar"
+			},
+			{
+				"name": "STATE_PROVINCE_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "POSTAL_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "POSTAL_CODE_EXT",
+				"type": "nvarchar"
+			},
+			{
+				"name": "COUNTRY_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SOURCE_INSERTED_ON",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "SOURCE_UPDATED_ON",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			},
+			{
+				"name": "TERRITORY",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "GEN_ADDRESS"
+		}
+	}
+}

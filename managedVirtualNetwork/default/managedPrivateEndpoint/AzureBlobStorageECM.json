@@ -1,0 +1,7 @@
+{
+	"name": "AzureBlobStorageECM",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/dcd09377-b8fe-4215-bcee-03ff11e989d6/resourceGroups/CT-AKS-RG-BPA-ECM-MIGRATION/providers/Microsoft.Storage/storageAccounts/bpaecmmigration",
+		"groupId": "blob"
+	}
+}

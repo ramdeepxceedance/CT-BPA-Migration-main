@@ -1,0 +1,78 @@
+{
+	"name": "ds_source_stage_policyRiskDetails",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "RISK_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "RISK_VID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "RISK_TYPE_CD",
+				"type": "nvarchar"
+			},
+			{
+				"name": "RISK_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ATTRIBUTE_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ATTRIBUTE_VALUE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SORT_ORDER",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "DELETED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "BPAM_LAST_MODIFIED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BPAM_LAST_CREATED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "POL_RISK_DETAILS"
+		}
+	}
+}

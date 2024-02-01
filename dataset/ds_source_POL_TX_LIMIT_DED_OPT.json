@@ -1,0 +1,152 @@
+{
+	"name": "ds_source_POL_TX_LIMIT_DED_OPT",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "TX_LIMIT_DED_OPT_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "TX_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LOCATION_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LOCATION_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "SECTION_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "SECTION_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "TX_BRIDGE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "RISK_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "RISK_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LIMIT_DED_OPT_TYPE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LDO_FLAG",
+				"type": "nchar"
+			},
+			{
+				"name": "LDO_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LIMIT_OCCURRENCE_FLAG",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LDO_VALUE",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LDO_VALUE_CCY_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LDO_PERCENTAGE",
+				"type": "decimal",
+				"precision": 6,
+				"scale": 4
+			},
+			{
+				"name": "LDO_TEXT",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "UNIQUE_IDENTIFIER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DELETED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "BPAM_LAST_MODIFIED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BPAM_LAST_CREATED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "COVERAGE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "COVERAGE_OVID",
+				"type": "bigint",
+				"precision": 19
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "POL_TX_LIMIT_DED_OPT"
+		}
+	}
+}

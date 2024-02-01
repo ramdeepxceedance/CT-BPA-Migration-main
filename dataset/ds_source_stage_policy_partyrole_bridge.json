@@ -1,0 +1,104 @@
+{
+	"name": "ds_source_stage_policy_partyrole_bridge",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "POLICY_PARTY_ROLE_BRIDGE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "ROLE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "ROLE_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PARTY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PARTY_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "IS_VALID_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "VALID_START_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "VALID_END_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "SOURCE_SYSTEM",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "UNIQUE_IDENTIFIER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			},
+			{
+				"name": "DELETED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "BPAM_LAST_MODIFIED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BPAM_LAST_CREATED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "POL_POLICY_PARTY_ROLE_BRIDGE"
+		}
+	}
+}

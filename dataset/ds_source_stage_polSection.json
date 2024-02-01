@@ -1,0 +1,124 @@
+{
+	"name": "ds_source_stage_polSection",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "SECTION_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "SECTION_VID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "COVERAGE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "COVERAGE_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LOCATION_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LOCATION_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "LOB_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "SUB_LOB_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "RATE_SET_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "PRIMARY_POLICY_STATE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "IS_VALID_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "VALID_START_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "VALID_END_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "UNIQUE_IDENTIFIER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DELETED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "BPAM_LAST_MODIFIED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BPAM_LAST_CREATED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "POL_SECTION"
+		}
+	}
+}

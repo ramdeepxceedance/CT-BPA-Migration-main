@@ -1,0 +1,61 @@
+{
+	"name": "ds_source_stage_ECMDataDictionary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "Database",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SchemaName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TableName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TableType",
+				"type": "varchar"
+			},
+			{
+				"name": "ColumnNumber",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Column",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DataType",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Length",
+				"type": "varchar"
+			},
+			{
+				"name": "DecimalPlaces",
+				"type": "varchar"
+			},
+			{
+				"name": "ColumnDescription",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "ECMDataDictionary"
+		}
+	}
+}

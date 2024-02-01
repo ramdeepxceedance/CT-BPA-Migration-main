@@ -1,0 +1,111 @@
+{
+	"name": "ds_source_FactCoverageDeductible",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "Policy",
+				"type": "varchar"
+			},
+			{
+				"name": "Policy_Sequence",
+				"type": "varchar"
+			},
+			{
+				"name": "PolicyPrefix",
+				"type": "char"
+			},
+			{
+				"name": "ARICCoverageCode",
+				"type": "varchar"
+			},
+			{
+				"name": "ARICCoverageDescription",
+				"type": "varchar"
+			},
+			{
+				"name": "CoverageDescription",
+				"type": "char"
+			},
+			{
+				"name": "CoverageInternalCode",
+				"type": "char"
+			},
+			{
+				"name": "LocationState",
+				"type": "char"
+			},
+			{
+				"name": "ARICLOB",
+				"type": "char"
+			},
+			{
+				"name": "LocationNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationUnitNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "ARICCoverageSequence",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CoveragePart",
+				"type": "char"
+			},
+			{
+				"name": "CoverageAddDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "DESDSC",
+				"type": "char"
+			},
+			{
+				"name": "DEDESC",
+				"type": "char"
+			},
+			{
+				"name": "DeductibleCode",
+				"type": "varchar"
+			},
+			{
+				"name": "DeductibleAmount1Type",
+				"type": "char"
+			},
+			{
+				"name": "DeductibleAmount1",
+				"type": "decimal",
+				"precision": 7,
+				"scale": 0
+			},
+			{
+				"name": "DeductibleAmount2Type",
+				"type": "char"
+			},
+			{
+				"name": "DeductibleAmount2",
+				"type": "decimal",
+				"precision": 7,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Fact_Coverage_Deductible"
+		}
+	}
+}

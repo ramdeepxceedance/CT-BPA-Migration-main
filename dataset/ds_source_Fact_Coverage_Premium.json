@@ -1,0 +1,105 @@
+{
+	"name": "ds_source_Fact_Coverage_Premium",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "Policy",
+				"type": "varchar"
+			},
+			{
+				"name": "Policy_Sequence",
+				"type": "varchar"
+			},
+			{
+				"name": "PolicyPrefix",
+				"type": "char"
+			},
+			{
+				"name": "ARICLOB",
+				"type": "char"
+			},
+			{
+				"name": "ARICGroupCode",
+				"type": "char"
+			},
+			{
+				"name": "Description",
+				"type": "char"
+			},
+			{
+				"name": "Product",
+				"type": "char"
+			},
+			{
+				"name": "ARICCoverageCode",
+				"type": "varchar"
+			},
+			{
+				"name": "ARICCoverageDescription",
+				"type": "varchar"
+			},
+			{
+				"name": "PrimaryPremiumStateCode",
+				"type": "char"
+			},
+			{
+				"name": "LocationNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationUnitNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "ARICCoverageSequence",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CoveragePart",
+				"type": "char"
+			},
+			{
+				"name": "CoverageAddDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CoverageDescription",
+				"type": "char"
+			},
+			{
+				"name": "Limit1",
+				"type": "decimal",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "Limit2",
+				"type": "decimal",
+				"precision": 38,
+				"scale": 0
+			},
+			{
+				"name": "PremiumAmount",
+				"type": "decimal",
+				"precision": 38,
+				"scale": 2
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Fact_Coverage_Premium"
+		}
+	}
+}

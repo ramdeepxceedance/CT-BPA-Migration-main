@@ -1,0 +1,80 @@
+{
+	"name": "ds_source_insuredAddress",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "Policy",
+				"type": "varchar"
+			},
+			{
+				"name": "Policy_Sequence",
+				"type": "char"
+			},
+			{
+				"name": "PolicyPrefix",
+				"type": "char"
+			},
+			{
+				"name": "ProductCode",
+				"type": "char"
+			},
+			{
+				"name": "EffectiveDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ExpirationDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "InsuredName",
+				"type": "varchar"
+			},
+			{
+				"name": "InsuredAddress1",
+				"type": "varchar"
+			},
+			{
+				"name": "InsuredAddress2",
+				"type": "varchar"
+			},
+			{
+				"name": "InsuredAddress3",
+				"type": "varchar"
+			},
+			{
+				"name": "InsuredCity",
+				"type": "varchar"
+			},
+			{
+				"name": "InsuredState",
+				"type": "char"
+			},
+			{
+				"name": "InsuredZipCode",
+				"type": "varchar"
+			},
+			{
+				"name": "InsuredTelephone",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Insured_Address"
+		}
+	}
+}

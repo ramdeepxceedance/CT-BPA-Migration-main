@@ -1,0 +1,95 @@
+{
+	"name": "ds_source_stage_partyrole",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "ROLE_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "ROLE_VID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "ROLE_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ROLE_DESCRIPTION",
+				"type": "nvarchar"
+			},
+			{
+				"name": "IS_PRIMARY_INSURED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "IS_DRIVER_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "IS_CUSTOMER_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "IS_VALID_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "VALID_START_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "VALID_END_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "UNIQUE_IDENTIFIER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DELETED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "BPAM_LAST_MODIFIED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BPAM_LAST_CREATED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "POL_PARTY_ROLE"
+		}
+	}
+}

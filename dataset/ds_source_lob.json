@@ -1,0 +1,44 @@
+{
+	"name": "ds_source_lob",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "ARICGroupCode",
+				"type": "char"
+			},
+			{
+				"name": "ARICLineOfBusinessID",
+				"type": "char"
+			},
+			{
+				"name": "ARICGroupLineDescription",
+				"type": "varchar"
+			},
+			{
+				"name": "ARICMajorProductCode",
+				"type": "char"
+			},
+			{
+				"name": "ProductCode",
+				"type": "varchar"
+			},
+			{
+				"name": "INFCATPProduct",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "dimARICCompanyLineofBusiness"
+		}
+	}
+}

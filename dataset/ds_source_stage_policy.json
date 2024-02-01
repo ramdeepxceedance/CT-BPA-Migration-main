@@ -1,0 +1,338 @@
+{
+	"name": "ds_source_stage_policy",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "POLICY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_VID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "REINSURANCE_DAC",
+				"type": "nchar"
+			},
+			{
+				"name": "PREVIOUS_INSURANCE_NO_REMARKS",
+				"type": "nvarchar"
+			},
+			{
+				"name": "AGENCY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "AGENCY_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PRODUCER_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PRODUCER_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PRODUCER_CONTACT_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PRODUCER_CONTACT_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_NUMBER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ENTITY_TYPE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ENTITY_STATUS",
+				"type": "nvarchar"
+			},
+			{
+				"name": "IS_RENEWAL_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "REVISION_NUMBER",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PRODUCT_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PRODUCT_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "POLICY_EFFECTIVE_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "POLICY_EXPIRATION_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "NON_RENEWAL_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "POLICY_RENEWED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "CANCELLATION_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "IS_RENEWABLE_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "PREVIOUS_INSURANCE_NO_REASON",
+				"type": "nvarchar"
+			},
+			{
+				"name": "POLICY_STATUS",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CANCEL_REASON_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CANCEL_REASON_DESCRIPTION",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CANCEL_METHOD",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CANCEL_METHOD_DESC",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LOSE_REASON_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "LOSE_REASON_DESC",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DECLINATION_REASON_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DECLINATION_REASON_DESC",
+				"type": "nvarchar"
+			},
+			{
+				"name": "NOT_WRITTEN_REASON_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "NOT_WRITTEN_REASON_DESC",
+				"type": "nvarchar"
+			},
+			{
+				"name": "POLICY_STATE_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PROGRAM_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PROGRAM_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "BILLING_TYPE_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "UNDERWRITING_COMPANY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "UNDERWRITING_COMPANY_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "SUBMISSION_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PREVIOUS_INSURANCE_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "LEGACY_POLICY_NUMBER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "STATE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "POLICY_POLICY",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "PAYMENT_PLAN",
+				"type": "nvarchar"
+			},
+			{
+				"name": "APPLICATION_RECEIVED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "INCEPTION_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BILL_TYPE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FORMS_LANGUAGE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BASE_CURRENCY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "INVOICE_CURRENCY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PREVIOUS_POLICY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PREVIOUS_POLICY_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "REVISED_FROM_POLICY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "REVISED_FROM_POLICY_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "OPERATING_COMPANY_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "OPERATING_COMPANY_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "CONVERTED_FROM_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "CONVERTED_FROM_OVID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "INSTALLMENT_RENEWAL",
+				"type": "nvarchar"
+			},
+			{
+				"name": "IS_VALID_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "VALID_START_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BPAM_LAST_MODIFIED_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "VALID_END_DATE",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "BATCH_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "UNIQUE_IDENTIFIER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DELETED_YN",
+				"type": "nchar"
+			},
+			{
+				"name": "SOURCE_KEY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DATA_HASH",
+				"type": "varbinary"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "POL_POLICY"
+		}
+	}
+}

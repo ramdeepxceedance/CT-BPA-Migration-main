@@ -1,0 +1,45 @@
+{
+	"name": "ds_source_stage__emp_riskType_excel",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "RISK TYPE CODES",
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Mortality_Reverse_Migration_Mapping_v22.0_new (1).xlsx",
+				"container": "migration"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "UNIT_TYPE",
+				"type": "String"
+			},
+			{
+				"name": "RSKTYPE",
+				"type": "String"
+			},
+			{
+				"name": "RISK_TYPE_CODE",
+				"type": "String"
+			},
+			{
+				"name": "DIMENSION_NAME",
+				"type": "String"
+			},
+			{
+				"name": "RISK_TYPE_CODE_DESC",
+				"type": "String"
+			}
+		]
+	}
+}

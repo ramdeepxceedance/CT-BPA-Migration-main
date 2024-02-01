@@ -1,0 +1,76 @@
+{
+	"name": "ds_source_locationAddress",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "Policy",
+				"type": "varchar"
+			},
+			{
+				"name": "Policy_Sequence",
+				"type": "varchar"
+			},
+			{
+				"name": "PolicyPrefix",
+				"type": "char"
+			},
+			{
+				"name": "ProductCode",
+				"type": "char"
+			},
+			{
+				"name": "LocationNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "BuildingNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationName",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationAddress1",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationAddress2",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationAddress3",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationCity",
+				"type": "varchar"
+			},
+			{
+				"name": "LocationZipCode",
+				"type": "char"
+			},
+			{
+				"name": "LocationCounty",
+				"type": "varchar"
+			},
+			{
+				"name": "Territory",
+				"type": "char"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Location_Address"
+		}
+	}
+}

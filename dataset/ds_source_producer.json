@@ -1,0 +1,49 @@
+{
+	"name": "ds_source_producer",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "SubProducerCode",
+				"type": "varchar"
+			},
+			{
+				"name": "SubProducerName",
+				"type": "varchar"
+			},
+			{
+				"name": "FergusonSubProducerFlag",
+				"type": "varchar"
+			},
+			{
+				"name": "GroupCode",
+				"type": "varchar"
+			},
+			{
+				"name": "SubProducerType",
+				"type": "varchar"
+			},
+			{
+				"name": "SubproducerState",
+				"type": "varchar"
+			},
+			{
+				"name": "DistributionTypeCode",
+				"type": "smallint",
+				"precision": 5
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "dimSubProducer"
+		}
+	}
+}

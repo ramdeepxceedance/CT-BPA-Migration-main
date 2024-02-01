@@ -1,0 +1,64 @@
+{
+	"name": "ds_source_stage_coverage_section_lookup",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sourceStageDB",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source Stage"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "COVERAGE_SECTION_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PRODUCT_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "COVERAGE_SEQ",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "COVERAGE_CODE",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "COVERAGE_CODE_DES",
+				"type": "nvarchar"
+			},
+			{
+				"name": "COVERAGE_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BPA_SEC_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BPA_SECTION_CODE",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BPA_COVERAGES",
+				"type": "nvarchar"
+			},
+			{
+				"name": "BPA_COVERAGE_CODES",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "COVERAGE_SECTION_REF"
+		}
+	}
+}

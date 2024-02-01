@@ -1,0 +1,113 @@
+{
+	"name": "ds_source_company",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ecmmigrationdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Source/ecm"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "WINSCompanyID",
+				"type": "char"
+			},
+			{
+				"name": "Name",
+				"type": "varchar"
+			},
+			{
+				"name": "NAICNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "NAICGroupCode",
+				"type": "char"
+			},
+			{
+				"name": "NCCICode",
+				"type": "char"
+			},
+			{
+				"name": "ISOCode",
+				"type": "char"
+			},
+			{
+				"name": "FEIN",
+				"type": "char"
+			},
+			{
+				"name": "AddressLine1",
+				"type": "varchar"
+			},
+			{
+				"name": "AddressLine2",
+				"type": "varchar"
+			},
+			{
+				"name": "City",
+				"type": "varchar"
+			},
+			{
+				"name": "AlphaStateCode",
+				"type": "varchar"
+			},
+			{
+				"name": "ZipCode",
+				"type": "varchar"
+			},
+			{
+				"name": "CreateTime",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CreatedBy",
+				"type": "varchar"
+			},
+			{
+				"name": "UpdateTime",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "UpdatedBy",
+				"type": "varchar"
+			},
+			{
+				"name": "AgentUploadFlag",
+				"type": "char"
+			},
+			{
+				"name": "ARICGroupCode",
+				"type": "char"
+			},
+			{
+				"name": "CompanyGroup",
+				"type": "char"
+			},
+			{
+				"name": "ARICDirectAssumed",
+				"type": "char"
+			},
+			{
+				"name": "CompanyAbbreviation",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "dimCompany"
+		}
+	}
+}
