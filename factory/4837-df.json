@@ -1,5 +1,13 @@
 {
 	"name": "4837-df",
+	"properties": {
+		"globalParameters": {
+			"policyPrefix": {
+				"type": "string",
+				"value": " "
+			}
+		}
+	},
 	"location": "eastus2",
 	"identity": {
 		"type": "SystemAssigned",
