@@ -21,6 +21,10 @@
 			"tokenBaseURL": {
 				"type": "string",
 				"value": " "
+			},
+			"client_secret": {
+				"type": "string",
+				"value": " "
 			}
 		}
 	},
