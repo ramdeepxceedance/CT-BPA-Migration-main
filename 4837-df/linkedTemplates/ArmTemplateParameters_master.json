@@ -1,0 +1,69 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "4837-df"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"RestService1_clientSecret": {
+			"value": ""
+		},
+		"RestService2_clientSecret": {
+			"value": ""
+		},
+		"ecmmigrationdb_connectionString": {
+			"value": ""
+		},
+		"ls_DM_Stage_Target_connectionString": {
+			"value": ""
+		},
+		"postgresTest_connectionString": {
+			"value": ""
+		},
+		"sourceStageDB_connectionString": {
+			"value": ""
+		},
+		"ssSqlServer_connectionString": {
+			"value": "Integrated Security=False;Data Source=@{linkedService().dbUrl};Initial Catalog=@{linkedService().dbName};User ID=@{linkedService().dbUsername};Password=@{linkedService().dbPassword}"
+		},
+		"submitService_clientSecret": {
+			"value": ""
+		},
+		"RestService1_properties_typeProperties_url": {
+			"value": "https://bpa-dev.chainthat.net"
+		},
+		"RestService1_properties_typeProperties_clientId": {
+			"value": "adf-client"
+		},
+		"RestService2_properties_typeProperties_url": {
+			"value": "https://bpa-ecm-migration.chainthat.net"
+		},
+		"RestService2_properties_typeProperties_clientId": {
+			"value": "adf-client"
+		},
+		"sampleLogin_properties_typeProperties_url": {
+			"value": "http://restapi.adequateshop.com"
+		},
+		"submitService_properties_typeProperties_url": {
+			"value": "https://bpa-tst.chainthat.net/policyadmin-api/submitPolicyInformation/v1/policy"
+		},
+		"submitService_properties_typeProperties_clientId": {
+			"value": "ecm-claims-client"
+		},
+		"AzureBlobStorageECM_properties_privateLinkResourceId": {
+			"value": "/subscriptions/dcd09377-b8fe-4215-bcee-03ff11e989d6/resourceGroups/CT-AKS-RG-BPA-ECM-MIGRATION/providers/Microsoft.Storage/storageAccounts/bpaecmmigration"
+		},
+		"AzureBlobStorageECM_properties_groupId": {
+			"value": "blob"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

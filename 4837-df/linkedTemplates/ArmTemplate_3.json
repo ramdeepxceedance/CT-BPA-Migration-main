@@ -1,0 +1,1610 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "4837-df"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_stage_polTxnPremium')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sourceStageDB",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source Stage"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "AGENCY_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "AGENCY_VID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "AGENCY_GEN_ADDRESS_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "AGENCY_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AGENCY_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AGENCY_STATUS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AGENCY_CATEGORY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DIRECT_BILL_FLAG_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "TELEPHONE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FAX",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EMAIL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "WEBSITE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "IS_VALID_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "VALID_START_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "VALID_END_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "UNIQUE_IDENTIFIER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DELETED_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "BPAM_LAST_MODIFIED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BPAM_LAST_CREATED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "ENTITY_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ENTITY_PARENT_ID",
+						"type": "bigint",
+						"precision": 19
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "POL_PREMIUM"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_stage_policy')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sourceStageDB",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source Stage"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "POLICY_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "POLICY_VID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "REINSURANCE_DAC",
+						"type": "nchar"
+					},
+					{
+						"name": "PREVIOUS_INSURANCE_NO_REMARKS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AGENCY_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "AGENCY_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "PRODUCER_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "PRODUCER_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "PRODUCER_CONTACT_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "PRODUCER_CONTACT_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "POLICY_NUMBER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ENTITY_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ENTITY_STATUS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "IS_RENEWAL_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "REVISION_NUMBER",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PRODUCT_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "PRODUCT_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "POLICY_EFFECTIVE_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "POLICY_EXPIRATION_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "NON_RENEWAL_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POLICY_RENEWED_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "CANCELLATION_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "IS_RENEWABLE_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "PREVIOUS_INSURANCE_NO_REASON",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POLICY_STATUS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CANCEL_REASON_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CANCEL_REASON_DESCRIPTION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CANCEL_METHOD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CANCEL_METHOD_DESC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LOSE_REASON_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LOSE_REASON_DESC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DECLINATION_REASON_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DECLINATION_REASON_DESC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "NOT_WRITTEN_REASON_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "NOT_WRITTEN_REASON_DESC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POLICY_STATE_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PROGRAM_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "PROGRAM_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "BILLING_TYPE_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UNDERWRITING_COMPANY_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "UNDERWRITING_COMPANY_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "SUBMISSION_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "PREVIOUS_INSURANCE_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "LEGACY_POLICY_NUMBER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "STATE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POLICY_POLICY",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "PAYMENT_PLAN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "APPLICATION_RECEIVED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "INCEPTION_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BILL_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FORMS_LANGUAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BASE_CURRENCY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "INVOICE_CURRENCY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PREVIOUS_POLICY_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "PREVIOUS_POLICY_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "REVISED_FROM_POLICY_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "REVISED_FROM_POLICY_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "OPERATING_COMPANY_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "OPERATING_COMPANY_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "CONVERTED_FROM_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "CONVERTED_FROM_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "INSTALLMENT_RENEWAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "IS_VALID_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "VALID_START_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BPAM_LAST_MODIFIED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "VALID_END_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "UNIQUE_IDENTIFIER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DELETED_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "SOURCE_KEY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DATA_HASH",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "POL_POLICY"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_stage_policyRisk')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sourceStageDB",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source Stage"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "RISK_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "RISK_VID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "RISK_NUMBER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POLICY_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "POLICY_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "RISK_IS_ACTIVE_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "RISK_EFF_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "RISK_EXP_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "IS_VALID_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "VALID_START_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "VALID_END_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "RISK_TYPE_CD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RISK_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "UNIQUE_IDENTIFIER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DELETED_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "BPAM_LAST_MODIFIED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BPAM_LAST_CREATED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "SOURCE_KEY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DATA_HASH",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "POL_RISK"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_stage_policyRiskDetails')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sourceStageDB",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source Stage"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "RISK_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "RISK_VID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "RISK_TYPE_CD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RISK_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ATTRIBUTE_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ATTRIBUTE_VALUE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SORT_ORDER",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "DELETED_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "BPAM_LAST_MODIFIED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BPAM_LAST_CREATED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "SOURCE_KEY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DATA_HASH",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "POL_RISK_DETAILS"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_stage_policy_partyrole_bridge')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sourceStageDB",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source Stage"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "POLICY_PARTY_ROLE_BRIDGE_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "ROLE_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "ROLE_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "POLICY_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "POLICY_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "PARTY_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "PARTY_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "IS_VALID_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "VALID_START_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "VALID_END_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SOURCE_KEY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UNIQUE_IDENTIFIER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DATA_HASH",
+						"type": "varbinary"
+					},
+					{
+						"name": "DELETED_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "BPAM_LAST_MODIFIED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BPAM_LAST_CREATED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "POL_POLICY_PARTY_ROLE_BRIDGE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_stage_sub_LOB')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sourceStageDB",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source Stage"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "SUB_LOB_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "SUB_LOB_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SUB_LOB_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SUB_LOB_DESCRIPTION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "UNIQUE_IDENTIFIER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BPAM_LAST_MODIFIED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BPAM_LAST_CREATED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "SOURCE_KEY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DATA_HASH",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "POL_SUB_LOB"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_stage_txnBridge')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sourceStageDB",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source Stage"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "TX_BRIDGE_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "POLICY_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "POLICY_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "TX_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "SECTION_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "SECTION_VID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "RISK_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "RISK_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "CLASSIFICATION_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "CLASSIFICATION_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "UNIQUE_IDENTIFIER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DELETED_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "BPAM_LAST_MODIFIED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BPAM_LAST_CREATED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "DATA_HASH",
+						"type": "varbinary"
+					},
+					{
+						"name": "SOURCE_KEY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "COVERAGE_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "COVERAGE_VID",
+						"type": "bigint",
+						"precision": 19
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "POL_TX_BRIDGE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_address')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "address_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "extendedattributes",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "address"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_agency')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "agency_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_party_code",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_party_id",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "party_name",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "agency"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_agent')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "agent_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "policy_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "party_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "party_role_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "agent"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_coverage')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "coverage_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "policy_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "coverage_code",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "risk_id",
+						"type": "bigint",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "location_id",
+						"type": "bigint",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "coverage"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_deductible')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "deductible_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "coverage_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "risk_id",
+						"type": "bigint",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "deductible"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_horseBreed_lookup')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage/lookup"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "HorseBreed.csv",
+						"container": "migration"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Code",
+						"type": "String"
+					},
+					{
+						"name": "Description",
+						"type": "String"
+					},
+					{
+						"name": "SubCode",
+						"type": "String"
+					},
+					{
+						"name": "Order",
+						"type": "String"
+					},
+					{
+						"name": "ExtendedAttributes",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_horseDetailsLookup')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "lookup_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_code",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_code_desc",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "bpa_horse_details_lookup"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_horseSex_lookup')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage/lookup"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "HorseGender.csv",
+						"container": "migration"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Code",
+						"type": "String"
+					},
+					{
+						"name": "Description",
+						"type": "String"
+					},
+					{
+						"name": "SubCode",
+						"type": "String"
+					},
+					{
+						"name": "Order",
+						"type": "String"
+					},
+					{
+						"name": "ExtendedAttributes",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_horseUse_lookup')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage/lookup"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "HorseUse.csv",
+						"container": "migration"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Code",
+						"type": "String"
+					},
+					{
+						"name": "Description",
+						"type": "String"
+					},
+					{
+						"name": "SubCode",
+						"type": "String"
+					},
+					{
+						"name": "Order",
+						"type": "String"
+					},
+					{
+						"name": "ExtendedAttributes",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_limit')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "limit_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "coverage_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "risk_id",
+						"type": "bigint",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "cov_limit"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_location')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "location_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "policy_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "address_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "extendedattributes",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "location"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_party')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "party_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "party_code",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "parententityid",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_party_code",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_party_id",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "party_name",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "partyidentity"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_policy')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "policy_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "policy_number",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "policy"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

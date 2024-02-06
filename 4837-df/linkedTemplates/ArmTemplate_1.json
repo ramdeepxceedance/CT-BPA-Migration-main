@@ -1,0 +1,2404 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "4837-df"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/StgLookUpType')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sourceStageDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "LOOKUP_TYPE_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "LOOKUP_TYPE_DOMAIN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "DELETED_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "IS_VALID_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "VALID_START_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "VALID_END_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BPAM_LAST_MODIFIED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BPAM_LAST_CREATED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "DATA_HASH",
+						"type": "varbinary"
+					},
+					{
+						"name": "SOURCE_KEY",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "REF_LOOKUP_TYPE"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/StgRefLookUp')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sourceStageDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "LOOKUP_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "LOOKUP_TYPE_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "LOOKUP_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LOOKUP_SHORT_DESCRIPTION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LOOKUP_DESCRIPTION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "DELETED_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "IS_VALID_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "VALID_START_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "VALID_END_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BPAM_LAST_MODIFIED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BPAM_LAST_CREATED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "DATA_HASH",
+						"type": "varbinary"
+					},
+					{
+						"name": "SOURCE_KEY",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "REF_LOOKUP"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/bpa_CFA_product_json')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "CFA"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "CFA1_1.0.417.json",
+						"container": "migration"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"BroadLine": {
+							"type": "string"
+						},
+						"Sections": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"Code": {
+										"type": "string"
+									},
+									"DisplayName": {
+										"type": "string"
+									},
+									"Description": {
+										"type": "string"
+									},
+									"LOB": {
+										"type": "string"
+									},
+									"SequenceNumber": {
+										"type": "integer"
+									},
+									"IsPrimary": {
+										"type": "boolean"
+									},
+									"IsMandatory": {
+										"type": "boolean"
+									},
+									"Coverages": {
+										"type": "array",
+										"items": {
+											"type": "object",
+											"properties": {
+												"Code": {
+													"type": "string"
+												},
+												"DisplayName": {
+													"type": "string"
+												},
+												"CoverageType": {
+													"type": "string"
+												},
+												"Limit": {
+													"type": "array",
+													"items": {
+														"type": "object",
+														"properties": {
+															"TypeCode": {
+																"type": "string"
+															},
+															"Min": {
+																"type": "number"
+															},
+															"Max": {
+																"type": "integer"
+															},
+															"ValueType": {
+																"type": "string"
+															},
+															"InputType": {
+																"type": "string"
+															},
+															"Name": {
+																"type": "string"
+															}
+														}
+													}
+												},
+												"Level": {
+													"type": "string"
+												},
+												"IsMandatory": {
+													"type": "boolean"
+												},
+												"IsDefault": {
+													"type": "boolean"
+												}
+											}
+										}
+									},
+									"IsSharedCarrier": {
+										"type": "boolean"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/bpa_emp_product')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "EMP1_1.0.3.json",
+						"container": "migration"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"BroadLine": {
+							"type": "string"
+						},
+						"Sections": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"Code": {
+										"type": "string"
+									},
+									"DisplayName": {
+										"type": "string"
+									},
+									"Description": {
+										"type": "string"
+									},
+									"LOB": {
+										"type": "string"
+									},
+									"SequenceNumber": {
+										"type": "integer"
+									},
+									"IsPrimary": {
+										"type": "boolean"
+									},
+									"IsMandatory": {
+										"type": "boolean"
+									},
+									"Coverages": {
+										"type": "array",
+										"items": {
+											"type": "object",
+											"properties": {
+												"Code": {
+													"type": "string"
+												},
+												"DisplayName": {
+													"type": "string"
+												},
+												"CoverageType": {
+													"type": "string"
+												},
+												"Limit": {
+													"type": "array",
+													"items": {
+														"type": "object",
+														"properties": {
+															"TypeCode": {
+																"type": "string"
+															},
+															"Min": {
+																"type": "number"
+															},
+															"Max": {
+																"type": "integer"
+															},
+															"ValueType": {
+																"type": "string"
+															},
+															"InputType": {
+																"type": "string"
+															},
+															"Name": {
+																"type": "string"
+															}
+														}
+													}
+												},
+												"Level": {
+													"type": "string"
+												},
+												"IsMandatory": {
+													"type": "boolean"
+												},
+												"IsDefault": {
+													"type": "boolean"
+												}
+											}
+										}
+									},
+									"IsSharedCarrier": {
+										"type": "boolean"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dsCFA')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "CFA"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "coverages_BPA_MetaV2.xlsx",
+						"container": "migration"
+					},
+					"sheetIndex": 0,
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "SI_NO",
+						"type": "String"
+					},
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "COVERAGE_CODE",
+						"type": "String"
+					},
+					{
+						"name": "COV_SEQ",
+						"type": "String"
+					},
+					{
+						"name": "COVERAGE_CODE_DES",
+						"type": "String"
+					},
+					{
+						"name": "COVERAGES",
+						"type": "String"
+					},
+					{
+						"name": "BPA_COVERAGE_CODES",
+						"type": "String"
+					},
+					{
+						"name": "BPA_SECTION_CODE",
+						"type": "String"
+					},
+					{
+						"name": "BPA_SEC_NAME",
+						"type": "String"
+					},
+					{
+						"name": "BPA_COVERAGES",
+						"type": "String"
+					},
+					{
+						"name": "BPA Coverage Groups",
+						"type": "String"
+					},
+					{
+						"name": "BPA Coverage Type",
+						"type": "String"
+					},
+					{
+						"name": "BPA_PRODUCT_CODE",
+						"type": "String"
+					},
+					{
+						"name": "SOURCE_PRODUCT_CODE",
+						"type": "String"
+					},
+					{
+						"name": "coverage_level",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_BPA_limit')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "limit_id",
+						"type": "bigint",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "coverageCode",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "secCode",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "limitValueType",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "limitTypeCode",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "limitName",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "coverage_group_code",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "bpa_limit_detail"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_calculate_premium')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "RestService2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"baseURL": {
+						"type": "string"
+					},
+					"domain": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "rest"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": "/policyadmin-api/calculateRatedValues/v1/quote"
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ecm_state_code')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "StateCode",
+						"type": "char"
+					},
+					{
+						"name": "StateAbbreviation",
+						"type": "char"
+					},
+					{
+						"name": "StateName",
+						"type": "varchar"
+					},
+					{
+						"name": "WCTypeOfLossGroupCode",
+						"type": "varchar"
+					},
+					{
+						"name": "QuickRaterStateID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "AutoDoNotRenewDays",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "AutoConditionalRenewalNoticeDays",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "AutoUMLimitFlag",
+						"type": "char"
+					},
+					{
+						"name": "AutoStateBand",
+						"type": "char"
+					},
+					{
+						"name": "AutoRegionID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "StateTypeCode",
+						"type": "char"
+					},
+					{
+						"name": "FIPSStateCode",
+						"type": "char"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "dimState"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_error_location_risk_bridge')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "RISK_LOCATION_ERROR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_FactCoverageDeductible')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source/ecm"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "Policy",
+						"type": "varchar"
+					},
+					{
+						"name": "Policy_Sequence",
+						"type": "varchar"
+					},
+					{
+						"name": "PolicyPrefix",
+						"type": "char"
+					},
+					{
+						"name": "ARICCoverageCode",
+						"type": "varchar"
+					},
+					{
+						"name": "ARICCoverageDescription",
+						"type": "varchar"
+					},
+					{
+						"name": "CoverageDescription",
+						"type": "char"
+					},
+					{
+						"name": "CoverageInternalCode",
+						"type": "char"
+					},
+					{
+						"name": "LocationState",
+						"type": "char"
+					},
+					{
+						"name": "ARICLOB",
+						"type": "char"
+					},
+					{
+						"name": "LocationNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationUnitNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "ARICCoverageSequence",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CoveragePart",
+						"type": "char"
+					},
+					{
+						"name": "CoverageAddDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DESDSC",
+						"type": "char"
+					},
+					{
+						"name": "DEDESC",
+						"type": "char"
+					},
+					{
+						"name": "DeductibleCode",
+						"type": "varchar"
+					},
+					{
+						"name": "DeductibleAmount1Type",
+						"type": "char"
+					},
+					{
+						"name": "DeductibleAmount1",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "DeductibleAmount2Type",
+						"type": "char"
+					},
+					{
+						"name": "DeductibleAmount2",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Fact_Coverage_Deductible"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_Fact_Coverage_Premium')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source/ecm"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "Policy",
+						"type": "varchar"
+					},
+					{
+						"name": "Policy_Sequence",
+						"type": "varchar"
+					},
+					{
+						"name": "PolicyPrefix",
+						"type": "char"
+					},
+					{
+						"name": "ARICLOB",
+						"type": "char"
+					},
+					{
+						"name": "ARICGroupCode",
+						"type": "char"
+					},
+					{
+						"name": "Description",
+						"type": "char"
+					},
+					{
+						"name": "Product",
+						"type": "char"
+					},
+					{
+						"name": "ARICCoverageCode",
+						"type": "varchar"
+					},
+					{
+						"name": "ARICCoverageDescription",
+						"type": "varchar"
+					},
+					{
+						"name": "PrimaryPremiumStateCode",
+						"type": "char"
+					},
+					{
+						"name": "LocationNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationUnitNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "ARICCoverageSequence",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CoveragePart",
+						"type": "char"
+					},
+					{
+						"name": "CoverageAddDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CoverageDescription",
+						"type": "char"
+					},
+					{
+						"name": "Limit1",
+						"type": "decimal",
+						"precision": 38,
+						"scale": 0
+					},
+					{
+						"name": "Limit2",
+						"type": "decimal",
+						"precision": 38,
+						"scale": 0
+					},
+					{
+						"name": "PremiumAmount",
+						"type": "decimal",
+						"precision": 38,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Fact_Coverage_Premium"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_POL_TX_LIMIT_DED_OPT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sourceStageDB",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source/ecm"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "TX_LIMIT_DED_OPT_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "TX_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "LOCATION_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "LOCATION_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "SECTION_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "SECTION_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "TX_BRIDGE_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "RISK_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "RISK_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "POLICY_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "POLICY_OVID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "LIMIT_DED_OPT_TYPE_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "LDO_FLAG",
+						"type": "nchar"
+					},
+					{
+						"name": "LDO_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LIMIT_OCCURRENCE_FLAG",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LDO_VALUE",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "LDO_VALUE_CCY_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LDO_PERCENTAGE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 4
+					},
+					{
+						"name": "LDO_TEXT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BATCH_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "UNIQUE_IDENTIFIER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DELETED_YN",
+						"type": "nchar"
+					},
+					{
+						"name": "BPAM_LAST_MODIFIED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "BPAM_LAST_CREATED_DATE",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "DATA_HASH",
+						"type": "varbinary"
+					},
+					{
+						"name": "SOURCE_KEY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "COVERAGE_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "COVERAGE_OVID",
+						"type": "bigint",
+						"precision": 19
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "POL_TX_LIMIT_DED_OPT"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_PolicyAutoUnit')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source/ecm"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "PolicyPrefix",
+						"type": "char"
+					},
+					{
+						"name": "Policy",
+						"type": "varchar"
+					},
+					{
+						"name": "Policy_Sequence",
+						"type": "varchar"
+					},
+					{
+						"name": "RowStatus",
+						"type": "char"
+					},
+					{
+						"name": "EffectiveDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ExpirationDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "LocationNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationUnitNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "UnitType/ModificationType",
+						"type": "varchar"
+					},
+					{
+						"name": "YearBuild",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "UnitValue",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 0
+					},
+					{
+						"name": "RiskUseCode",
+						"type": "char"
+					},
+					{
+						"name": "Make",
+						"type": "varchar"
+					},
+					{
+						"name": "Model",
+						"type": "varchar"
+					},
+					{
+						"name": "UnitWidth",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "ISOClassCode",
+						"type": "varchar"
+					},
+					{
+						"name": "RiskType",
+						"type": "char"
+					},
+					{
+						"name": "UnitLength",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "PurchaseDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "AppraisalYear",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "UnitDescription",
+						"type": "varchar"
+					},
+					{
+						"name": "AnimalUseCode",
+						"type": "char"
+					},
+					{
+						"name": "LeaseFlag",
+						"type": "char"
+					},
+					{
+						"name": "AppraisalFlag",
+						"type": "char"
+					},
+					{
+						"name": "RegistrationState",
+						"type": "char"
+					},
+					{
+						"name": "VehicleID",
+						"type": "varchar"
+					},
+					{
+						"name": "EngineDisplacement",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "FuelTypeCode",
+						"type": "varchar"
+					},
+					{
+						"name": "Layup",
+						"type": "char"
+					},
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DataSource",
+						"type": "char"
+					},
+					{
+						"name": "DW_InsertDate",
+						"type": "date"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "PolicyAutoUnit_P"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_agent')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source/ecm"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "AgentCode",
+						"type": "char"
+					},
+					{
+						"name": "AgentName",
+						"type": "varchar"
+					},
+					{
+						"name": "GroupCode",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentStatus",
+						"type": "varchar"
+					},
+					{
+						"name": "StartDate",
+						"type": "date"
+					},
+					{
+						"name": "EndDate",
+						"type": "date"
+					},
+					{
+						"name": "AgentOffice",
+						"type": "varchar"
+					},
+					{
+						"name": "RenewalNoticeDays",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "AuditExclusion",
+						"type": "char"
+					},
+					{
+						"name": "AuditThreshold",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "IssuanceGroup",
+						"type": "varchar"
+					},
+					{
+						"name": "DefaultBusinessDivisionID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DefaultPricingProductID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "OfficeID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "EMail",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentAddress1",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentAddress2",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentAddress3",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentCity",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentState",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentZipCode",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentPhone",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentCounty",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentContact",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "dimAgent"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_company')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source/ecm"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "WINSCompanyID",
+						"type": "char"
+					},
+					{
+						"name": "Name",
+						"type": "varchar"
+					},
+					{
+						"name": "NAICNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "NAICGroupCode",
+						"type": "char"
+					},
+					{
+						"name": "NCCICode",
+						"type": "char"
+					},
+					{
+						"name": "ISOCode",
+						"type": "char"
+					},
+					{
+						"name": "FEIN",
+						"type": "char"
+					},
+					{
+						"name": "AddressLine1",
+						"type": "varchar"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "varchar"
+					},
+					{
+						"name": "City",
+						"type": "varchar"
+					},
+					{
+						"name": "AlphaStateCode",
+						"type": "varchar"
+					},
+					{
+						"name": "ZipCode",
+						"type": "varchar"
+					},
+					{
+						"name": "CreateTime",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "UpdateTime",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "UpdatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentUploadFlag",
+						"type": "char"
+					},
+					{
+						"name": "ARICGroupCode",
+						"type": "char"
+					},
+					{
+						"name": "CompanyGroup",
+						"type": "char"
+					},
+					{
+						"name": "ARICDirectAssumed",
+						"type": "char"
+					},
+					{
+						"name": "CompanyAbbreviation",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "dimCompany"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_insuredAddress')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source/ecm"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "Policy",
+						"type": "varchar"
+					},
+					{
+						"name": "Policy_Sequence",
+						"type": "char"
+					},
+					{
+						"name": "PolicyPrefix",
+						"type": "char"
+					},
+					{
+						"name": "ProductCode",
+						"type": "char"
+					},
+					{
+						"name": "EffectiveDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ExpirationDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "InsuredName",
+						"type": "varchar"
+					},
+					{
+						"name": "InsuredAddress1",
+						"type": "varchar"
+					},
+					{
+						"name": "InsuredAddress2",
+						"type": "varchar"
+					},
+					{
+						"name": "InsuredAddress3",
+						"type": "varchar"
+					},
+					{
+						"name": "InsuredCity",
+						"type": "varchar"
+					},
+					{
+						"name": "InsuredState",
+						"type": "char"
+					},
+					{
+						"name": "InsuredZipCode",
+						"type": "varchar"
+					},
+					{
+						"name": "InsuredTelephone",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Insured_Address"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_lob')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source/ecm"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "ARICGroupCode",
+						"type": "char"
+					},
+					{
+						"name": "ARICLineOfBusinessID",
+						"type": "char"
+					},
+					{
+						"name": "ARICGroupLineDescription",
+						"type": "varchar"
+					},
+					{
+						"name": "ARICMajorProductCode",
+						"type": "char"
+					},
+					{
+						"name": "ProductCode",
+						"type": "varchar"
+					},
+					{
+						"name": "INFCATPProduct",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "dimARICCompanyLineofBusiness"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_locationAddress')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source/ecm"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "Policy",
+						"type": "varchar"
+					},
+					{
+						"name": "Policy_Sequence",
+						"type": "varchar"
+					},
+					{
+						"name": "PolicyPrefix",
+						"type": "char"
+					},
+					{
+						"name": "ProductCode",
+						"type": "char"
+					},
+					{
+						"name": "LocationNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "BuildingNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationName",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationAddress1",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationAddress2",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationAddress3",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationCity",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationZipCode",
+						"type": "char"
+					},
+					{
+						"name": "LocationCounty",
+						"type": "varchar"
+					},
+					{
+						"name": "Territory",
+						"type": "char"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Location_Address"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_party')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source/ecm"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "Policy",
+						"type": "varchar"
+					},
+					{
+						"name": "Policy_Sequence",
+						"type": "varchar"
+					},
+					{
+						"name": "EffectiveDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ExpirationDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "LocationNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationUnitNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "InsuredNumber",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "InsuredType",
+						"type": "char"
+					},
+					{
+						"name": "InsuredSubType",
+						"type": "char"
+					},
+					{
+						"name": "FirstName",
+						"type": "varchar"
+					},
+					{
+						"name": "MiddleName",
+						"type": "varchar"
+					},
+					{
+						"name": "LastName",
+						"type": "varchar"
+					},
+					{
+						"name": "NameSuffix",
+						"type": "varchar"
+					},
+					{
+						"name": "CorporateName",
+						"type": "varchar"
+					},
+					{
+						"name": "AlternateName",
+						"type": "varchar"
+					},
+					{
+						"name": "MailingAddress1",
+						"type": "varchar"
+					},
+					{
+						"name": "MailingAddress2",
+						"type": "varchar"
+					},
+					{
+						"name": "MailingCity",
+						"type": "varchar"
+					},
+					{
+						"name": "MailingZipCode",
+						"type": "varchar"
+					},
+					{
+						"name": "DOB",
+						"type": "date"
+					},
+					{
+						"name": "Relationship",
+						"type": "char"
+					},
+					{
+						"name": "ExcludedDate",
+						"type": "date"
+					},
+					{
+						"name": "DW_InsertDate",
+						"type": "date"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Additional_Insured"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_policyCoverage')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Source/ecm"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "Policy",
+						"type": "varchar"
+					},
+					{
+						"name": "Policy_Sequence",
+						"type": "varchar"
+					},
+					{
+						"name": "ARICLOB",
+						"type": "char"
+					},
+					{
+						"name": "ARICGroupCode",
+						"type": "char"
+					},
+					{
+						"name": "Description",
+						"type": "char"
+					},
+					{
+						"name": "Product",
+						"type": "char"
+					},
+					{
+						"name": "ARICCoverageCode",
+						"type": "varchar"
+					},
+					{
+						"name": "ARICCoverageDescription",
+						"type": "varchar"
+					},
+					{
+						"name": "EndorsementNumber",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "LocationNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationUnitNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "BuildingNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationName",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationAddress1",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationAddress2",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationAddress3",
+						"type": "varchar"
+					},
+					{
+						"name": "Occupancy",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationCity",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationZipCode",
+						"type": "char"
+					},
+					{
+						"name": "LocationCounty",
+						"type": "varchar"
+					},
+					{
+						"name": "Territory",
+						"type": "char"
+					},
+					{
+						"name": "ConstructionCode",
+						"type": "char"
+					},
+					{
+						"name": "ConstructionYear",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "NumberOfFloors",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProtectionClass",
+						"type": "char"
+					},
+					{
+						"name": "GEOLatitude",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 8
+					},
+					{
+						"name": "GEOLongitude",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 8
+					},
+					{
+						"name": "CauseOfLoss",
+						"type": "char"
+					},
+					{
+						"name": "BCEGClassCode",
+						"type": "char"
+					},
+					{
+						"name": "CoverageForm",
+						"type": "varchar"
+					},
+					{
+						"name": "DesignatedPremisis",
+						"type": "varchar"
+					},
+					{
+						"name": "WindIndicatorFlag",
+						"type": "char"
+					},
+					{
+						"name": "PurchaseCost",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "dbo",
+						"type": "char"
+					},
+					{
+						"name": "CoInsuranceBuilding",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CoInsurancePersonalProperty",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CoInsuranceBodilyInjury",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CountryCode",
+						"type": "char"
+					},
+					{
+						"name": "MunicipalityCode",
+						"type": "varchar"
+					},
+					{
+						"name": "ParkName",
+						"type": "varchar"
+					},
+					{
+						"name": "CountyCode",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "NumberParkSpaces",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "NumberOfAcres",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OwnOrRent",
+						"type": "char"
+					},
+					{
+						"name": "ResidenceTypeCode",
+						"type": "char"
+					},
+					{
+						"name": "LocationZone",
+						"type": "varchar"
+					},
+					{
+						"name": "ARICCoverageSequence",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CoveragePart",
+						"type": "char"
+					},
+					{
+						"name": "CoverageAddDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CoverageDescription",
+						"type": "char"
+					},
+					{
+						"name": "CoverageInternalCode",
+						"type": "char"
+					},
+					{
+						"name": "CoverageAbbreviation",
+						"type": "char"
+					},
+					{
+						"name": "CoveragePartSequence",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CoverageISOLine",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CoverageCATCode",
+						"type": "char"
+					},
+					{
+						"name": "CoverageLine4",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CoverageAddUser",
+						"type": "char"
+					},
+					{
+						"name": "CoverageUpdateDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CoverageUpdateUser",
+						"type": "char"
+					},
+					{
+						"name": "CoverageLineFlag",
+						"type": "char"
+					},
+					{
+						"name": "LocationState",
+						"type": "char"
+					},
+					{
+						"name": "ISOClassCode",
+						"type": "varchar"
+					},
+					{
+						"name": "RetroEndorsementNumber",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PolicyPrefix",
+						"type": "char"
+					},
+					{
+						"name": "EffectiveDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Policy_Accounting_date",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ExpirationDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CancelDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CancelReason",
+						"type": "varchar"
+					},
+					{
+						"name": "CancelReasonDescription",
+						"type": "varchar"
+					},
+					{
+						"name": "PolicyTermMonths",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "InsuredName",
+						"type": "varchar"
+					},
+					{
+						"name": "InsuredAddress1",
+						"type": "varchar"
+					},
+					{
+						"name": "InsuredAddress2",
+						"type": "varchar"
+					},
+					{
+						"name": "InsuredCity",
+						"type": "varchar"
+					},
+					{
+						"name": "InsuredState",
+						"type": "char"
+					},
+					{
+						"name": "InsuredZipCode",
+						"type": "varchar"
+					},
+					{
+						"name": "CompanyCode",
+						"type": "char"
+					},
+					{
+						"name": "CompanyName",
+						"type": "varchar"
+					},
+					{
+						"name": "GroupName",
+						"type": "varchar"
+					},
+					{
+						"name": "GBLICompanyCode",
+						"type": "char"
+					},
+					{
+						"name": "AgentCode",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentName",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentOffice",
+						"type": "varchar"
+					},
+					{
+						"name": "GroupCode",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentCity",
+						"type": "varchar"
+					},
+					{
+						"name": "EMail",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentPhone",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentCounty",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentZipCode",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentAddress1",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentAddress2",
+						"type": "varchar"
+					},
+					{
+						"name": "AgentState",
+						"type": "varchar"
+					},
+					{
+						"name": "SubProducerNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "SubProducerCode",
+						"type": "varchar"
+					},
+					{
+						"name": "SubProducerName",
+						"type": "varchar"
+					},
+					{
+						"name": "SubproducerState",
+						"type": "varchar"
+					},
+					{
+						"name": "SubProducerType",
+						"type": "varchar"
+					},
+					{
+						"name": "ProductCode",
+						"type": "char"
+					},
+					{
+						"name": "ProductCodeDescription",
+						"type": "varchar"
+					},
+					{
+						"name": "PreviousPolicy",
+						"type": "varchar"
+					},
+					{
+						"name": "OriginalPolicyYear",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "NonRenewalReason",
+						"type": "char"
+					},
+					{
+						"name": "NonRenewalNoticeDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DatabaseCode",
+						"type": "char"
+					},
+					{
+						"name": "Policy_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "MinimumPremium",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 0
+					},
+					{
+						"name": "POlicy_Receive_date",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "MasterPolicy",
+						"type": "varchar"
+					},
+					{
+						"name": "BillingType",
+						"type": "char"
+					},
+					{
+						"name": "RowStatus",
+						"type": "char"
+					},
+					{
+						"name": "OriginalInceptionDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "MultiplePolicyFlag",
+						"type": "char"
+					},
+					{
+						"name": "ARICBusinessUnit",
+						"type": "char"
+					},
+					{
+						"name": "HonorCurrentRateFlag",
+						"type": "char"
+					},
+					{
+						"name": "FarmType",
+						"type": "char"
+					},
+					{
+						"name": "PrimaryPremiumStateCode",
+						"type": "char"
+					},
+					{
+						"name": "StateName",
+						"type": "varchar"
+					},
+					{
+						"name": "Policy_Insert_Date",
+						"type": "date"
+					},
+					{
+						"name": "BillingSystem",
+						"type": "varchar"
+					},
+					{
+						"name": "Cov_effective_Date",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Cov_Expiry_Date",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ReceivedDate",
+						"type": "date"
+					},
+					{
+						"name": "CoverageArrayNumber",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "LiabilityFlag",
+						"type": "char"
+					},
+					{
+						"name": "ExperienceModFactor",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 4
+					},
+					{
+						"name": "Exposure",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "TaxFeeSurchargeFlag",
+						"type": "char"
+					},
+					{
+						"name": "CancelReinstateFlag",
+						"type": "char"
+					},
+					{
+						"name": "ReleasedFlag",
+						"type": "char"
+					},
+					{
+						"name": "ReleaseDate",
+						"type": "date"
+					},
+					{
+						"name": "Rate",
+						"type": "decimal",
+						"precision": 12,
+						"scale": 6
+					},
+					{
+						"name": "PremiumStateCode",
+						"type": "varchar"
+					},
+					{
+						"name": "Coverage_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Coverage_accounting_date",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Coverage_Insert_Date",
+						"type": "date"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Policy_Coverage"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

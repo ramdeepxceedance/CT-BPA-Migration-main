@@ -1,0 +1,2850 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "4837-df"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/df_target_premiumComparison_risk')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "utility"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_target_quoteInfo",
+								"type": "DatasetReference"
+							},
+							"name": "targetQuoteInfo"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_source_Fact_Coverage_Premium",
+								"type": "DatasetReference"
+							},
+							"name": "sourcePremium"
+						},
+						{
+							"dataset": {
+								"referenceName": "ECMBPA_COV_MAP",
+								"type": "DatasetReference"
+							},
+							"name": "coverageSectionLookup"
+						},
+						{
+							"dataset": {
+								"referenceName": "joinTableStageSQL",
+								"type": "DatasetReference"
+							},
+							"name": "stagingPolicyRisk"
+						},
+						{
+							"dataset": {
+								"referenceName": "joinTableStageSQL",
+								"type": "DatasetReference"
+							},
+							"name": "stageRiskDetails"
+						},
+						{
+							"dataset": {
+								"referenceName": "joinTableSourceSQL",
+								"type": "DatasetReference"
+							},
+							"name": "sourceLocation"
+						},
+						{
+							"dataset": {
+								"referenceName": "StgRefLookUp",
+								"type": "DatasetReference"
+							},
+							"name": "horseLookup"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_target_rater_report",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "parse1"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "flatten1"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "select3"
+						},
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "coveragePremiumLookup"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "join1"
+						},
+						{
+							"name": "select4"
+						},
+						{
+							"name": "lookup1"
+						},
+						{
+							"name": "select5"
+						},
+						{
+							"name": "MapDrifted1",
+							"description": "Creates an explicit mapping for each drifted column"
+						},
+						{
+							"name": "derivedColumn4"
+						},
+						{
+							"name": "pivot1"
+						},
+						{
+							"name": "lookup2"
+						},
+						{
+							"name": "MapDrifted2",
+							"description": "Creates an explicit mapping for each drifted column"
+						},
+						{
+							"name": "lookup3"
+						},
+						{
+							"name": "lookup4"
+						},
+						{
+							"name": "derivedColumn5"
+						},
+						{
+							"name": "filter2"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     policyPrefix as string,",
+						"     policies as string[]",
+						"}",
+						"source(output(",
+						"          policy_number as string,",
+						"          policy_id as integer,",
+						"          policy_reference as string,",
+						"          quote_number as string,",
+						"          quote as string,",
+						"          status as string,",
+						"          response as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: (\"select * from quote_info where status='success' \"+iif(size($policies) >0&& size($policies) ==1&&$policies[1] =='','','and policy_number in ('+dropLeft(toString(reduce($policies, \"'\", #acc + \",'\" + #item +\"'\", #result)), 2)+')')),",
+						"     format: 'query') ~> targetQuoteInfo",
+						"source(output(",
+						"          Policy as string,",
+						"          Policy_Sequence as string,",
+						"          PolicyPrefix as string,",
+						"          ARICLOB as string,",
+						"          ARICGroupCode as string,",
+						"          Description as string,",
+						"          Product as string,",
+						"          ARICCoverageCode as string,",
+						"          ARICCoverageDescription as string,",
+						"          PrimaryPremiumStateCode as string,",
+						"          LocationNumber as string,",
+						"          LocationUnitNumber as string,",
+						"          ARICCoverageSequence as string,",
+						"          CoveragePart as string,",
+						"          CoverageAddDate as timestamp,",
+						"          CoverageDescription as string,",
+						"          Limit1 as decimal(38,0),",
+						"          Limit2 as decimal(38,0),",
+						"          PremiumAmount as decimal(38,2)",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: (\"select * from Fact_Coverage_Premium where PolicyPrefix = '{$policyPrefix}'\"+iif(size($policies) >0&& size($policies) ==1&&$policies[1] =='','','and policy in ('+dropLeft(toString(reduce($policies, \"'\", #acc + \",'\" + #item +\"'\", #result)), 2)+')')),",
+						"     format: 'query') ~> sourcePremium",
+						"source(output(",
+						"          COV_SEQ as string,",
+						"          BPA_SECTION_CODE as string,",
+						"          COVERAGE_CODE as string,",
+						"          COVERAGE_CODE_DES as string,",
+						"          BPA_COVERAGE_CODES as string,",
+						"          BPA_COVERAGES as string,",
+						"          COVERAGES as string,",
+						"          BPA_PRODUCT_CODE as string,",
+						"          SI_NO as string,",
+						"          id as long,",
+						"          BPA_SEC_NAME as string,",
+						"          SOURCE_PRODUCT_CODE as string,",
+						"          bpa_coverage_group as string,",
+						"          bpa_coverage_level as string,",
+						"          bpa_coverage_type as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> coverageSectionLookup",
+						"source(output(",
+						"          RISK_ID as string,",
+						"          RISK_NUMBER as string,",
+						"          POLICY_ID as long,",
+						"          POLICY_NUMBER as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: ('select pr.RISK_ID, pr.RISK_NUMBER, pr.POLICY_ID, pp.POLICY_NUMBER from POL_RISK pr join POL_POLICY pp on pr.POLICY_ID = pp.POLICY_ID'),",
+						"     format: 'query') ~> stagingPolicyRisk",
+						"source(output(",
+						"          RISK_ID as long,",
+						"          RISK_NUMBER as string,",
+						"          POLICY_ID as long,",
+						"          POLICY_NUMBER as string,",
+						"          ATTRIBUTE_NAME as string,",
+						"          ATTRIBUTE_VALUE as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: (\"select pr.RISK_ID, pr.RISK_NUMBER, pr.POLICY_ID, pp.POLICY_NUMBER, prd.ATTRIBUTE_NAME, prd.ATTRIBUTE_VALUE from POL_RISK pr join POL_POLICY pp on pr.POLICY_ID = pp.POLICY_ID join POL_RISK_DETAILS prd on prd.RISK_ID = pr.RISK_ID where prd.RISK_TYPE_CD = 'HO'\"),",
+						"     format: 'query') ~> stageRiskDetails",
+						"source(output(",
+						"          Policy as string,",
+						"          LocationNumber as string,",
+						"          LocationUnitNumber as string,",
+						"          LocationState as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: (\"select distinct Policy, LocationNumber, LocationUnitNumber, LocationState from Policy_Coverage where LocationNumber != '000' and PolicyPrefix = '{$policyPrefix}'\"+iif(size($policies) >0&& size($policies) ==1&&$policies[1] =='','','and policy in ('+dropLeft(toString(reduce($policies, \"'\", #acc + \",'\" + #item +\"'\", #result)), 2)+')')),",
+						"     format: 'query') ~> sourceLocation",
+						"source(output(",
+						"          LOOKUP_ID as long,",
+						"          LOOKUP_TYPE_ID as long,",
+						"          LOOKUP_CODE as string,",
+						"          LOOKUP_SHORT_DESCRIPTION as string,",
+						"          LOOKUP_DESCRIPTION as string,",
+						"          BATCH_ID as long,",
+						"          DELETED_YN as string,",
+						"          IS_VALID_YN as string,",
+						"          VALID_START_DATE as timestamp,",
+						"          VALID_END_DATE as timestamp,",
+						"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+						"          BPAM_LAST_CREATED_DATE as timestamp,",
+						"          DATA_HASH as binary,",
+						"          SOURCE_KEY as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: (\"select * from ref_lookup where lookup_type_id in (1,2,3)\"),",
+						"     format: 'query') ~> horseLookup",
+						"targetQuoteInfo parse(quote_json = response ? (agent as (agencyCode as string,",
+						"          agencyTier as string,",
+						"          agencyType as string,",
+						"          id as string,",
+						"          isCancelled as string,",
+						"          maintenanceAgency as string,",
+						"          number as string,",
+						"          parentEntityId as string,",
+						"          parentEntityTypeName as string,",
+						"          partyCode as string,",
+						"          partyIdentifiers as string[],",
+						"          partyName as string,",
+						"          typeCode as string),",
+						"          amountItem as (appliesToCode as string, currencyCode as string, description as string, editableOnTransaction as string, isAggregate as string, isMtaImpacted as string, isRefundable as string, levelCode as string, maxValue as string, minValue as string, originalAmount as string, pricedAmount as string, pricedValue as string, sequenceNumber as string, subTypeCode as string, typeCode as string, value as string, valueType as string)[],",
+						"          businessPurposeType as string,",
+						"          businessPurposeTypeCode as string,",
+						"          carrierProcessingType as string,",
+						"          claim as string[],",
+						"          clientParticipant as (effectiveDate as string, expirationDate as string, extendedAttributes as (name as string)[], id as string, isCancelled as string, originalPartyName as string, parentEntityId as string, parentEntityTypeName as string, partyCode as string, partyName as string, professionalRole as string, questionAnswer as string[], roleCode as string, subRoleCode as string)[],",
+						"          companyProductCode as string,",
+						"          coverage as string[],",
+						"          coverageGroup as string[],",
+						"          createdBy as string,",
+						"          createdDate as string,",
+						"          currencyCode as string,",
+						"          desiredEffectiveDate as string,",
+						"          endorsement as (amountItem as (appliesToCode as string, currencyCode as string, editableOnTransaction as string, levelCode as string, originalAmount as string, pricedAmount as string, typeCode as string, valueType as string), clauses as string[], coverageCode as string, editionNumber as string, effectiveDate as string, endorsedPolicyReference as string, endorsementCode as string, endorsementNumber as string, endorsementType as string, expirationDate as string, extendedAttributes as string[], formCode as string, id as string, insurableObjectId as string, isCancelled as string, questionAnswer as string[], reasonCodes as string[], sectionCode as string, sourcePolicyReference as string)[],",
+						"          extendedAttributes as (name as string, value as string)[],",
+						"          firmRatingTrackingNumber as string,",
+						"          forms as string[],",
+						"          groupCode as string,",
+						"          id as string,",
+						"          initialRequestDate as string,",
+						"          iterationNumber as string,",
+						"          lineofBusinessCode as string,",
+						"          location as string[],",
+						"          majorVersion as string,",
+						"          mgaParticipant as string[],",
+						"          minorVersion as string,",
+						"          operatingCompanyCode as string,",
+						"          originalBusinessPurposeType as string,",
+						"          originalBusinessPurposeTypeCode as string,",
+						"          parentEntityId as string,",
+						"          parentEntityTypeName as string,",
+						"          policyEffectiveDate as string,",
+						"          policyExpirationDate as string,",
+						"          policyStage as string,",
+						"          policyStatus as string,",
+						"          policyStatusCodeDisplayName as string,",
+						"          policyTerm as string,",
+						"          preparedDate as string,",
+						"          priorPolicy as string[],",
+						"          productVersion as string,",
+						"          questionAnswer as (answerCode as string, extendedAttributes as string[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, questionCode as string, questionText as string, value as string)[],",
+						"          quoteNumber as string,",
+						"          ratedIndicator as string,",
+						"          reasons as string[],",
+						"          referenceNumber as string,",
+						"          sanctionCheckInfo as string[],",
+						"          section as (amountItem as (appliesToCode as string, currencyCode as string, description as string, editableOnTransaction as string, isAggregate as string, isMtaImpacted as string, isRefundable as string, levelCode as string, maxValue as string, minValue as string, originalAmount as string, pricedAmount as string, pricedValue as string, sequenceNumber as string, subTypeCode as string, typeCode as string, value as string, valueType as string)[], carrierParticipant as string[], commissionAmountBasis as string, coverTypeCode as string, coverage as (amountItem as string[], appliesToCode as string, appliesToLevel as string, deductible as (currencyCode as string, id as string, name as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string, value as string, valueType as string)[], effectiveDate as string, expirationDate as string, extendedAttributes as string[], fullPremium as string, id as string, isCancelled as string, limit as (currencyCode as string, id as string, name as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string, value as string, valueType as string)[], option as string[], parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, tax as string[], typeCode as string)[], coverageGroup as string[], declinedIndicator as string, effectiveDate as string, expirationDate as string, extendedAttributes as string[], feeAmountBasis as string, id as string, insurableObject as (businessKey as string, extendedAttributes as (name as string, value as string)[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string)[], insurableObjectParticipant as (effectiveDate as string, expirationDate as string, extendedAttributes as string[], id as string, insurableObjectId as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string)[], isCancelled as string, isSharedCarrier as string, lineOfBusinessCode as string, location as string[], mappedLocations as string[], parentEntityId as string, parentEntityTypeName as string, premiumAmountBasis as string, pricedIndicator as string, pricingFactor as string[], primaryRatingState as string, questionAnswer as (answerCode as string, appliesToCode as string, extendedAttributes as string[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, questionCode as string, questionText as string, value as string)[], sectionItem as string[], sequenceNumber as string, subjectivity as string[], tax as string[], taxAmountBasis as string, taxJurisdiction as string[], triaRate as string, underwritingYear as string)[],",
+						"          sectionWiseLocationAllocation as string,",
+						"          sequenceNumber as string,",
+						"          statusCode as string,",
+						"          statusCodeDisplayName as string,",
+						"          submissionCreatedBy as string,",
+						"          submissionCreationDate as string,",
+						"          tax as string[],",
+						"          trackingNumber as string,",
+						"          typeCode as string,",
+						"          underlyingPolicies as string[],",
+						"          underwriterDecisionInfo as string[],",
+						"          validUntilDate as string),",
+						"     format: 'json',",
+						"     documentForm: 'singleDocument') ~> parse1",
+						"parse1 select(mapColumn(",
+						"          policy_number,",
+						"          policy_id,",
+						"          policy_reference,",
+						"          quote_number,",
+						"          sections = quote_json.section,",
+						"          policy_reference",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 foldDown(unrollMultiple(sections,sections.amountItem,every(match(name=='coverage'))),",
+						"     mapColumn(",
+						"          policy_number,",
+						"          coverage = sections.coverage,",
+						"          sectionCode = sections.coverTypeCode,",
+						"          premiumLevelCode = sections.amountItem.levelCode,",
+						"          premiumTypeCode = sections.amountItem.typeCode,",
+						"          premiumAppliesToCode = sections.amountItem.appliesToCode,",
+						"          premiumAmount = sections.amountItem.originalAmount,",
+						"          stage_policy_number = policy_id,",
+						"          policy_reference",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flatten1",
+						"MapDrifted1 derive(coverageCode = mapIf(coverage, #item.appliesToCode ==premiumAppliesToCode && #item.appliesToLevel == 'RSKUNT', #item.typeCode)) ~> derivedColumn1",
+						"derivedColumn4 select(mapColumn(",
+						"          policy_number,",
+						"          sectionCode,",
+						"          premiumLevelCode,",
+						"          premiumTypeCode,",
+						"          premiumAppliesToCode,",
+						"          targetPremiumAmount = premiumAmount,",
+						"          coverageCode,",
+						"          stage_policy_number,",
+						"          transaction_type,",
+						"          target_coverage_code,",
+						"          product_code,",
+						"          policy_reference",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"sourcePremium select(mapColumn(",
+						"          Policy,",
+						"          PolicyPrefix,",
+						"          Description,",
+						"          ARICCoverageCode,",
+						"          ARICCoverageDescription,",
+						"          LocationNumber,",
+						"          LocationUnitNumber,",
+						"          ARICCoverageSequence,",
+						"          CoverageDescription,",
+						"          Limit1,",
+						"          Limit2,",
+						"          SourcePremiumAmount = PremiumAmount",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select3",
+						"select2 filter(premiumLevelCode ==",
+						"'riskUnit'",
+						"&& ((premiumTypeCode ==",
+						"'premium'",
+						"&& sectionCode ==",
+						"'SEC001'",
+						") || ((premiumTypeCode ==",
+						"'medical_cov_premium'",
+						"&& sectionCode ==",
+						"'SEC002'",
+						"))) && size(coverageCode) !=",
+						"0) ~> filter1",
+						"select3, filter2 join(ARICCoverageCode == COVERAGE_CODE",
+						"     && ARICCoverageSequence == COV_SEQ,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> coveragePremiumLookup",
+						"coveragePremiumLookup derive(source_risk_id = LocationNumber+'-'+LocationUnitNumber,",
+						"          source_coverage_code = toString(ARICCoverageCode)+'-'+toString(ARICCoverageSequence)) ~> derivedColumn2",
+						"derivedColumn2, stagingPolicyRisk join(Policy == POLICY_NUMBER",
+						"     && source_risk_id == RISK_NUMBER,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 select(mapColumn(",
+						"          source_policy_number = Policy,",
+						"          Description,",
+						"          ARICCoverageDescription,",
+						"          CoverageDescription,",
+						"          ARICCoverageCode,",
+						"          ARICCoverageSequence,",
+						"          LocationNumber,",
+						"          LocationUnitNumber,",
+						"          SourcePremiumAmount,",
+						"          COVERAGE_NAME = COVERAGES,",
+						"          BPA_COVERAGES,",
+						"          BPA_SEC_NAME,",
+						"          BPA_SECTION_CODE,",
+						"          BPA_COVERAGE_CODES,",
+						"          source_insurable_object = RISK_ID,",
+						"          RISK_NUMBER,",
+						"          POLICY_ID,",
+						"          POLICY_NUMBER,",
+						"          source_coverage_code",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select4",
+						"filter1, lookup2 lookup(select2@policy_number == source_policy_number",
+						"     && premiumAppliesToCode == source_insurable_object",
+						"     && sectionCode == BPA_SECTION_CODE",
+						"     && trim(target_coverage_code) == trim(BPA_COVERAGE_CODES),",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup1",
+						"MapDrifted2 select(mapColumn(",
+						"          target_section = sectionCode,",
+						"          premiumLevelCode,",
+						"          premiumTypeCode,",
+						"          target_insurable_object = premiumAppliesToCode,",
+						"          target_premium = targetPremiumAmount,",
+						"          target_coverage_code,",
+						"          source_policy_number,",
+						"          Description,",
+						"          ARICCoverageDescription,",
+						"          source_coverage_name = CoverageDescription,",
+						"          ARICCoverageCode,",
+						"          ARICCoverageSequence,",
+						"          LocationNumber = select4@LocationNumber,",
+						"          LocationUnitNumber = select4@LocationUnitNumber,",
+						"          source_premium = SourcePremiumAmount,",
+						"          COVERAGE_NAME,",
+						"          target_coverage_name = BPA_COVERAGES,",
+						"          target_section_name = BPA_SEC_NAME,",
+						"          BPA_SECTION_CODE,",
+						"          BPA_COVERAGE_CODES,",
+						"          source_insurable_object,",
+						"          RISK_NUMBER = select4@RISK_NUMBER,",
+						"          POLICY_ID,",
+						"          target_coverage_code,",
+						"          stage_policy_number,",
+						"          product_code,",
+						"          transaction_type,",
+						"          source_coverage_code,",
+						"          horse_breed = {horseBreed },",
+						"          horse_sex = {horseSex },",
+						"          use = {use },",
+						"          requested_limit = {requestedLimit },",
+						"          age_in_years = {ageInYears },",
+						"          year_born = {yearBorn },",
+						"          purchase_price = {purchasePrice },",
+						"          purchase_date = {purchaseDate },",
+						"          location_state = LocationState,",
+						"          target_policy_number = policy_reference",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select5",
+						"flatten1 derive(coverage = coverage,",
+						"          sectionCode = toString(byName('sectionCode')),",
+						"          premiumLevelCode = toString(byName('premiumLevelCode')),",
+						"          premiumTypeCode = toString(byName('premiumTypeCode')),",
+						"          premiumAppliesToCode = toString(byName('premiumAppliesToCode')),",
+						"          premiumAmount = toString(byName('premiumAmount'))) ~> MapDrifted1",
+						"derivedColumn1 derive(target_coverage_code = replace(regexReplace(toString(byName('coverageCode')),`@\"\\s+|\\[+|\\]+`,''), '\"', ''),",
+						"          transaction_type = 'premium',",
+						"          product_code = $policyPrefix) ~> derivedColumn4",
+						"derivedColumn5 pivot(groupBy(POLICY_NUMBER,",
+						"          RISK_NUMBER),",
+						"     pivotBy(ATTRIBUTE_NAME),",
+						"     { } = first(final_attribute_value),",
+						"     columnNaming: '$V$N',",
+						"     lateral: true) ~> pivot1",
+						"lookup3, pivot1 lookup(source_policy_number == pivot1@POLICY_NUMBER",
+						"     && select4@RISK_NUMBER == pivot1@RISK_NUMBER,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup2",
+						"lookup1 derive({ageInYears } = trim(toString(byName('ageInYears '))),",
+						"          {horseBreed } = trim(toString(byName('horseBreed '))),",
+						"          {horseName } = trim(toString(byName('horseName '))),",
+						"          {horseSex } = trim(toString(byName('horseSex '))),",
+						"          {purchaseDate } = trim(toString(byName('purchaseDate '))),",
+						"          {purchasePrice } = trim(toString(byName('purchasePrice '))),",
+						"          {requestedLimit } = trim(toString(byName('requestedLimit '))),",
+						"          {use } = trim(toString(byName('use '))),",
+						"          {yearBorn } = trim(toString(byName('yearBorn ')))) ~> MapDrifted2",
+						"select4, sourceLocation lookup(source_policy_number == Policy",
+						"     && select4@LocationNumber == sourceLocation@LocationNumber",
+						"     && select4@LocationUnitNumber == sourceLocation@LocationUnitNumber,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup3",
+						"stageRiskDetails, horseLookup lookup(trim(ATTRIBUTE_VALUE) == trim(LOOKUP_CODE),",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup4",
+						"lookup4 derive(final_attribute_value = iif(isNull(LOOKUP_DESCRIPTION), ATTRIBUTE_VALUE, LOOKUP_DESCRIPTION)) ~> derivedColumn5",
+						"coverageSectionLookup filter(bpa_coverage_level == 'U') ~> filter2",
+						"select5 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          source_policy_number as string,",
+						"          stage_policy_number as string,",
+						"          target_policy_number as string,",
+						"          transaction_type as string,",
+						"          source_coverage_code as string,",
+						"          target_coverage_code as string,",
+						"          source_insurable_object as string,",
+						"          target_insurable_object as string,",
+						"          target_section as string,",
+						"          source_premium as string,",
+						"          target_premium as string,",
+						"          batch_id as integer,",
+						"          bpa_tenant_id as string,",
+						"          product_code as string,",
+						"          created_at as timestamp,",
+						"          updated_at as timestamp,",
+						"          horse_breed as string,",
+						"          horse_sex as string,",
+						"          use as string,",
+						"          age_in_years as string,",
+						"          year_born as string,",
+						"          purchase_date as string,",
+						"          purchase_price as string,",
+						"          requested_limit as string,",
+						"          location_state as string,",
+						"          target_section_name as string,",
+						"          target_coverage_name as string,",
+						"          source_coverage_name as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_target_premium_report')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "utility"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_target_rater_report",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "rater_report",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          source_policy_number as string,",
+						"          stage_policy_number as string,",
+						"          target_policy_number as string,",
+						"          transaction_type as string,",
+						"          source_coverage_code as string,",
+						"          target_coverage_code as string,",
+						"          source_insurable_object as string,",
+						"          target_insurable_object as string,",
+						"          target_section as string,",
+						"          source_premium as string,",
+						"          target_premium as string,",
+						"          batch_id as integer,",
+						"          bpa_tenant_id as string,",
+						"          product_code as string,",
+						"          created_at as timestamp,",
+						"          updated_at as timestamp,",
+						"          horse_breed as string,",
+						"          horse_sex as string,",
+						"          use as string,",
+						"          age_in_years as string,",
+						"          year_born as string,",
+						"          purchase_date as string,",
+						"          purchase_price as string,",
+						"          requested_limit as string,",
+						"          location_state as string,",
+						"          target_section_name as string,",
+						"          target_coverage_name as string,",
+						"          source_coverage_name as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Code as string,",
+						"          Description as string,",
+						"          SubCode as string,",
+						"          Order as string,",
+						"          ExtendedAttributes as string",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_target_quoteInfo_deprecated')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "utility"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_stage_policy",
+								"type": "DatasetReference"
+							},
+							"name": "policyTarget"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_stage_policytracker",
+								"type": "DatasetReference"
+							},
+							"name": "policyTrackerTarget"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_target_quoteInfo",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "retrieveQuoteInfoAPI",
+							"linkedService": {
+								"referenceName": "RestService2",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "searchQuoteAPI",
+							"linkedService": {
+								"referenceName": "RestService2",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "searchPolicyAPI",
+							"linkedService": {
+								"referenceName": "RestService2",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "select4"
+						},
+						{
+							"name": "select6"
+						},
+						{
+							"name": "join2"
+						},
+						{
+							"name": "derivedColumn8"
+						},
+						{
+							"name": "derivedColumn9"
+						},
+						{
+							"name": "select13"
+						},
+						{
+							"name": "AlterRow1"
+						},
+						{
+							"name": "searchParamsRenewalOf"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     policyPrefix as string,",
+						"     policies as string[]",
+						"}",
+						"source(output(",
+						"          policy_id as integer,",
+						"          policy_number as string,",
+						"          json_data as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: (\"select * from policy \"+iif(size($policies) >0&& size($policies) ==1&&$policies[1] =='','','where policy_number in ('+dropLeft(toString(reduce($policies, \"'\", #acc + \",'\" + #item +\"'\", #result)), 2)+')')),",
+						"     format: 'query') ~> policyTarget",
+						"source(output(",
+						"          policy_id as integer,",
+						"          policy_number as string,",
+						"          bpa_tracking_number as string,",
+						"          bpa_tenant_id as string,",
+						"          bpa_username as string,",
+						"          status as string,",
+						"          created_at as timestamp,",
+						"          updated_at as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: 'select * from policy_tracker where status = \\'200\\'',",
+						"     format: 'query') ~> policyTrackerTarget",
+						"derivedColumn8 call(mapColumn(",
+						"          policy_policy_number,",
+						"          policy_reference,",
+						"          quote_number,",
+						"          queryParams",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     output(",
+						"          retrieveQuoteResponse as (quote as string)",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     format: 'rest',",
+						"     store: 'restservice',",
+						"     timeout: 30,",
+						"     requestInterval: 0,",
+						"     httpMethod: 'GET',",
+						"     rowRelativeUrl: 'queryParams',",
+						"     entity: ('/policyadmin-api/retrieveQuoteInformation/v1/quote/'),",
+						"     bodyColumnName: 'retrieveQuoteResponse',",
+						"     requestFormat: ['type' -> 'json'],",
+						"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> retrieveQuoteInfoAPI",
+						"derivedColumn9 call(mapColumn(",
+						"          searchParams",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     output(",
+						"          searchQuoteResponse as (quote as (quoteNumber as string)[])",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     format: 'rest',",
+						"     store: 'restservice',",
+						"     timeout: 30,",
+						"     requestInterval: 0,",
+						"     httpMethod: 'POST',",
+						"     entity: (\"/policyadmin-api/searchQuote/v1/quote\"),",
+						"     bodyColumnName: 'searchQuoteResponse',",
+						"     requestFormat: ['type' -> 'json'],",
+						"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> searchQuoteAPI",
+						"searchParamsRenewalOf call(mapColumn(",
+						"          searchParams",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     output(",
+						"          headers as [string,string],",
+						"          searchPolicyResponse as (policy as (referenceNumber as string)[]),",
+						"          status as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     format: 'rest',",
+						"     store: 'restservice',",
+						"     timeout: 30,",
+						"     requestInterval: 0,",
+						"     httpMethod: 'POST',",
+						"     entity: ('/policyadmin-api/searchPolicyInformation/v1/policy'),",
+						"     headerColumnName: 'headers',",
+						"     bodyColumnName: 'searchPolicyResponse',",
+						"     statusColumnName: 'status',",
+						"     addResponseCode: true,",
+						"     requestFormat: ['type' -> 'json'],",
+						"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> searchPolicyAPI",
+						"policyTrackerTarget select(mapColumn(",
+						"          tracker_policy_number = policy_number",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"policyTarget select(mapColumn(",
+						"          policy_id,",
+						"          policy_policy_number = policy_number",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select4",
+						"retrieveQuoteInfoAPI select(mapColumn(",
+						"          policy_number = policy_policy_number,",
+						"          policy_reference,",
+						"          quote_number,",
+						"          quote = retrieveQuoteResponse.quote,",
+						"          policy_id",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select6",
+						"select4, select1 join(policy_policy_number == tracker_policy_number,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join2",
+						"searchQuoteAPI derive(quote_number = searchQuoteResponse.quote[1].quoteNumber,",
+						"          queryParams = searchQuoteResponse.quote[1].quoteNumber+'?identifierType=number') ~> derivedColumn8",
+						"searchPolicyAPI derive(policy_reference = searchPolicyResponse.policy[1].referenceNumber,",
+						"          searchParams = 'referenceNumber:*' + searchPolicyResponse.policy[1].referenceNumber +'*') ~> derivedColumn9",
+						"join2 select(mapColumn(",
+						"          policy_policy_number,",
+						"          policy_id",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select13",
+						"select6 alterRow(upsertIf(!isNull(policy_number)&&!isNull(quote_number))) ~> AlterRow1",
+						"select13 derive(searchParams = 'renewalOf:'+policy_policy_number) ~> searchParamsRenewalOf",
+						"AlterRow1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          policy_number as string,",
+						"          policy_id as integer,",
+						"          policy_reference as string,",
+						"          quote_number as string,",
+						"          quote as string,",
+						"          status as string,",
+						"          response as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:true,",
+						"     keys:['policy_number'],",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_update_stage_policyWithSection')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "Target Stage Data Flows/updateJsonDataFlow"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_stage_policy",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_stage_policy",
+								"type": "DatasetReference"
+							},
+							"name": "sink1",
+							"rejectedDataLinkedService": {
+								"referenceName": "AzureBlobStorage1",
+								"type": "LinkedServiceReference"
+							}
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "AlterRow1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "derivedColumn3"
+						},
+						{
+							"name": "derivedColumn4"
+						},
+						{
+							"name": "derivedColumn5"
+						},
+						{
+							"name": "derivedColumn6"
+						},
+						{
+							"name": "derivedColumn7"
+						},
+						{
+							"name": "derivedColumn8"
+						},
+						{
+							"name": "derivedColumn9"
+						},
+						{
+							"name": "derivedColumn10"
+						},
+						{
+							"name": "derivedColumn11"
+						},
+						{
+							"name": "filter1"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     policyPrefix as string ('CFA')",
+						"}",
+						"source(output(",
+						"          policy_id as integer,",
+						"          policy_number as string,",
+						"          policyjson as string,",
+						"          sectionjson as string,",
+						"          section_code as string,",
+						"          section_id as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     batchSize: 0,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: 'select pc.policy_id,pc.policy_number,pc.json_data  as policyJson ,sc.json_data as sectionJson ,sc.section_code,sc.section_id from policy pc\\njoin bpa_section sc \\non pc.policy_id=sc.policy_id',",
+						"     format: 'query') ~> source1",
+						"aggregate1 derive(finalPolicy = replace(policyjson,'\"section\":[]',concat('\"section\":',toString(sections)))) ~> derivedColumn1",
+						"derivedColumn10 select(mapColumn(",
+						"          policy_id,",
+						"          policy_number,",
+						"          json_data = finalPolicy",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 alterRow(updateIf(!isNull(policy_id))) ~> AlterRow1",
+						"derivedColumn1 derive(finalPolicy = unescape(finalPolicy, 'json')) ~> derivedColumn2",
+						"filter1 aggregate(groupBy(policy_id,",
+						"          policy_number,",
+						"          policyjson),",
+						"     sections = collect(sectionjson)) ~> aggregate1",
+						"derivedColumn2 derive(finalPolicy = replace(finalPolicy,'[\"{','[{')) ~> derivedColumn3",
+						"derivedColumn6 derive(finalPolicy = replace(finalPolicy,'}\"]','}]')) ~> derivedColumn4",
+						"derivedColumn4 derive(finalPolicy = replace(finalPolicy, '\"{', '{')) ~> derivedColumn5",
+						"derivedColumn3 derive(finalPolicy = unescape(finalPolicy, 'json')) ~> derivedColumn6",
+						"derivedColumn5 derive(finalPolicy = replace(finalPolicy, '}\"', '}')) ~> derivedColumn7",
+						"derivedColumn7 derive(finalPolicy = regexReplace(finalPolicy,'\"\"([^\"]*)\"\"', '\"$1\"')) ~> derivedColumn8",
+						"derivedColumn8 derive(finalPolicy = replace(finalPolicy,'\"[','[')) ~> derivedColumn9",
+						"derivedColumn9 derive(finalPolicy = replace(finalPolicy,']\"',']')) ~> derivedColumn10",
+						"source1 derive(policyPrefixTemp = substring(policy_number, 1, 3)) ~> derivedColumn11",
+						"derivedColumn11 filter(policyPrefixTemp == $policyPrefix) ~> filter1",
+						"AlterRow1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          policy_id as integer,",
+						"          policy_number as string,",
+						"          json_data as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:false,",
+						"     updateable:true,",
+						"     upsertable:false,",
+						"     keys:['policy_id'],",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_update_stage_policy_agent_clientparticipant')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "Target Stage Data Flows/updateJsonDataFlow"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_source_stage_policy_partyrole_bridge",
+								"type": "DatasetReference"
+							},
+							"name": "policyPartyBridgeStaging"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_source_stage_partyrole",
+								"type": "DatasetReference"
+							},
+							"name": "partyroleStaging"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_stage_agency",
+								"type": "DatasetReference"
+							},
+							"name": "agencyTarget"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_stage_policy",
+								"type": "DatasetReference"
+							},
+							"name": "policyTarget"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_stage_policy",
+								"type": "DatasetReference"
+							},
+							"name": "policyTargetSink"
+						}
+					],
+					"transformations": [
+						{
+							"name": "join1"
+						},
+						{
+							"name": "split1"
+						},
+						{
+							"name": "join3"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "join4"
+						},
+						{
+							"name": "join5"
+						},
+						{
+							"name": "derivedColumn3"
+						},
+						{
+							"name": "select3"
+						},
+						{
+							"name": "alterRow1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          POLICY_PARTY_ROLE_BRIDGE_ID as long,",
+						"          ROLE_ID as long,",
+						"          ROLE_OVID as long,",
+						"          POLICY_ID as long,",
+						"          POLICY_OVID as long,",
+						"          PARTY_ID as long,",
+						"          PARTY_OVID as long,",
+						"          IS_VALID_YN as string,",
+						"          VALID_START_DATE as timestamp,",
+						"          VALID_END_DATE as timestamp,",
+						"          BATCH_ID as long,",
+						"          SOURCE_SYSTEM as string,",
+						"          SOURCE_KEY as string,",
+						"          UNIQUE_IDENTIFIER as string,",
+						"          DATA_HASH as binary,",
+						"          DELETED_YN as string,",
+						"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+						"          BPAM_LAST_CREATED_DATE as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: 'SELECT *\\n  FROM [DM_Source_Stage].[dbo].[POL_POLICY_PARTY_ROLE_BRIDGE]',",
+						"     format: 'query') ~> policyPartyBridgeStaging",
+						"source(output(",
+						"          ROLE_ID as long,",
+						"          ROLE_VID as long,",
+						"          ROLE_CODE as string,",
+						"          ROLE_DESCRIPTION as string,",
+						"          IS_PRIMARY_INSURED_YN as string,",
+						"          IS_DRIVER_YN as string,",
+						"          IS_CUSTOMER_YN as string,",
+						"          IS_VALID_YN as string,",
+						"          VALID_START_DATE as timestamp,",
+						"          VALID_END_DATE as timestamp,",
+						"          BATCH_ID as long,",
+						"          UNIQUE_IDENTIFIER as string,",
+						"          DELETED_YN as string,",
+						"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+						"          BPAM_LAST_CREATED_DATE as timestamp,",
+						"          SOURCE_KEY as string,",
+						"          DATA_HASH as binary",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> partyroleStaging",
+						"source(output(",
+						"          agency_id as integer,",
+						"          json_data as string,",
+						"          bpa_party_code as string,",
+						"          bpa_party_id as string,",
+						"          party_name as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> agencyTarget",
+						"source(output(",
+						"          policy_id as integer,",
+						"          policy_number as string,",
+						"          json_data as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> policyTarget",
+						"policyPartyBridgeStaging, partyroleStaging join(policyPartyBridgeStaging@ROLE_ID == partyroleStaging@ROLE_ID,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 split(ROLE_CODE=='INSURED',",
+						"     ROLE_CODE=='AGENCY',",
+						"     disjoint: false) ~> split1@(split1, split2, default)",
+						"split1@split2, agencyTarget join(PARTY_ID == agency_id,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join3",
+						"join3 derive(agency_json_data = @(agencyCode=bpa_party_code,",
+						"          partyName=party_name)) ~> derivedColumn2",
+						"split1@split1 select(mapColumn(",
+						"          POLICY_ID",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"derivedColumn2 select(mapColumn(",
+						"          agency_json_data,",
+						"          POLICY_ID",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"select1, select2 join(select1@POLICY_ID == select2@POLICY_ID,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join4",
+						"join4, policyTarget join(select1@POLICY_ID == policyTarget@policy_id,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join5",
+						"join5 derive(policy_json_data = replace(json_data,'\"agent\":[]', concat('\"agent\":', iif(isNull(agency_json_data), 'null', toString(agency_json_data))))) ~> derivedColumn3",
+						"derivedColumn3 select(mapColumn(",
+						"          policy_id = policyTarget@policy_id,",
+						"          json_data = policy_json_data",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select3",
+						"select3 alterRow(updateIf(!isNull(json_data))) ~> alterRow1",
+						"alterRow1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          policy_id as integer,",
+						"          policy_number as string,",
+						"          json_data as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:true,",
+						"     upsertable:false,",
+						"     keys:['policy_id'],",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     mapColumn(",
+						"          policy_id,",
+						"          json_data",
+						"     )) ~> policyTargetSink"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sub_lob_df')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "Source Stage Data Flows"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_source_policyCoverage",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_source_stage_sub_LOB",
+								"type": "DatasetReference"
+							},
+							"name": "source2"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_source_stage_sub_LOB",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						},
+						{
+							"name": "sink2"
+						}
+					],
+					"transformations": [
+						{
+							"name": "flowlet1",
+							"flowlet": {
+								"referenceName": "fl_source_addDefaultColumnFlowlet",
+								"type": "DataFlowReference",
+								"parameters": {
+									"FL_batch": "1"
+								}
+							}
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "surrogateKey1"
+						},
+						{
+							"name": "select1"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     policyPrefix as string ('EMP')",
+						"}",
+						"source(output(",
+						"          Policy as string,",
+						"          Policy_Sequence as string,",
+						"          ARICLOB as string,",
+						"          ARICGroupCode as string,",
+						"          Description as string,",
+						"          Product as string,",
+						"          ARICCoverageCode as string,",
+						"          ARICCoverageDescription as string,",
+						"          EndorsementNumber as integer,",
+						"          LocationNumber as string,",
+						"          LocationUnitNumber as string,",
+						"          BuildingNumber as string,",
+						"          LocationName as string,",
+						"          LocationAddress1 as string,",
+						"          LocationAddress2 as string,",
+						"          LocationAddress3 as string,",
+						"          Occupancy as string,",
+						"          LocationCity as string,",
+						"          LocationZipCode as string,",
+						"          LocationCounty as string,",
+						"          Territory as string,",
+						"          ConstructionCode as string,",
+						"          ConstructionYear as integer,",
+						"          NumberOfFloors as integer,",
+						"          ProtectionClass as string,",
+						"          GEOLatitude as decimal(11,8),",
+						"          GEOLongitude as decimal(11,8),",
+						"          CauseOfLoss as string,",
+						"          BCEGClassCode as string,",
+						"          CoverageForm as string,",
+						"          DesignatedPremisis as string,",
+						"          WindIndicatorFlag as string,",
+						"          PurchaseCost as decimal(8,2),",
+						"          dbo as string,",
+						"          CoInsuranceBuilding as integer,",
+						"          CoInsurancePersonalProperty as integer,",
+						"          CoInsuranceBodilyInjury as integer,",
+						"          CountryCode as string,",
+						"          MunicipalityCode as string,",
+						"          ParkName as string,",
+						"          CountyCode as integer,",
+						"          NumberParkSpaces as integer,",
+						"          NumberOfAcres as integer,",
+						"          OwnOrRent as string,",
+						"          ResidenceTypeCode as string,",
+						"          LocationZone as string,",
+						"          ARICCoverageSequence as integer,",
+						"          CoveragePart as string,",
+						"          CoverageAddDate as timestamp,",
+						"          CoverageDescription as string,",
+						"          CoverageInternalCode as string,",
+						"          CoverageAbbreviation as string,",
+						"          CoveragePartSequence as integer,",
+						"          CoverageISOLine as integer,",
+						"          CoverageCATCode as string,",
+						"          CoverageLine4 as integer,",
+						"          CoverageAddUser as string,",
+						"          CoverageUpdateDate as timestamp,",
+						"          CoverageUpdateUser as string,",
+						"          CoverageLineFlag as string,",
+						"          LocationState as string,",
+						"          ISOClassCode as string,",
+						"          RetroEndorsementNumber as integer,",
+						"          PolicyPrefix as string,",
+						"          EffectiveDate as timestamp,",
+						"          Policy_Accounting_date as timestamp,",
+						"          ExpirationDate as timestamp,",
+						"          CancelDate as timestamp,",
+						"          CancelReason as string,",
+						"          CancelReasonDescription as string,",
+						"          PolicyTermMonths as integer,",
+						"          InsuredName as string,",
+						"          InsuredAddress1 as string,",
+						"          InsuredAddress2 as string,",
+						"          InsuredCity as string,",
+						"          InsuredState as string,",
+						"          InsuredZipCode as string,",
+						"          CompanyCode as string,",
+						"          CompanyName as string,",
+						"          GroupName as string,",
+						"          GBLICompanyCode as string,",
+						"          AgentCode as string,",
+						"          AgentName as string,",
+						"          AgentOffice as string,",
+						"          GroupCode as string,",
+						"          AgentCity as string,",
+						"          EMail as string,",
+						"          AgentPhone as string,",
+						"          AgentCounty as string,",
+						"          AgentZipCode as string,",
+						"          AgentAddress1 as string,",
+						"          AgentAddress2 as string,",
+						"          AgentState as string,",
+						"          SubProducerNumber as string,",
+						"          SubProducerCode as string,",
+						"          SubProducerName as string,",
+						"          SubproducerState as string,",
+						"          SubProducerType as string,",
+						"          ProductCode as string,",
+						"          ProductCodeDescription as string,",
+						"          PreviousPolicy as string,",
+						"          OriginalPolicyYear as integer,",
+						"          NonRenewalReason as string,",
+						"          NonRenewalNoticeDate as timestamp,",
+						"          DatabaseCode as string,",
+						"          Policy_ID as integer,",
+						"          MinimumPremium as decimal(13,0),",
+						"          POlicy_Receive_date as timestamp,",
+						"          MasterPolicy as string,",
+						"          BillingType as string,",
+						"          RowStatus as string,",
+						"          OriginalInceptionDate as timestamp,",
+						"          MultiplePolicyFlag as string,",
+						"          ARICBusinessUnit as string,",
+						"          HonorCurrentRateFlag as string,",
+						"          FarmType as string,",
+						"          PrimaryPremiumStateCode as string,",
+						"          StateName as string,",
+						"          Policy_Insert_Date as date,",
+						"          BillingSystem as string,",
+						"          Cov_effective_Date as timestamp,",
+						"          Cov_Expiry_Date as timestamp,",
+						"          ReceivedDate as date,",
+						"          CoverageArrayNumber as integer,",
+						"          LiabilityFlag as string,",
+						"          ExperienceModFactor as decimal(7,4),",
+						"          Exposure as decimal(8,0),",
+						"          TaxFeeSurchargeFlag as string,",
+						"          CancelReinstateFlag as string,",
+						"          ReleasedFlag as string,",
+						"          ReleaseDate as date,",
+						"          Rate as decimal(12,6),",
+						"          PremiumStateCode as string,",
+						"          Coverage_ID as integer,",
+						"          Coverage_accounting_date as timestamp,",
+						"          Coverage_Insert_Date as date",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: (\"select DISTINCT ARICCoverageCode,ARICCoverageDescription from  Policy_Coverage where PolicyPrefix='{$policyPrefix}'\" ),",
+						"     format: 'query') ~> source1",
+						"source(output(",
+						"          sublob_id as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     query: 'select MAX(SUB_LOB_ID)  as sublob_id from dbo.POL_SUB_LOB',",
+						"     format: 'query') ~> source2",
+						"derivedColumn1 compose(mapParameter(",
+						"          FL_batch = 1",
+						"     ),",
+						"     composition: 'fl_source_addDefaultColumnFlowlet') ~> flowlet1@(output1)",
+						"select1 derive(SUB_LOB_ID = sink2#outputs()[1].sublob_id +pkey,",
+						"          SUB_LOB_CODE = ARICCoverageCode,",
+						"          SUB_LOB_NAME = ARICCoverageDescription,",
+						"          SUB_LOB_DESCRIPTION = ARICCoverageDescription) ~> derivedColumn1",
+						"source2 derive(sublob_id = iifNull(sublob_id, 0, sublob_id)) ~> derivedColumn2",
+						"source1 keyGenerate(output(pkey as long),",
+						"     startAt: 1L,",
+						"     stepValue: 1L) ~> surrogateKey1",
+						"surrogateKey1 select(mapColumn(",
+						"          ARICCoverageCode,",
+						"          ARICCoverageDescription,",
+						"          pkey",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"flowlet1@output1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          SUB_LOB_ID as long,",
+						"          SUB_LOB_CODE as string,",
+						"          SUB_LOB_NAME as string,",
+						"          SUB_LOB_DESCRIPTION as string,",
+						"          BATCH_ID as long,",
+						"          UNIQUE_IDENTIFIER as string,",
+						"          BPAM_LAST_MODIFIED_DATE as timestamp,",
+						"          BPAM_LAST_CREATED_DATE as timestamp,",
+						"          SOURCE_KEY as string,",
+						"          DATA_HASH as binary",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1",
+						"derivedColumn2 sink(validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     store: 'cache',",
+						"     format: 'inline',",
+						"     output: false,",
+						"     saveOrder: 1) ~> sink2"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_Target_policy_master')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Set round",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@range(variables('lowerBound'), variables('round'))",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "policyRun",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pl_api_policy",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"lb": {
+												"value": "@variables('lowerBound')",
+												"type": "Expression"
+											},
+											"hb": {
+												"value": "@variables('higherBound')",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "update lowerbound",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "policyRun",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "lowerBound",
+										"value": {
+											"value": "@variables('higherBound')",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "update higherbound",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "update lowerbound",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "higherBound",
+										"value": {
+											"value": "@add(variables('lowerBound'),500)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Set lowerBound",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "lowerBound",
+							"value": 1
+						}
+					},
+					{
+						"name": "Set higherbound",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Set lowerBound",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "higherBound",
+							"value": 500
+						}
+					},
+					{
+						"name": "Set round",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Set higherbound",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "round",
+							"value": 18
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"higherBound": {
+						"type": "Integer"
+					},
+					"round": {
+						"type": "Integer"
+					},
+					"lowerBound": {
+						"type": "Integer"
+					}
+				},
+				"folder": {
+					"name": "Target Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_bpa_limt_ref')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "empLimits",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_bpa_product_Ref",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source2": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime2-selfhosted",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "cfaLimits",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "empLimits",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_bpa_cfa_limits",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source2": {},
+									"pkey": {},
+									"limitMeta": {},
+									"nextPkey": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime2-selfhosted",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Target Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_cfa_coverage_meta_upload')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_CFA_coverages_meta",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"source2": {},
+									"sink1": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime2-selfhosted",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Target Data Movement/cfa"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_cfa_limit_meta_upload')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "limitMetaUpload",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_bpa_cfa_limits",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source2": {},
+									"pkey": {},
+									"limitMeta": {},
+									"nextPkey": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime2-selfhosted",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Target Data Movement/cfa"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_compare_premium')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Compare Premium - Risk",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_target_premiumComparison_risk",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"targetQuoteInfo": {},
+									"sourcePremium": {},
+									"coverageSectionLookup": {},
+									"stagingPolicyRisk": {},
+									"stageRiskDetails": {},
+									"sourceLocation": {},
+									"horseLookup": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Compare Premium - Policy",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Compare Premium - Risk",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_target_premiumComparison_policy",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"targetQuoteInfo": {},
+									"sourcePremium": {},
+									"coverageSectionLookup": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "utility/rating"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_target_premiumComparison_risk')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_premium_report')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Premium Report",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_target_premium_report",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime2-selfhosted",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "utility/rating"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_target_premium_report')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_agencyproducer')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Agency Data Flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Agency MaxId Lookup",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_agency",
+								"type": "DataFlowReference",
+								"parameters": {
+									"DF_max_id": {
+										"value": "@activity('Agency MaxId Lookup').output.firstRow.maxId",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"agencySource": {},
+									"agencySourceLookup": {},
+									"agencyStaging": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Agency MaxId Lookup",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "SELECT isnull(MAX(AGENCY_ID), 0) as maxId\nFROM dbo.POL_AGENCY",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_source_stage_agency",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "Agency MaxId Lookup1",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Agency Data Flow",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "SELECT isnull(MAX(AGENCY_ID), 0) as maxId\nFROM dbo.POL_AGENCY",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_source_stage_agency",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "Producer Data Flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Agency MaxId Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_producer",
+								"type": "DataFlowReference",
+								"parameters": {
+									"DF_max_id": {
+										"value": "@activity('Agency MaxId Lookup1').output.firstRow.maxId",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"producerSource": {},
+									"agencyStagingLookup": {},
+									"agencyStaging": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipeline_reference"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_bpa_cov_mapping')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "df_coverage_BPA_mapping",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_stage_ecm_bpa_cov_mapping",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"ecmCovMapping": {},
+									"ecmBpaCovMapping": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime2-selfhosted",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipeline_reference"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_coverage_coverageext')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Coverage Data Flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_coverage",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"policyCoverageSource": {},
+									"policyStaging": {},
+									"coverageCodeStaging": {},
+									"coverageStagingLookup": {},
+									"coverageStagingMaxId": {},
+									"coverageStaging": {},
+									"maxIdCache": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Coverage Ext Data Flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Coverage Data Flow",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_coverageExt",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"coverageStaging": {},
+									"policyStaging": {},
+									"policySource": {},
+									"coverageExtStaging": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipelien_txn"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_coveragecode')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Coverage Code Data flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_coverageCode",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"policyCoverageSource": {},
+									"pkey": {},
+									"coverageCodeStaging": {},
+									"ssCoverCodPkeyCache": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipeline_reference"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_genaddress')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Gen Address MaxId Lookup",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "SELECT isnull(MAX(GEN_ADDRESS_UNIQ_ID), 0) as maxId\nFROM dbo.GEN_ADDRESS",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_source_stage_genAddress",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "Gen Address MaxId Lookup1",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Location Address Data flow",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "SELECT isnull(MAX(GEN_ADDRESS_UNIQ_ID), 0) as maxId\nFROM dbo.GEN_ADDRESS",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_source_stage_genAddress",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "Location Address Data flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Gen Address MaxId Lookup",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_locationgenaddress",
+								"type": "DataFlowReference",
+								"parameters": {
+									"DF_max_id": {
+										"value": "@activity('Gen Address MaxId Lookup').output.firstRow.maxId",
+										"type": "Expression"
+									},
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"locationAddressSource": {},
+									"genAddressStagingLookup": {},
+									"genAddressStaging": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Insured Address Data flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Gen Address MaxId Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_insuredgenaddress",
+								"type": "DataFlowReference",
+								"parameters": {
+									"DF_max_id": {
+										"value": "@activity('Gen Address MaxId Lookup1').output.firstRow.maxId",
+										"type": "Expression"
+									},
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"insuredAddressSource": {},
+									"genAddressStagingLookup": {},
+									"genAddressStaging": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipeline_reference"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_limitDedType')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_POL__LIMIT_DED_OPT_TYPE",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipeline_reference"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_lobcompany')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lob Company Data Flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "lob max id Lookup",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "company max id Lookup",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_lobcompany",
+								"type": "DataFlowReference",
+								"parameters": {
+									"DF_batch": {
+										"value": "@variables('BatchId')",
+										"type": "Expression"
+									},
+									"DF_lob_max_id": {
+										"value": "@activity('lob max id Lookup').output.firstRow.maxId",
+										"type": "Expression"
+									},
+									"DF_company_max_id": {
+										"value": "@activity('company max id Lookup').output.firstRow.maxId",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"companySource": {},
+									"lobSource": {},
+									"compnayStatgingLookup": {},
+									"lobStagingLookup": {},
+									"companyStaging": {},
+									"lobStaging": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "lob max id Lookup",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "SELECT isnull(MAX(LOB_ID), 0) as maxId\nFROM dbo.POL_LOB",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_source_stage_lob",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "company max id Lookup",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "SELECT isnull(MAX(COMPANY_ID), 0) as maxId\nFROM dbo.CO_COMPANY",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_source_stage_company",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"BatchId": {
+						"type": "Integer",
+						"defaultValue": 1
+					}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipeline_reference"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_loc_risk_bridge')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "df_risk_location_bridge",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_location_risk_bridege",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									},
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"location": {},
+									"policy": {},
+									"risk": {},
+									"sink1": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipelien_txn"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}

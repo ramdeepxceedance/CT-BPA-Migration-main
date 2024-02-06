@@ -1,0 +1,2549 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "4837-df"
+		},
+		"AzureBlobStorageECM_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/dcd09377-b8fe-4215-bcee-03ff11e989d6/resourceGroups/CT-AKS-RG-BPA-ECM-MIGRATION/providers/Microsoft.Storage/storageAccounts/bpaecmmigration"
+		},
+		"AzureBlobStorageECM_properties_groupId": {
+			"type": "string",
+			"defaultValue": "blob"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_policytracker')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "policy_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "policy_number",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_tracking_number",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_tenant_id",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_username",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "status",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "created_at",
+						"type": "timestamp with time zone",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "updated_at",
+						"type": "timestamp with time zone",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "policy_tracker"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_risk')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "risk_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "policy_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "location_id",
+						"type": "bigint",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "risk"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_stage_riskDetail')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "risk_detail_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "risk_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "policy_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "extended_attributes",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "risk_detail"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_targetSectionCopy')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "insurableobject_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "limit_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "policy_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "coverage_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "location_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "extendedattributes",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "section_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "deductible_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "section_code",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "section_copy"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_target_quoteInfo')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "policy_number",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "policy_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "policy_reference",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "quote_number",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "quote",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "status",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "response",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "quote_info"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_target_rater_report')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Stage"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "source_policy_number",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "stage_policy_number",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "target_policy_number",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "transaction_type",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "source_coverage_code",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "target_coverage_code",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "source_insurable_object",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "target_insurable_object",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "target_section",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "source_premium",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "target_premium",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "batch_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_tenant_id",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "product_code",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "created_at",
+						"type": "timestamp with time zone",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "updated_at",
+						"type": "timestamp with time zone",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "horse_breed",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "horse_sex",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "use",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "age_in_years",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "year_born",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "purchase_date",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "purchase_price",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "requested_limit",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "location_state",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "target_section_name",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "target_coverage_name",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "source_coverage_name",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "rating_report"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ecmPolicyJson')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "value",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "BPA_policy_Json"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/insuredDetails')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "PolicyPrefix",
+						"type": "char"
+					},
+					{
+						"name": "Policy",
+						"type": "varchar"
+					},
+					{
+						"name": "Policy_Sequence",
+						"type": "varchar"
+					},
+					{
+						"name": "RowStatus",
+						"type": "char"
+					},
+					{
+						"name": "EffectiveDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ExpirationDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "LocationNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "LocationUnitNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "InsuredNumber",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "InsuredType",
+						"type": "char"
+					},
+					{
+						"name": "InsuredSubType",
+						"type": "char"
+					},
+					{
+						"name": "LinkToApplicant",
+						"type": "varchar"
+					},
+					{
+						"name": "FirstName",
+						"type": "varchar"
+					},
+					{
+						"name": "MiddleName",
+						"type": "varchar"
+					},
+					{
+						"name": "LastName",
+						"type": "varchar"
+					},
+					{
+						"name": "NameSuffix",
+						"type": "varchar"
+					},
+					{
+						"name": "CorporateName",
+						"type": "varchar"
+					},
+					{
+						"name": "DBACode",
+						"type": "char"
+					},
+					{
+						"name": "AlternateName",
+						"type": "varchar"
+					},
+					{
+						"name": "MailingAddress1",
+						"type": "varchar"
+					},
+					{
+						"name": "MailingAddress2",
+						"type": "varchar"
+					},
+					{
+						"name": "MailingCity",
+						"type": "varchar"
+					},
+					{
+						"name": "MailingState",
+						"type": "varchar"
+					},
+					{
+						"name": "MailingZipCode",
+						"type": "varchar"
+					},
+					{
+						"name": "MailingCountryCode",
+						"type": "char"
+					},
+					{
+						"name": "DOB",
+						"type": "date"
+					},
+					{
+						"name": "Relationship",
+						"type": "char"
+					},
+					{
+						"name": "ExcludedDate",
+						"type": "date"
+					},
+					{
+						"name": "ActiveMilitary",
+						"type": "char"
+					},
+					{
+						"name": "SubTypeOther",
+						"type": "varchar"
+					},
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DataSource",
+						"type": "char"
+					},
+					{
+						"name": "DW_InsertDate",
+						"type": "date"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "PolicyInsuredInfo_P"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/joinTablePostgres')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/joinTableSourceSQL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ecmmigrationdb",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/joinTableStageSQL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sourceStageDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/lookup')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sourceStageDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "TestExcel"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/policyJson')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "equine.json",
+						"container": "migration"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"messageInformation": {
+							"type": "object",
+							"properties": {
+								"businessPurposeTypeCode": {
+									"type": "string"
+								},
+								"trackingNumber": {
+									"type": "string"
+								},
+								"messageStatus": {
+									"type": "object",
+									"properties": {
+										"statusCode": {
+											"type": "integer"
+										},
+										"statusDescription": {
+											"type": "string"
+										},
+										"successStatusCode": {
+											"type": "string"
+										}
+									}
+								},
+								"userInfo": {
+									"type": "object",
+									"properties": {
+										"userName": {
+											"type": "string"
+										}
+									}
+								},
+								"userJourneyType": {
+									"type": "string"
+								}
+							}
+						},
+						"policy": {
+							"type": "object",
+							"properties": {
+								"companyProductCode": {
+									"type": "string"
+								},
+								"lineofBusinessCode": {
+									"type": "string"
+								},
+								"effectiveDate": {
+									"type": "string"
+								},
+								"expirationDate": {
+									"type": "string"
+								},
+								"ratedPremium": {
+									"type": "null"
+								},
+								"quotedPremium": {
+									"type": "null"
+								},
+								"premiumDueDate": {
+									"type": "string"
+								},
+								"amountItem": {
+									"type": "array"
+								},
+								"tax": {
+									"type": "array"
+								},
+								"policyTerm": {
+									"type": "string"
+								},
+								"operatingCompanyCode": {
+									"type": "string"
+								},
+								"agent": {
+									"type": "object",
+									"properties": {
+										"party": {
+											"type": "object",
+											"properties": {
+												"partyCode": {
+													"type": "string"
+												},
+												"partyTypeCode": {
+													"type": "string"
+												},
+												"id": {
+													"type": "string"
+												},
+												"name": {
+													"type": "object",
+													"properties": {
+														"fullName": {
+															"type": "string"
+														},
+														"titlePrefix": {
+															"type": "string"
+														},
+														"givenName": {
+															"type": "string"
+														},
+														"surname": {
+															"type": "string"
+														},
+														"parentEntityId": {
+															"type": "string"
+														},
+														"parentEntityTypeName": {
+															"type": "string"
+														},
+														"sequenceNumber": {
+															"type": "integer"
+														}
+													}
+												},
+												"partyStatus": {
+													"type": "string"
+												},
+												"sicCode": {
+													"type": "array"
+												},
+												"naicCode": {
+													"type": "array"
+												},
+												"modifiedComments": {
+													"type": "string"
+												},
+												"person": {
+													"type": "object",
+													"properties": {
+														"id": {
+															"type": "string"
+														},
+														"citizenshipCode": {
+															"type": "array"
+														},
+														"languageCode": {
+															"type": "array",
+															"items": {
+																"type": "string"
+															}
+														}
+													}
+												},
+												"partyRole": {
+													"type": "array",
+													"items": {
+														"type": "object",
+														"properties": {
+															"id": {
+																"type": "string"
+															},
+															"parentEntityId": {
+																"type": "string"
+															},
+															"parentEntityTypeName": {
+																"type": "string"
+															},
+															"effectiveDate": {
+																"type": "string"
+															},
+															"roleType": {
+																"type": "string"
+															},
+															"roleCode": {
+																"type": "string"
+															},
+															"name": {
+																"type": "object",
+																"properties": {
+																	"fullName": {
+																		"type": "string"
+																	},
+																	"id": {
+																		"type": "string"
+																	},
+																	"parentEntityId": {
+																		"type": "string"
+																	},
+																	"parentEntityTypeName": {
+																		"type": "string"
+																	},
+																	"sequenceNumber": {
+																		"type": "integer"
+																	}
+																}
+															},
+															"communication": {
+																"type": "array"
+															}
+														}
+													}
+												},
+												"languageCode": {
+													"type": "array",
+													"items": {
+														"type": "string"
+													}
+												},
+												"address": {
+													"type": "array"
+												},
+												"communication": {
+													"type": "array"
+												},
+												"partyAdditionalDetails": {
+													"type": "object",
+													"properties": {
+														"id": {
+															"type": "string"
+														},
+														"partyId": {
+															"type": "string"
+														}
+													}
+												},
+												"partyRelationships": {
+													"type": "array",
+													"items": {
+														"type": "object",
+														"properties": {
+															"id": {
+																"type": "string"
+															},
+															"partyCode": {
+																"type": "string"
+															},
+															"relatedPartyCode": {
+																"type": "string"
+															},
+															"partyName": {
+																"type": "string"
+															},
+															"relatedPartyName": {
+																"type": "string"
+															},
+															"relationshipTypeCode": {
+																"type": "string"
+															},
+															"relationshipType": {
+																"type": "string"
+															},
+															"beginDate": {
+																"type": "string"
+															}
+														}
+													}
+												}
+											}
+										},
+										"id": {
+											"type": "string"
+										},
+										"typeCode": {
+											"type": "string"
+										},
+										"number": {
+											"type": "integer"
+										},
+										"parentEntityId": {
+											"type": "string"
+										},
+										"parentEntityTypeName": {
+											"type": "string"
+										},
+										"partyName": {
+											"type": "string"
+										},
+										"isCancelled": {
+											"type": "boolean"
+										},
+										"partyCode": {
+											"type": "string"
+										},
+										"maintenanceAgency": {
+											"type": "string"
+										},
+										"agencyCode": {
+											"type": "string"
+										},
+										"partyIdentifiers": {
+											"type": "array"
+										}
+									}
+								},
+								"coverage": {
+									"type": "array"
+								},
+								"coverageGroup": {
+									"type": "array"
+								},
+								"clientParticipant": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"roleCode": {
+												"type": "string"
+											},
+											"partyCode": {
+												"type": "string"
+											},
+											"partyName": {
+												"type": "string"
+											},
+											"questionAnswer": {
+												"type": "array"
+											},
+											"effectiveDate": {
+												"type": "string"
+											},
+											"expirationDate": {
+												"type": "string"
+											},
+											"isCancelled": {
+												"type": "boolean"
+											},
+											"subRoleCode": {
+												"type": "string"
+											},
+											"professionalRole": {
+												"type": "string"
+											},
+											"originalPartyName": {
+												"type": "string"
+											},
+											"extendedAttributes": {
+												"type": "array"
+											},
+											"party": {
+												"type": "object",
+												"properties": {
+													"partyCode": {
+														"type": "string"
+													},
+													"partyTypeCode": {
+														"type": "string"
+													},
+													"name": {
+														"type": "object",
+														"properties": {
+															"fullName": {
+																"type": "string"
+															},
+															"givenName": {
+																"type": "string"
+															},
+															"surname": {
+																"type": "string"
+															},
+															"parentEntityTypeName": {
+																"type": "string"
+															},
+															"sequenceNumber": {
+																"type": "integer"
+															}
+														}
+													},
+													"partyStatus": {
+														"type": "string"
+													},
+													"sicCode": {
+														"type": "array"
+													},
+													"naicCode": {
+														"type": "array"
+													},
+													"modifiedComments": {
+														"type": "string"
+													},
+													"person": {
+														"type": "object",
+														"properties": {
+															"genderCode": {
+																"type": "string"
+															},
+															"citizenshipCode": {
+																"type": "array"
+															},
+															"languageCode": {
+																"type": "array"
+															}
+														}
+													},
+													"partyRole": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"parentEntityTypeName": {
+																	"type": "string"
+																},
+																"effectiveDate": {
+																	"type": "string"
+																},
+																"roleType": {
+																	"type": "string"
+																},
+																"roleCode": {
+																	"type": "string"
+																},
+																"name": {
+																	"type": "object",
+																	"properties": {
+																		"fullName": {
+																			"type": "string"
+																		},
+																		"parentEntityTypeName": {
+																			"type": "string"
+																		},
+																		"sequenceNumber": {
+																			"type": "integer"
+																		}
+																	}
+																},
+																"communication": {
+																	"type": "array"
+																}
+															}
+														}
+													},
+													"partyIdentity": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"id": {
+																	"type": "string"
+																},
+																"parentEntityId": {
+																	"type": "string"
+																},
+																"parentEntityTypeName": {
+																	"type": "string"
+																},
+																"typeCode": {
+																	"type": "string"
+																},
+																"value": {
+																	"type": "string"
+																}
+															}
+														}
+													},
+													"languageCode": {
+														"type": "array"
+													},
+													"address": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"line1": {
+																	"type": "string"
+																},
+																"city": {
+																	"type": "string"
+																},
+																"stateOrProvinceName": {
+																	"type": "string"
+																},
+																"stateOrProvinceCode": {
+																	"type": "string"
+																},
+																"postalCode": {
+																	"type": "string"
+																},
+																"countryName": {
+																	"type": "string"
+																},
+																"countryCode": {
+																	"type": "string"
+																},
+																"isPrimaryAddress": {
+																	"type": "boolean"
+																},
+																"typeCode": {
+																	"type": "string"
+																}
+															}
+														}
+													},
+													"communication": {
+														"type": "array"
+													},
+													"partySanctionChecks": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"sanctionCheckDate": {
+																	"type": "string"
+																},
+																"sanctionCheckStatus": {
+																	"type": "string"
+																},
+																"sanctionCheckReferenceId": {
+																	"type": "string"
+																},
+																"sanctionCheckValidUptoDate": {
+																	"type": "string"
+																}
+															}
+														}
+													},
+													"partyRelationships": {
+														"type": "array"
+													}
+												}
+											}
+										}
+									}
+								},
+								"mgaParticipant": {
+									"type": "array"
+								},
+								"section": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"lineOfBusinessCode": {
+												"type": "string"
+											},
+											"sequenceNumber": {
+												"type": "integer"
+											},
+											"declinedIndicator": {
+												"type": "boolean"
+											},
+											"coverTypeCode": {
+												"type": "string"
+											},
+											"underwritingYear": {
+												"type": "integer"
+											},
+											"coverage": {
+												"type": "array",
+												"items": {
+													"type": "object",
+													"properties": {
+														"coverageInfo": {
+															"type": "object",
+															"properties": {
+																"code": {
+																	"type": "string"
+																},
+																"displayName": {
+																	"type": "string"
+																},
+																"coverageType": {
+																	"type": "string"
+																},
+																"limit": {
+																	"type": "array",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"typeCode": {
+																				"type": "string"
+																			},
+																			"min": {
+																				"type": "integer"
+																			},
+																			"max": {
+																				"type": "integer"
+																			},
+																			"valueType": {
+																				"type": "string"
+																			},
+																			"inputType": {
+																				"type": "string"
+																			},
+																			"name": {
+																				"type": "string"
+																			}
+																		}
+																	}
+																},
+																"level": {
+																	"type": "string"
+																},
+																"isMandatory": {
+																	"type": "boolean"
+																}
+															}
+														},
+														"typeCode": {
+															"type": "string"
+														},
+														"sequenceNumber": {
+															"type": "integer"
+														},
+														"fullPremium": {
+															"type": "string"
+														},
+														"effectiveDate": {
+															"type": "string"
+														},
+														"expirationDate": {
+															"type": "string"
+														},
+														"limit": {
+															"type": "array"
+														},
+														"deductible": {
+															"type": "array"
+														},
+														"option": {
+															"type": "array"
+														},
+														"isCancelled": {
+															"type": "boolean"
+														},
+														"tax": {
+															"type": "array"
+														},
+														"amountItem": {
+															"type": "array"
+														},
+														"extendedAttributes": {
+															"type": "array"
+														},
+														"appliesToLevel": {
+															"type": "string"
+														}
+													}
+												}
+											},
+											"subjectivity": {
+												"type": "array"
+											},
+											"tax": {
+												"type": "array"
+											},
+											"sectionItem": {
+												"type": "array"
+											},
+											"location": {
+												"type": "array",
+												"items": {
+													"type": "object",
+													"properties": {
+														"address": {
+															"type": "object",
+															"properties": {
+																"stateOrProvinceCode": {
+																	"type": "string"
+																},
+																"isPrimaryAddress": {
+																	"type": "boolean"
+																}
+															}
+														},
+														"typeCode": {
+															"type": "string"
+														},
+														"earthquakeZone": {
+															"type": "boolean"
+														},
+														"effectiveDate": {
+															"type": "string"
+														},
+														"expirationDate": {
+															"type": "string"
+														},
+														"isCancelled": {
+															"type": "boolean"
+														},
+														"tax": {
+															"type": "array"
+														},
+														"amountItem": {
+															"type": "array"
+														},
+														"extendedAttributes": {
+															"type": "array"
+														},
+														"insurableObject": {
+															"type": "array"
+														},
+														"businessKey": {
+															"type": "string"
+														}
+													}
+												}
+											},
+											"coverageGroup": {
+												"type": "array"
+											},
+											"effectiveDate": {
+												"type": "string"
+											},
+											"expirationDate": {
+												"type": "string"
+											},
+											"isCancelled": {
+												"type": "boolean"
+											},
+											"triaRate": {
+												"type": "integer"
+											},
+											"amountItem": {
+												"type": "array"
+											},
+											"extendedAttributes": {
+												"type": "array"
+											},
+											"insurableObject": {
+												"type": "array",
+												"items": {
+													"type": "object",
+													"properties": {
+														"businessKey": {
+															"type": "string"
+														},
+														"typeCode": {
+															"type": "string"
+														},
+														"sequenceNumber": {
+															"type": "integer"
+														},
+														"extendedAttributes": {
+															"type": "array",
+															"items": {
+																"type": "object",
+																"properties": {
+																	"name": {
+																		"type": "string"
+																	},
+																	"value": {
+																		"type": "string"
+																	}
+																}
+															}
+														},
+														"appliesToLevel": {
+															"type": "string"
+														},
+														"appliesToCode": {
+															"type": "string"
+														},
+														"isCancelled": {
+															"type": "boolean"
+														},
+														"isDeletedOnMta": {
+															"type": "boolean"
+														}
+													}
+												}
+											},
+											"taxesLicensesFees": {
+												"type": "number"
+											},
+											"commission": {
+												"type": "integer"
+											},
+											"profitProvision": {
+												"type": "number"
+											},
+											"carrierParticipant": {
+												"type": "array"
+											},
+											"pricedIndicator": {
+												"type": "boolean"
+											},
+											"isSharedCarrier": {
+												"type": "boolean"
+											},
+											"mappedLocations": {
+												"type": "array"
+											},
+											"insurableObjectParticipant": {
+												"type": "array"
+											},
+											"taxJurisdiction": {
+												"type": "array"
+											}
+										}
+									}
+								},
+								"location": {
+									"type": "array"
+								},
+								"productVersion": {
+									"type": "string"
+								},
+								"claim": {
+									"type": "array"
+								},
+								"paymentInfo": {
+									"type": "object",
+									"properties": {
+										"parentEntityTypeName": {
+											"type": "string"
+										},
+										"billingType": {
+											"type": "string"
+										},
+										"paymentPlan": {
+											"type": "string"
+										}
+									}
+								},
+								"underwriterDecisionInfo": {
+									"type": "array"
+								},
+								"minorVersion": {
+									"type": "integer"
+								},
+								"majorVersion": {
+									"type": "integer"
+								},
+								"businessPurposeTypeCode": {
+									"type": "string"
+								},
+								"businessPurposeType": {
+									"type": "string"
+								},
+								"statusCodeDisplayName": {
+									"type": "string"
+								},
+								"reasons": {
+									"type": "array"
+								},
+								"policyExpirationDate": {
+									"type": "string"
+								},
+								"policyEffectiveDate": {
+									"type": "string"
+								},
+								"agency": {
+									"type": "object",
+									"properties": {
+										"partyCode": {
+											"type": "string"
+										},
+										"partyTypeCode": {
+											"type": "string"
+										},
+										"name": {
+											"type": "object",
+											"properties": {
+												"fullName": {
+													"type": "string"
+												},
+												"parentEntityTypeName": {
+													"type": "string"
+												},
+												"sequenceNumber": {
+													"type": "integer"
+												}
+											}
+										},
+										"partyStatus": {
+											"type": "string"
+										},
+										"sicCode": {
+											"type": "array"
+										},
+										"naicCode": {
+											"type": "array"
+										},
+										"modifiedComments": {
+											"type": "string"
+										},
+										"organization": {
+											"type": "object",
+											"properties": {
+												"memberCount": {
+													"type": "integer"
+												},
+												"fullName": {
+													"type": "string"
+												},
+												"languageCode": {
+													"type": "array",
+													"items": {
+														"type": "string"
+													}
+												}
+											}
+										},
+										"partyRole": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"effectiveDate": {
+														"type": "string"
+													},
+													"roleType": {
+														"type": "string"
+													},
+													"roleCode": {
+														"type": "string"
+													},
+													"agencyType": {
+														"type": "string"
+													},
+													"tier": {
+														"type": "string"
+													},
+													"name": {
+														"type": "object",
+														"properties": {
+															"fullName": {
+																"type": "string"
+															},
+															"sequenceNumber": {
+																"type": "integer"
+															}
+														}
+													},
+													"communication": {
+														"type": "array"
+													}
+												}
+											}
+										},
+										"languageCode": {
+											"type": "array",
+											"items": {
+												"type": "string"
+											}
+										},
+										"address": {
+											"type": "array"
+										},
+										"communication": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"id": {
+														"type": "string"
+													},
+													"parentEntityTypeName": {
+														"type": "string"
+													},
+													"parentEntityId": {
+														"type": "string"
+													},
+													"phoneTypeCode": {
+														"type": "string"
+													},
+													"phoneNumber": {
+														"type": "string"
+													},
+													"emailAddress": {
+														"type": "string"
+													},
+													"doNotContactIndicator": {
+														"type": "boolean"
+													}
+												}
+											}
+										},
+										"partyAdditionalDetails": {
+											"type": "object",
+											"properties": {
+												"id": {
+													"type": "string"
+												},
+												"partyId": {
+													"type": "string"
+												}
+											}
+										},
+										"partyRelationships": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"id": {
+														"type": "string"
+													},
+													"partyCode": {
+														"type": "string"
+													},
+													"relatedPartyCode": {
+														"type": "string"
+													},
+													"partyName": {
+														"type": "string"
+													},
+													"relatedPartyName": {
+														"type": "string"
+													},
+													"relationshipTypeCode": {
+														"type": "string"
+													},
+													"relationshipType": {
+														"type": "string"
+													},
+													"beginDate": {
+														"type": "string"
+													}
+												}
+											}
+										}
+									}
+								},
+								"carrierProcessingType": {
+									"type": "string"
+								},
+								"endorsement": {
+									"type": "array"
+								},
+								"certificateNumber": {
+									"type": "string"
+								},
+								"currencyCode": {
+									"type": "string"
+								},
+								"productTimeZone": {
+									"type": "string"
+								},
+								"priorPolicy": {
+									"type": "array"
+								},
+								"sanctionCheckInfo": {
+									"type": "array"
+								},
+								"underlyingPolicies": {
+									"type": "array"
+								},
+								"forms": {
+									"type": "array"
+								},
+								"masterContractIndicator": {
+									"type": "boolean"
+								},
+								"originalBusinessPurposeTypeCode": {
+									"type": "string"
+								},
+								"originalBusinessPurposeType": {
+									"type": "string"
+								},
+								"sectionWiseLocationAllocation": {
+									"type": "boolean"
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/rater_report')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "migration"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Code",
+						"type": "String"
+					},
+					{
+						"name": "Description",
+						"type": "String"
+					},
+					{
+						"name": "SubCode",
+						"type": "String"
+					},
+					{
+						"name": "Order",
+						"type": "String"
+					},
+					{
+						"name": "ExtendedAttributes",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/targetSection')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_DM_Stage_Target",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "section_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "policy_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "coverage_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "location_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "limit_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "deductible_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "insurableobject_id",
+						"type": "integer",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "json_data",
+						"type": "jsonb",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "extendedattributes",
+						"type": "json",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "section_code",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "bpa_section"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime2-selfhosted')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "East US",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 16,
+							"timeToLive": 10,
+							"cleanup": false,
+							"customProperties": []
+						},
+						"pipelineExternalComputeScaleProperties": {
+							"timeToLive": 60,
+							"numberOfPipelineNodes": 1,
+							"numberOfExternalNodes": 1
+						}
+					}
+				},
+				"managedVirtualNetwork": {
+					"type": "ManagedVirtualNetworkReference",
+					"referenceName": "default"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/fl_rater_api_requests')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "utility/flowlet"
+				},
+				"type": "Flowlet",
+				"typeProperties": {
+					"sources": [],
+					"sinks": [],
+					"transformations": [
+						{
+							"name": "calculatePremiumAPI",
+							"linkedService": {
+								"referenceName": "RestService2",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "retrieveQuoteInfoAPI",
+							"linkedService": {
+								"referenceName": "RestService2",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "retrievePolicyInfoAPI",
+							"linkedService": {
+								"referenceName": "RestService2",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "searchQuoteAPI",
+							"linkedService": {
+								"referenceName": "RestService2",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "select6"
+						},
+						{
+							"name": "flatten1"
+						},
+						{
+							"name": "select7"
+						},
+						{
+							"name": "derivedColumn7"
+						},
+						{
+							"name": "derivedColumn8"
+						},
+						{
+							"name": "policyTarget"
+						},
+						{
+							"name": "output1"
+						}
+					],
+					"scriptLines": [
+						"input(output(",
+						"          policy_policy_number as string,",
+						"          tracker_policy_number as string,",
+						"          ref_pol as string",
+						"     ),",
+						"     order: 0,",
+						"     allowSchemaDrift: true) ~> policyTarget",
+						"derivedColumn1 call(mapColumn(",
+						"          quote_number,",
+						"          quote = retrieveQuoteResponse.quote,",
+						"          messageInformation",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     output(",
+						"          raterResponse as (messageInformation as (businessPurposeTypeCode as string, messageStatus as (statusCode as string, statusDescription as string, successStatusCode as string), trackingNumber as string, userInfo as (userName as string), userJourneyType as string), riskDetail as (agent as (agencyCode as string, agencyTier as string, agencyType as string, id as string, isCancelled as string, maintenanceAgency as string, number as string, parentEntityId as string, parentEntityTypeName as string, partyCode as string, partyIdentifiers as string[], partyName as string, typeCode as string), amountItem as string[], businessPurposeType as string, businessPurposeTypeCode as string, carrierProcessingType as string, claim as string[], clientParticipant as (effectiveDate as string, expirationDate as string, extendedAttributes as (name as string)[], id as string, isCancelled as string, originalPartyName as string, parentEntityId as string, parentEntityTypeName as string, partyCode as string, partyName as string, professionalRole as string, questionAnswer as string[], roleCode as string, subRoleCode as string)[], companyProductCode as string, coverage as string[], coverageGroup as string[], createdBy as string, createdDate as string, currencyCode as string, desiredEffectiveDate as string, endorsement as (amountItem as (appliesToCode as string, currencyCode as string, editableOnTransaction as string, levelCode as string, originalAmount as string, pricedAmount as string, typeCode as string, valueType as string), clauses as string[], coverageCode as string, editionNumber as string, effectiveDate as string, endorsedPolicyReference as string, endorsementCode as string, endorsementNumber as string, endorsementType as string, expirationDate as string, extendedAttributes as string[], formCode as string, id as string, insurableObjectId as string, isCancelled as string, questionAnswer as string[], reasonCodes as string[], sectionCode as string, sourcePolicyReference as string)[], extendedAttributes as (name as string, value as string)[], firmRatingTrackingNumber as string, forms as string[], groupCode as string, id as string, initialRequestDate as string, iterationNumber as string, lineofBusinessCode as string, location as string[], majorVersion as string, mgaParticipant as string[], minorVersion as string, operatingCompanyCode as string, originalBusinessPurposeType as string, originalBusinessPurposeTypeCode as string, parentEntityId as string, parentEntityTypeName as string, policyEffectiveDate as string, policyExpirationDate as string, policyStage as string, policyStatus as string, policyStatusCodeDisplayName as string, policyTerm as string, preparedDate as string, priorPolicy as string[], productVersion as string, questionAnswer as (answerCode as string, extendedAttributes as string[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, questionCode as string, questionText as string, value as string)[], quoteNumber as string, ratedIndicator as string, reasons as string[], referenceNumber as string, sanctionCheckInfo as string[], section as (amountItem as (appliesToCode as string, currencyCode as string, description as string, editableOnTransaction as string, isAggregate as string, isMtaImpacted as string, isRefundable as string, levelCode as string, maxValue as string, minValue as string, originalAmount as string, pricedAmount as string, pricedValue as string, sequenceNumber as string, subTypeCode as string, typeCode as string, value as string, valueType as string)[], carrierParticipant as string[], commissionAmountBasis as string, coverTypeCode as string, coverage as (amountItem as string[], appliesToCode as string, appliesToLevel as string, deductible as (currencyCode as string, id as string, name as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string, value as string, valueType as string)[], effectiveDate as string, expirationDate as string, extendedAttributes as string[], fullPremium as string, id as string, isCancelled as string, limit as (currencyCode as string, id as string, name as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string, value as string, valueType as string)[], option as string[], parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, tax as string[], typeCode as string)[], coverageGroup as string[], declinedIndicator as string, effectiveDate as string, expirationDate as string, extendedAttributes as string[], feeAmountBasis as string, id as string, insurableObject as (businessKey as string, extendedAttributes as (name as string, value as string)[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string)[], insurableObjectParticipant as (effectiveDate as string, expirationDate as string, extendedAttributes as string[], id as string, insurableObjectId as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string)[], isCancelled as string, isSharedCarrier as string, lineOfBusinessCode as string, location as string[], mappedLocations as string[], parentEntityId as string, parentEntityTypeName as string, premiumAmountBasis as string, pricedIndicator as string, pricingFactor as string[], primaryRatingState as string, questionAnswer as (answerCode as string, appliesToCode as string, extendedAttributes as string[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, questionCode as string, questionText as string, value as string)[], sectionItem as string[], sequenceNumber as string, subjectivity as string[], tax as string[], taxAmountBasis as string, taxJurisdiction as string[], triaRate as string, underwritingYear as string)[], sectionWiseLocationAllocation as string, sequenceNumber as string, statusCode as string, statusCodeDisplayName as string, submissionCreatedBy as string, submissionCreationDate as string, tax as string[], trackingNumber as string, typeCode as string, underlyingPolicies as string[], underwriterDecisionInfo as string[], validUntilDate as string))",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     format: 'rest',",
+						"     store: 'restservice',",
+						"     timeout: 30,",
+						"     requestInterval: 0,",
+						"     httpMethod: 'POST',",
+						"     rowRelativeUrl: 'quote_number',",
+						"     entity: ('/policyadmin-api/calculateRatedValues/v1/quote/'),",
+						"     bodyColumnName: 'raterResponse',",
+						"     requestFormat: ['type' -> 'json'],",
+						"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> calculatePremiumAPI",
+						"derivedColumn8 call(mapColumn(",
+						"          policy_policy_number,",
+						"          tracker_policy_number,",
+						"          retrievePolicyInfoResponse,",
+						"          policy_reference,",
+						"          searchParams,",
+						"          searchQuoteResponse,",
+						"          quote_number,",
+						"          queryParams,",
+						"          ref_pol",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     output(",
+						"          retrieveQuoteResponse as (quote as (agent as (agencyCode as string, agencyTier as string, agencyType as string, id as string, isCancelled as string, maintenanceAgency as string, number as string, parentEntityId as string, parentEntityTypeName as string, partyCode as string, partyIdentifiers as (id as string, partyCode as string, identifierType as string, identifierValue as string)[], partyName as string, typeCode as string), amountItem as string[], businessPurposeType as string, businessPurposeTypeCode as string, carrierProcessingType as string, claim as string[], clientParticipant as (effectiveDate as string, expirationDate as string, extendedAttributes as (name as string, value as string)[], id as string, isCancelled as string, originalPartyName as string, parentEntityId as string, parentEntityTypeName as string, partyCode as string, partyName as string, professionalRole as string, questionAnswer as string[], roleCode as string, subRoleCode as string)[], companyProductCode as string, coverage as string[], coverageGroup as string[], createdBy as string, createdDate as string, currencyCode as string, desiredEffectiveDate as string, endorsement as (clauses as string[], coverageCode as string, editionNumber as string, effectiveDate as string, endorsedPolicyReference as string, endorsementCode as string, endorsementNumber as string, endorsementType as string, expirationDate as string, extendedAttributes as (name as string, value as string)[], formCode as string, id as string, insurableObjectId as string, isCancelled as string, questionAnswer as string[], reasonCodes as string[], sectionCode as string, sourcePolicyReference as string)[], extendedAttributes as (name as string, value as string)[], forms as string[], groupCode as string, id as string, initialRequestDate as string, iterationNumber as string, lineofBusinessCode as string, location as (address as (line1 as string, line2 as string, city as string, postalCode as string, isPrimaryAddress as string, countyName as string), id as string, typeCode as string, parentEntityId as string, parentEntityTypeName as string, earthquakeZone as string, effectiveDate as string, expirationDate as string, isCancelled as string, tax as string[], amountItem as string[], extendedAttributes as (name as string, value as string)[], insurableObject as string[], businessKey as string)[], majorVersion as string, mgaParticipant as string[], minorVersion as string, operatingCompanyCode as string, originalBusinessPurposeType as string, originalBusinessPurposeTypeCode as string, parentEntityId as string, parentEntityTypeName as string, policyEffectiveDate as string, policyExpirationDate as string, policyStage as string, policyStatus as string, policyStatusCodeDisplayName as string, policyTerm as string, preparedDate as string, priorPolicy as string[], productVersion as string, questionAnswer as (answerCode as string, extendedAttributes as (name as string, value as string)[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, questionCode as string, questionText as string, value as string)[], quoteNumber as string, ratedIndicator as string, reasons as string[], referenceNumber as string, sanctionCheckInfo as string[], section as (amountItem as string[], carrierParticipant as string[], coverTypeCode as string, coverage as (amountItem as string[], appliesToCode as string, appliesToLevel as string, deductible as (currencyCode as string, id as string, name as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string, value as string, valueType as string)[], effectiveDate as string, expirationDate as string, extendedAttributes as (name as string, value as string)[], fullPremium as string, id as string, isCancelled as string, limit as (currencyCode as string, id as string, name as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string, value as string, valueType as string)[], option as string[], parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, tax as string[], typeCode as string)[], coverageGroup as string[], declinedIndicator as string, effectiveDate as string, expirationDate as string, extendedAttributes as (name as string, value as string)[], id as string, insurableObject as (businessKey as string, extendedAttributes as (name as string, value as string)[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, sequenceNumber as string, typeCode as string)[], insurableObjectParticipant as (effectiveDate as string, expirationDate as string, extendedAttributes as (name as string, value as string)[], id as string, insurableObjectId as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string)[], isCancelled as string, isSharedCarrier as string, lineOfBusinessCode as string, location as (address as (line1 as string, line2 as string, city as string, postalCode as string, isPrimaryAddress as string, countyName as string), id as string, typeCode as string, parentEntityId as string, parentEntityTypeName as string, earthquakeZone as string, effectiveDate as string, expirationDate as string, isCancelled as string, tax as string[], amountItem as string[], extendedAttributes as (name as string, value as string)[], insurableObject as string[], businessKey as string)[], mappedLocations as string[], parentEntityId as string, parentEntityTypeName as string, premiumAmountBasis as string, pricedIndicator as string, pricingFactor as string[], primaryRatingState as string, questionAnswer as (answerCode as string, appliesToCode as string, extendedAttributes as (name as string, value as string)[], id as string, isCancelled as string, parentEntityId as string, parentEntityTypeName as string, questionCode as string, questionText as string, value as string)[], sectionItem as string[], sequenceNumber as string, subjectivity as string[], tax as string[], taxAmountBasis as string, taxJurisdiction as string[], triaRate as string, underwritingYear as string)[], sectionWiseLocationAllocation as string, sequenceNumber as string, statusCode as string, statusCodeDisplayName as string, submissionCreatedBy as string, submissionCreationDate as string, tax as string[], trackingNumber as string, typeCode as string, underlyingPolicies as string[], underwriterDecisionInfo as string[], validUntilDate as string))",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     format: 'rest',",
+						"     store: 'restservice',",
+						"     timeout: 30,",
+						"     requestInterval: 0,",
+						"     httpMethod: 'GET',",
+						"     rowRelativeUrl: 'queryParams',",
+						"     entity: ('/policyadmin-api/retrieveQuoteInformation/v1/quote/'),",
+						"     bodyColumnName: 'retrieveQuoteResponse',",
+						"     requestFormat: ['type' -> 'json'],",
+						"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> retrieveQuoteInfoAPI",
+						"policyTarget call(mapColumn(",
+						"          policy_policy_number,",
+						"          tracker_policy_number,",
+						"          ref_pol",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     output(",
+						"          retrievePolicyInfoResponse as (policy as (referenceNumber as string))",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     format: 'rest',",
+						"     store: 'restservice',",
+						"     timeout: 30,",
+						"     requestInterval: 0,",
+						"     httpMethod: 'GET',",
+						"     rowRelativeUrl: 'ref_pol',",
+						"     entity: ('/policyadmin-api/retrievePolicyInformation/v1/policy/'),",
+						"     bodyColumnName: 'retrievePolicyInfoResponse',",
+						"     requestFormat: ['type' -> 'json'],",
+						"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> retrievePolicyInfoAPI",
+						"derivedColumn7 call(mapColumn(",
+						"          searchParams",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     output(",
+						"          searchQuoteResponse as (quote as (quoteNumber as string)[])",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     format: 'rest',",
+						"     store: 'restservice',",
+						"     timeout: 30,",
+						"     requestInterval: 0,",
+						"     httpMethod: 'POST',",
+						"     entity: (\"/policyadmin-api/searchQuote/v1/quote\"),",
+						"     bodyColumnName: 'searchQuoteResponse',",
+						"     requestFormat: ['type' -> 'json'],",
+						"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> searchQuoteAPI",
+						"select6 derive(messageInformation = @(sender='viswa',",
+						"          userInfo=@(userName='viswa'),",
+						"          businessPurposeTypeCode='NBS',",
+						"          trackingNumber=uuid(),",
+						"          formKey='Policy Detail')) ~> derivedColumn1",
+						"retrieveQuoteInfoAPI select(mapColumn(",
+						"          policy_policy_number,",
+						"          policy_reference,",
+						"          quote_number,",
+						"          retrieveQuoteResponse",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select6",
+						"select7 foldDown(unroll(sections.amountItem),",
+						"     mapColumn(",
+						"          amountItem = sections.amountItem,",
+						"          policy = policy_policy_number",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flatten1",
+						"calculatePremiumAPI select(mapColumn(",
+						"          policy_policy_number,",
+						"          policy_reference,",
+						"          quote_number,",
+						"          sections = raterResponse.riskDetail.section",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select7",
+						"retrievePolicyInfoAPI derive(policy_reference = retrievePolicyInfoResponse.policy.referenceNumber,",
+						"          searchParams = 'referenceNumber:*' + retrievePolicyInfoResponse.policy.referenceNumber +'*') ~> derivedColumn7",
+						"searchQuoteAPI derive(quote_number = searchQuoteResponse.quote[1].quoteNumber,",
+						"          queryParams = searchQuoteResponse.quote[1].quoteNumber+'?identifierType=number') ~> derivedColumn8",
+						"flatten1 output() ~> output1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/AzureBlobStorageECM')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('AzureBlobStorageECM_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('AzureBlobStorageECM_properties_groupId')]"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_api_agency')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Target Agency Lookup",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzurePostgreSqlSource",
+								"query": "select agency_id, json_data from agency where bpa_party_code is null",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_stage_agency",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Iterate Agency JSON",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get token",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Target Agency Lookup').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Create Agency",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"Authorization": {
+												"value": "Bearer @{activity('Get token').output.access_token}",
+												"type": "Expression"
+											},
+											"Content-Type": "application/json"
+										},
+										"url": {
+											"value": "@{pipeline().globalParameters.baseURL}/party-api/submitPartyInformations/v1/party",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "@json(replace('{\"messageInformation\":{\"sender\":\"adfclient\",\"userInfo\":{\"partyDetails\":[{\"partyCode\":\"\",\"partyRole\":\"\"}],\"userName\":\"Viswa\"},\"businessPurposeTypeCode\":\"xyz\",\"trackingNumber\":\"09cbf4b4-2b59-f42c-3ce2-e8c34e737398\"},\"party\":[dynamicData]', 'dynamicData' , string(item().json_data)))",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Update Agency",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "Create Agency",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzurePostgreSqlSource",
+											"query": {
+												"value": "update agency set bpa_party_id='@{activity('Create Agency').output.success[0].partyId}', bpa_party_code='@{activity('Create Agency').output.success[0].partyCode}', party_name='@{activity('Create Agency').output.success[0].fullName}' where agency_id=@{string(item().agency_id)};\n\nselect * from agency limit 1",
+												"type": "Expression"
+											},
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "ds_stage_party",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Get token",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Target Agency Lookup",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"url": {
+								"value": "@{pipeline().globalParameters.baseURL}/auth/realms/ecm/protocol/openid-connect/token",
+								"type": "Expression"
+							},
+							"body": {
+								"value": "grant_type=client_credentials&client_id=@{pipeline().globalParameters.client_id}&client_secret=@{pipeline().globalParameters.client_secret}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Target Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_api_party')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Target Party Lookup",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzurePostgreSqlSource",
+								"query": "select party_id,json_data from partyidentity where bpa_party_code is null",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_stage_party",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Iterate Party JSON",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get token",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Target Party Lookup').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Create Party",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"Authorization": {
+												"value": "Bearer @{activity('Get token').output.access_token}",
+												"type": "Expression"
+											},
+											"Content-Type": "application/json"
+										},
+										"url": {
+											"value": "@{pipeline().globalParameters.baseURL}/party-api/submitPartyInformations/v1/party",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "@json(replace('{\"messageInformation\":{\"sender\":\"adfclient\",\"userInfo\":{\"partyDetails\":[{\"partyCode\":\"\",\"partyRole\":\"\"}],\"userName\":\"Viswa\"},\"businessPurposeTypeCode\":\"xyz\",\"trackingNumber\":\"09cbf4b4-2b59-f42c-3ce2-e8c34e737398\"},\"party\":[dynamicData]', 'dynamicData' , string(item().json_data)))",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Update Party",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "Create Party",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzurePostgreSqlSource",
+											"query": {
+												"value": "update partyidentity set bpa_party_id='@{activity('Create Party').output.success[0].partyId}', bpa_party_code='@{activity('Create Party').output.success[0].partyCode}', party_name='@{activity('Create Party').output.success[0].fullName}' where party_id=@{string(item().party_id)};\n\nselect  * from partyidentity limit 1\n",
+												"type": "Expression"
+											},
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "ds_stage_party",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Get token",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Target Party Lookup",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"url": {
+								"value": "@{pipeline().globalParameters.baseURL}/auth/realms/ecm/protocol/openid-connect/token\n",
+								"type": "Expression"
+							},
+							"body": {
+								"value": "grant_type=client_credentials&client_id=@{pipeline().globalParameters.client_id}&client_secret=@{pipeline().globalParameters.client_secret}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"concurrency": 4,
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Target Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}

@@ -1,0 +1,2114 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "4837-df"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_location')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Location Address to Location Data flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_locationAddressToLocation",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"locationAddressSource": {},
+									"policyStaging": {},
+									"genAddressStaging": {},
+									"locationStagingMaxId": {},
+									"locationStaging": {},
+									"maxIdCache": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Insured Address to Insured Location Data flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Location Address to Location Data flow",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_insuredAddressToLocation",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"insuredAddressSource": {},
+									"policyStaging": {},
+									"genAddressStaging": {},
+									"insuredLocationStagingMaxId": {},
+									"insuredLocationStaging": {},
+									"maxIdCache": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipelien_txn"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_lookupType')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "lookupType",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_emp_lookupType",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"empRiskTypeCodes": {},
+									"lookupTypeSource": {},
+									"LookUpTypeSink": {},
+									"lookupTypeCache": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime2-selfhosted",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "lookupDetails",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "lookupType",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_emp_lookupTypeDetails",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"empRiskTypeCodes": {},
+									"lookupTypeSource": {},
+									"lookupType": {},
+									"LookUpDetailsSink": {},
+									"lookupTypeCache": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime2-selfhosted",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipeline_reference"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_lookupTypeAndDetails')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "lookupType",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_emp_lookupType",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"empRiskTypeCodes": {},
+									"lookupTypeSource": {},
+									"LookUpTypeSink": {},
+									"lookupTypeCache": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime2-selfhosted",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "lookupDetails",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "lookupType",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_emp_lookupTypeDetails",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"empRiskTypeCodes": {},
+									"lookupTypeSource": {},
+									"lookupType": {},
+									"LookUpDetailsSink": {},
+									"lookupTypeCache": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime2-selfhosted",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipeline_reference"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_party')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Party Data flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Party MaxId Lookup",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_party",
+								"type": "DataFlowReference",
+								"parameters": {
+									"DF_batch": {
+										"value": "@variables('BatchId')",
+										"type": "Expression"
+									},
+									"DF_max_id": {
+										"value": "@activity('Party MaxId Lookup').output.firstRow.maxId",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"partySource": {},
+									"partyStagingLookup": {},
+									"partyStaging": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Party MaxId Lookup",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "SELECT isnull(MAX(PARTY_ID), 0) as maxId\nFROM dbo.POL_PARTY",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_source_stage_party",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": true
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"BatchId": {
+						"type": "Integer",
+						"defaultValue": 1
+					}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipeline_reference"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_polRiskAndDetails')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Switch1",
+						"type": "Switch",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"on": {
+								"value": "@pipeline().globalParameters.policyPrefix",
+								"type": "Expression"
+							},
+							"cases": [
+								{
+									"value": "EMP",
+									"activities": [
+										{
+											"name": "empRisk",
+											"type": "ExecuteDataFlow",
+											"dependsOn": [],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"dataflow": {
+													"referenceName": "df_source_policy_risk_emp",
+													"type": "DataFlowReference",
+													"parameters": {
+														"policyPrefix": {
+															"value": "'@{pipeline().globalParameters.policyPrefix}'",
+															"type": "Expression"
+														},
+														"policies": {
+															"value": "@pipeline().globalParameters.policies",
+															"type": "Expression"
+														}
+													},
+													"datasetParameters": {
+														"PropertyUnits": {},
+														"stgPolicy": {},
+														"riskStaging": {},
+														"PolRisk": {},
+														"maxId": {}
+													}
+												},
+												"staging": {},
+												"compute": {
+													"coreCount": 8,
+													"computeType": "General"
+												},
+												"traceLevel": "Fine"
+											}
+										},
+										{
+											"name": "empRiskDetails",
+											"type": "ExecuteDataFlow",
+											"dependsOn": [
+												{
+													"activity": "empRisk",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"dataflow": {
+													"referenceName": "df_source_empInsObj",
+													"type": "DataFlowReference",
+													"parameters": {
+														"policyPrefix": {
+															"value": "'@{pipeline().globalParameters.policyPrefix}'",
+															"type": "Expression"
+														},
+														"policies": {
+															"value": "@pipeline().globalParameters.policies",
+															"type": "Expression"
+														}
+													},
+													"datasetParameters": {
+														"StagingPolicyRisk": {},
+														"StagingPolicy": {},
+														"EcmPropertyUnits": {},
+														"ecmWithLimits": {},
+														"sourceRefLookUp": {},
+														"StagingPolicyRiskTypeBreed": {},
+														"StagingPolicyRiskTypeName": {},
+														"StagingPolicyRiskTypeSex": {},
+														"StagingPolicyRiskTypePurchaseDate": {},
+														"StagingPolicyRiskTypeMortality": {},
+														"StagingPolicyRiskTypeUse": {},
+														"StagingPolicyRiskTypePrice": {},
+														"StagingPolicyRiskTypeYearBorn": {},
+														"StagingPolicyRiskTypeRequestedLimit": {},
+														"StagingPolicyRiskTypeAge": {}
+													}
+												},
+												"staging": {},
+												"compute": {
+													"coreCount": 8,
+													"computeType": "General"
+												},
+												"traceLevel": "Fine"
+											}
+										}
+									]
+								},
+								{
+									"value": "CFA",
+									"activities": [
+										{
+											"name": "cfaRisk",
+											"type": "ExecuteDataFlow",
+											"dependsOn": [],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"dataflow": {
+													"referenceName": "df_source_policy_risk_cfa",
+													"type": "DataFlowReference",
+													"parameters": {
+														"policyPrefix": {
+															"value": "'@{pipeline().globalParameters.policyPrefix}'",
+															"type": "Expression"
+														},
+														"policies": {
+															"value": "@pipeline().globalParameters.policies",
+															"type": "Expression"
+														}
+													},
+													"datasetParameters": {
+														"autoUnitSource": {},
+														"stgPolicy": {},
+														"riskStaging": {},
+														"PolRisk": {},
+														"maxId": {}
+													}
+												},
+												"staging": {},
+												"compute": {
+													"coreCount": 8,
+													"computeType": "General"
+												},
+												"traceLevel": "Fine"
+											}
+										},
+										{
+											"name": "cfaRiskDetails",
+											"type": "ExecuteDataFlow",
+											"dependsOn": [
+												{
+													"activity": "cfaRisk",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"dataflow": {
+													"referenceName": "df_source_cfaInsObj",
+													"type": "DataFlowReference",
+													"parameters": {
+														"policyPrefix": {
+															"value": "'@{pipeline().globalParameters.policyPrefix}'",
+															"type": "Expression"
+														},
+														"policies": {
+															"value": "@pipeline().globalParameters.policies",
+															"type": "Expression"
+														}
+													},
+													"datasetParameters": {
+														"StagingPolicyRisk": {},
+														"StagingPolicy": {},
+														"autoUnitsSource": {},
+														"locationAddressSource": {},
+														"StagingPolicyRiskTypeBreed": {},
+														"StagingPolicyRiskTypeName": {},
+														"StagingPolicyRiskTypeSex": {},
+														"StagingPolicyRiskTypePurchaseDate": {},
+														"StagingPolicyRiskTypeMortality": {},
+														"StagingPolicyRiskTypeUse": {},
+														"StagingPolicyRiskTypePrice": {},
+														"StagingPolicyRiskTypeRequestedLimit": {},
+														"StagingPolicyRiskTypeAge": {},
+														"StagingPolicyRiskTypeVehicleOwned": {},
+														"StagingPolicyRiskTypeRadiusClass": {},
+														"StagingPolicyRiskTypePrimaryClass": {},
+														"StagingPolicyRiskTypeSecondaryClass": {},
+														"sink3": {},
+														"sink4": {},
+														"sink5": {},
+														"sink6": {},
+														"StagingPolicyRiskTypeFleet": {},
+														"sink7": {},
+														"sink8": {},
+														"sink9": {},
+														"sink10": {},
+														"sink11": {},
+														"sink13": {},
+														"sink14": {},
+														"sink15": {}
+													}
+												},
+												"staging": {},
+												"compute": {
+													"coreCount": 8,
+													"computeType": "General"
+												},
+												"traceLevel": "Fine"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"productCode": {
+						"type": "string",
+						"defaultValue": "\"emp\""
+					}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipelien_txn"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_polSection')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "polSectionDf",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_policy_section",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"source2": {},
+									"lobStg": {},
+									"subLobStg": {},
+									"sink1": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipelien_txn"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_policy')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ecmToSrcStgPolicy",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_policy",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"ecmPolicyCoverage": {},
+									"polAgencyStg": {},
+									"producerStg": {},
+									"stateCode": {},
+									"stgPolicyNextPkey": {},
+									"stgPolicy": {},
+									"stateCodeSink": {},
+									"policyPkeyCache": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipelien_txn"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_policy_partyrole_bridge')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Policy Party Role Data flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_policy_partyrole_bridge",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									},
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"EcmParty": {},
+									"StagingParty": {},
+									"StagingPolicy": {},
+									"StagingPartyRole": {},
+									"bridgeMaxId": {},
+									"StagingPolicyPartyRoleBridge": {},
+									"maxIdCache": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipelien_txn"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_policy_premium')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "polTxnPremium",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_policy_premium",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"StagingPolTxn": {},
+									"FactCoveragePremium": {},
+									"StagingPolicy": {},
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipelien_txn"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_policy_txn')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "pol_txn",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_policy_txn",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"coverages": {},
+									"polPolicy": {},
+									"txnStagingMaxId": {},
+									"polTxn": {},
+									"maxIdCache": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "pol_txn_bridge",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "pol_txn",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_policy_tx_bridge",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"polTxnStg": {},
+									"coverageStg": {},
+									"source1": {},
+									"polSection": {},
+									"txnBridgeStagingMaxId": {},
+									"stagingPolicy": {},
+									"sink1": {},
+									"maxIdCache": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "pol_premium",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "pol_txn_bridge",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_policy_premium",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"StagingPolTxn": {},
+									"FactCoveragePremium": {},
+									"StagingPolicy": {},
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipelien_txn"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_sublob')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "sub_lob_df",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"source2": {},
+									"sink1": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipeline_reference"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_tx_limits')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "limit2",
+						"type": "ExecuteDataFlow",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_POL_TX_LIMIT2",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"StagingTxnBridge": {},
+									"stgPolTxn": {},
+									"fcp": {},
+									"polPolicy": {},
+									"risklocationBridge": {},
+									"PolTxLimitDedOptLimit2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "limit1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "limit2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_POL_TX_LIMIT1",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"StagingTxnBridge": {},
+									"stgPolTxn": {},
+									"fcp": {},
+									"polPolicy": {},
+									"source1": {},
+									"PolTxLimitDedOptLimit2": {},
+									"limitKeyCache": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "POL_TX_Deductible_DF",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "limit1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_source_POL_TX_Deductible",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"policies": {
+										"value": "@pipeline().globalParameters.policies",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"StagingTxnBridge": {},
+									"stgPolTxn": {},
+									"fcp": {},
+									"polPolicy": {},
+									"PolTxnLimitDedMaxId": {},
+									"PolTxLimitDedOptLimit2": {},
+									"polTxnLDCache": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Source Data Movement/ecm/pipelien_txn"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_stage_address')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Address Data flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_stage_address",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"addressStaging": {},
+									"addressTarget": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Staging Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_stage_agency')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Target Agency Data Flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_stage_agency",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"agencyStaging": {},
+									"policyPartyRoleBridge": {},
+									"agencyTargetLookup": {},
+									"agencyTarget": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Staging Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_stage_cov_ded_limit')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "targetCoverages",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Set locationCode",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_stage_riskLevel_coverages",
+								"type": "DataFlowReference",
+								"parameters": {
+									"isLimitUpdateOnly": "false()",
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"locationState": {
+										"value": "'@{variables('locationState')}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"ssCoverages": {},
+									"ssCoverageExt": {},
+									"sslocation": {},
+									"ecmBpaCovMap": {},
+									"targetPolicy": {},
+									"stgPolicy": {},
+									"osStageCoverage": {},
+									"covCache": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "addLimitToCoverages",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "targetdeductible",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_addLimit_to_risk_level_coverage",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"targetCoverage": {},
+									"osTargeLimit": {},
+									"osTargetDeductible": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "limitRiskLevel",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Set variable1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_stage_covLimit_risk_level_cov",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"locationCode": {
+										"value": "'@{variables('locationCode')}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"source1": {},
+									"osStagingCoverageExt": {},
+									"srcBpaCovMap": {},
+									"BPAlimitRef": {},
+									"source2": {},
+									"TargetlimitSink": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "targetdeductible",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "limitPolicyLevel",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_stage_Deductible",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"stageDeductible": {},
+									"source1": {},
+									"source2": {},
+									"TargetdeductSink": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "onlyPolicyLevelCoverages",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "targetCoverages",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_stage_policyLevel_coverages",
+								"type": "DataFlowReference",
+								"parameters": {
+									"isLimitUpdateOnlyForPolicy": "false()",
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"locationState": {
+										"value": "'@{variables('locationState')}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"ssCoverages": {},
+									"ssCoverageExt": {},
+									"ecmBpaCovMap": {},
+									"targetPolicy": {},
+									"srcStgPolicy": {},
+									"osStageCoverage": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "limitsToPolicyLevelCoverages",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "addLimitToCoverages",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_addLimit_to_policy_level_coverage",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"targetCoverage": {},
+									"osTargeLimit": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "limitPolicyLevel",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "limitRiskLevel",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_stage_covLimit_policy_level",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									},
+									"locationCode": "'MT'"
+								},
+								"datasetParameters": {
+									"source1": {},
+									"osStagingCoverageExt": {},
+									"srcBpaCovMap": {},
+									"BPAlimitRef": {},
+									"source2": {},
+									"TargetlimitSink": {},
+									"sink2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "updateDeductibleToRiskLevelCoverages",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "limitsToPolicyLevelCoverages",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_addDeductible_to_risk_level_coverage",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"targetCoverage": {},
+									"osTargetDeductible": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "updateDeductibleToPolicyCoverages",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "updateDeductibleToRiskLevelCoverages",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_addDeductible_to_policy_level_coverage",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"targetCoverage": {},
+									"osDeductibleLimit": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "locaitonState",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "locationState",
+							"value": "Montana"
+						}
+					},
+					{
+						"name": "Set locationCode",
+						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "locaitonState",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "locationCode",
+							"value": "'MT'"
+						}
+					},
+					{
+						"name": "Set variable1",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "onlyPolicyLevelCoverages",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "locationCode",
+							"value": "MT"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"isLimitUpdateOnly": {
+						"type": "Boolean"
+					},
+					"limiPolicyLevelOnly": {
+						"type": "Boolean"
+					},
+					"locationState": {
+						"type": "String"
+					},
+					"locationCode": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Staging Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_stage_final_policy')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "updatePolicyWithFinalSections",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_update_stage_policyWithSection",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Staging Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_stage_horseDetails')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Horse details lookup data",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_stage_horsedetails_lookup",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"horseBreedCodes": {},
+									"stageHorseDetailsLookup": {},
+									"horseSexCodes": {},
+									"horseUseCodes": {},
+									"horseDetailsBreedTarget": {},
+									"lookupCache": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Staging Data Movement/lookup"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_stage_location')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Location Data flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_stage_location",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"locationStagingJoinStgingPolicy": {},
+									"addressTarget": {},
+									"stgPolicy": {},
+									"locationTarget": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Staging Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_stage_party')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Target Party Data Flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_stage_party",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"partyStaging": {},
+									"targetPartyLookup": {},
+									"policyPartyRoleJoin": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Staging Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_stage_policy')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "df_target_policy",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_stage_policy",
+								"type": "DataFlowReference",
+								"parameters": {
+									"policyPrefix": {
+										"value": "'@{pipeline().globalParameters.policyPrefix}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"StagingPolicy": {},
+									"pkey": {},
+									"targetPolicyEMP": {},
+									"nextPkey": {},
+									"targetPolicyCFA": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Staging Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}
