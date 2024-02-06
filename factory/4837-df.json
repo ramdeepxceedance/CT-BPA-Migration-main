@@ -17,6 +17,10 @@
 			"client_id": {
 				"type": "string",
 				"value": " "
+			},
+			"tokenBaseURL": {
+				"type": "string",
+				"value": " "
 			}
 		}
 	},
