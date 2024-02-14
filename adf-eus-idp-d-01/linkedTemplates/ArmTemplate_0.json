@@ -1,0 +1,820 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-eus-idp-d-01"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
+		"RestService1_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'RestService1'"
+		},
+		"RestService2_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'RestService2'"
+		},
+		"ecmmigrationdb_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ecmmigrationdb'"
+		},
+		"ls_DM_Stage_Target_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_DM_Stage_Target'"
+		},
+		"postgresTest_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'postgresTest'"
+		},
+		"sourceStageDB_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'sourceStageDB'"
+		},
+		"ssSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ssSqlServer'",
+			"defaultValue": "Integrated Security=False;Data Source=@{linkedService().dbUrl};Initial Catalog=@{linkedService().dbName};User ID=@{linkedService().dbUsername};Password=@{linkedService().dbPassword}"
+		},
+		"submitService_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'submitService'"
+		},
+		"RestService1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://bpa-dev.chainthat.net"
+		},
+		"RestService1_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "adf-client"
+		},
+		"RestService2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://bpa-ecm-migration.chainthat.net"
+		},
+		"RestService2_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "adf-client"
+		},
+		"sampleLogin_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "http://restapi.adequateshop.com"
+		},
+		"submitService_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://bpa-tst.chainthat.net/policyadmin-api/submitPolicyInformation/v1/policy"
+		},
+		"submitService_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "ecm-claims-client"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_api_token_only')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get token",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"url": {
+								"value": "@{pipeline().globalParameters.tokenBaseURL}/auth/realms/ecm/protocol/openid-connect/token",
+								"type": "Expression"
+							},
+							"body": {
+								"value": "grant_type=client_credentials&client_id=@{pipeline().globalParameters.client_id}&client_secret=@{pipeline().globalParameters.client_secret}",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set access token",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Get token",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "access_token",
+							"value": {
+								"value": "@{activity('Get token').output.access_token}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"access_token": {
+						"type": "String"
+					},
+					"continueLoop": {
+						"type": "Boolean",
+						"defaultValue": false
+					}
+				},
+				"folder": {
+					"name": "Target Data Movement"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RestService1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('RestService1_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('RestService1_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('RestService1_clientSecret')]"
+					},
+					"tokenEndpoint": "https://bpa-dev.chainthat.net/auth/realms/ecm/protocol/openid-connect/token"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RestService2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('RestService2_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('RestService2_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('RestService2_clientSecret')]"
+					},
+					"tokenEndpoint": "https://bpa-ecm-migration.chainthat.net/auth/realms/ecm/protocol/openid-connect/token"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ecmmigrationdb')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('ecmmigrationdb_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_DM_Stage_Target')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzurePostgreSql",
+				"typeProperties": {
+					"connectionString": "[parameters('ls_DM_Stage_Target_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/postgresTest')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzurePostgreSql",
+				"typeProperties": {
+					"connectionString": "[parameters('postgresTest_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sampleLogin')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('sampleLogin_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sourceStageDB')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('sourceStageDB_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ssSqlServer')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"dbUrl": {
+						"type": "string",
+						"defaultValue": "20.84.69.215"
+					},
+					"dbName": {
+						"type": "string",
+						"defaultValue": "DM_Source_Stage"
+					},
+					"dbUsername": {
+						"type": "string",
+						"defaultValue": "db_admin"
+					},
+					"dbPassword": {
+						"type": "string",
+						"defaultValue": "ProVT#2D1!@C"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('ssSqlServer_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/submitService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('submitService_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('submitService_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('submitService_clientSecret')]"
+					},
+					"tokenEndpoint": "https://bpa-tst.chainthat.net/auth/realms/ecm/protocol/openid-connect/token"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false,
+							"customProperties": []
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_update_stage_policyWithSection1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Flowlet",
+				"typeProperties": {
+					"sources": [],
+					"sinks": [],
+					"transformations": [
+						{
+							"name": "derivedColumn3"
+						},
+						{
+							"name": "derivedColumn4"
+						},
+						{
+							"name": "derivedColumn5"
+						},
+						{
+							"name": "derivedColumn6"
+						},
+						{
+							"name": "derivedColumn7"
+						},
+						{
+							"name": "input1"
+						},
+						{
+							"name": "output1"
+						}
+					],
+					"scriptLines": [
+						"input(output(",
+						"          json as string,",
+						"          id as long,",
+						"          sec_id as long,",
+						"          sec_code as string,",
+						"          filteredSection as string",
+						"     ),",
+						"     order: 0,",
+						"     allowSchemaDrift: true) ~> input1",
+						"input1 derive(finalJson = replace(json,'[\"{','[{')) ~> derivedColumn3",
+						"derivedColumn6 derive(finalJson = replace(finalJson,'}\"]','}]')) ~> derivedColumn4",
+						"derivedColumn4 derive(finalJson = replace(finalJson, '\"{', '{')) ~> derivedColumn5",
+						"derivedColumn3 derive(finalJson = unescape(finalJson, 'json')) ~> derivedColumn6",
+						"derivedColumn5 derive(finalJson = replace(finalJson, '}\"', '}')) ~> derivedColumn7",
+						"derivedColumn7 output() ~> output1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/fl_emp_premium_calc')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "utility/flowlet"
+				},
+				"type": "Flowlet",
+				"typeProperties": {
+					"sources": [],
+					"sinks": [],
+					"transformations": [
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "split1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "derivedColumn3"
+						},
+						{
+							"name": "join1"
+						},
+						{
+							"name": "derivedColumn4"
+						},
+						{
+							"name": "select8"
+						},
+						{
+							"name": "derivedColumn5"
+						},
+						{
+							"name": "derivedColumn6"
+						},
+						{
+							"name": "union1"
+						},
+						{
+							"name": "select9"
+						},
+						{
+							"name": "select10"
+						},
+						{
+							"name": "select12"
+						},
+						{
+							"name": "targetPremiumDetails"
+						},
+						{
+							"name": "output1"
+						}
+					],
+					"scriptLines": [
+						"input(output(",
+						"          policy as string,",
+						"          amountItem as (appliesToCode as string, currencyCode as string, description as string, editableOnTransaction as string, isAggregate as string, isMtaImpacted as string, isRefundable as string, levelCode as string, maxValue as string, minValue as string, originalAmount as string, pricedAmount as string, pricedValue as string, sequenceNumber as string, subTypeCode as string, typeCode as string, value as string, valueType as string)",
+						"     ),",
+						"     order: 0,",
+						"     allowSchemaDrift: true) ~> targetPremiumDetails",
+						"targetPremiumDetails filter((amountItem.typeCode == 'premium' && amountItem.levelCode == 'section' && (amountItem.appliesToCode == 'SEC001' || amountItem.appliesToCode == 'SEC002')) || (amountItem.typeCode == 'tack_premium' && ((amountItem.levelCode == 'policy' && amountItem.appliesToCode == 'SEC000') || (amountItem.levelCode == 'section' && amountItem.appliesToCode == 'SEC002')))) ~> filter1",
+						"filter1 split(amountItem.appliesToCode == 'SEC001',",
+						"     amountItem.appliesToCode == 'SEC002' && amountItem.typeCode == 'tack_premium',",
+						"     amountItem.appliesToCode == 'SEC000',",
+						"     amountItem.appliesToCode == 'SEC002' && amountItem.typeCode == 'premium',",
+						"     disjoint: false) ~> split1@(section1, section2TrackPremium, section0, section2)",
+						"split1@section2TrackPremium derive(tack_premium = toDecimal(amountItem.originalAmount),",
+						"          section = amountItem.appliesToCode) ~> derivedColumn2",
+						"split1@section2 derive(premium = toDecimal(amountItem.originalAmount),",
+						"          section = amountItem.appliesToCode) ~> derivedColumn3",
+						"derivedColumn3, derivedColumn2 join(derivedColumn3@section == derivedColumn2@section",
+						"     && split1@section2@policy == split1@section2TrackPremium@policy,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'right')~> join1",
+						"join1 derive(section2_premium = premium - tack_premium,",
+						"          section = split1@section2@amountItem.appliesToCode) ~> derivedColumn4",
+						"derivedColumn4 select(mapColumn(",
+						"          section_premium = section2_premium,",
+						"          section,",
+						"          policy = split1@section2@policy",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select8",
+						"split1@section0 derive(section_premium = toDecimal(amountItem.originalAmount),",
+						"          section = amountItem.appliesToCode) ~> derivedColumn5",
+						"split1@section1 derive(section_premium = toDecimal(amountItem.originalAmount),",
+						"          section = amountItem.appliesToCode) ~> derivedColumn6",
+						"select10, select9, select8 union(byName: true)~> union1",
+						"derivedColumn5 select(mapColumn(",
+						"          section_premium,",
+						"          section,",
+						"          policy",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select9",
+						"derivedColumn6 select(mapColumn(",
+						"          section_premium,",
+						"          section,",
+						"          policy",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select10",
+						"union1 select(mapColumn(",
+						"          section_premium,",
+						"          section,",
+						"          policy",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select12",
+						"select12 output() ~> output1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/fl_source_addDefaultColumnFlowlet')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "Source Stage Data Flows/flowlet"
+				},
+				"type": "Flowlet",
+				"typeProperties": {
+					"sources": [],
+					"sinks": [],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "input1"
+						},
+						{
+							"name": "output1"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     FL_batch as integer (1)",
+						"}",
+						"input(order: 0,",
+						"     allowSchemaDrift: true) ~> input1",
+						"input1 derive(IS_VALID_YN = \"Y\",",
+						"          VALID_START_DATE = currentTimestamp(),",
+						"          VALID_END_DATE = toTimestamp(\"9999-01-01 00:00:00\"),",
+						"          BATCH_ID = $FL_batch,",
+						"          UNIQUE_IDENTIFIER = uuid(),",
+						"          DELETED_YN = \"N\",",
+						"          BPAM_LAST_CREATED_DATE = currentTimestamp(),",
+						"          BPAM_LAST_MODIFIED_DATE = currentTimestamp()) ~> derivedColumn1",
+						"derivedColumn1 output() ~> output1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_source_stage_remove_txn')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Remove policy data from source stage",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[removeData]"
+						},
+						"linkedServiceName": {
+							"referenceName": "sourceStageDB",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "utility/cleanup"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/sourceStageDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "migration"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ECMBPA_COV_MAP')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "postgresTest",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzurePostgreSqlTable",
+				"schema": [
+					{
+						"name": "COV_SEQ",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "BPA_SECTION_CODE",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "COVERAGE_CODE",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "COVERAGE_CODE_DES",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "BPA_COVERAGE_CODES",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "BPA_COVERAGES",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "COVERAGES",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "BPA_PRODUCT_CODE",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "SI_NO",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "id",
+						"type": "bigint",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "BPA_SEC_NAME",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "SOURCE_PRODUCT_CODE",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_coverage_group",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_coverage_level",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bpa_coverage_type",
+						"type": "character varying",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "public",
+					"table": "ecm_bpa_cov_mapping"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/postgresTest')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ECM_BPA_COV_Mapping')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Sheet1",
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "coverages_BPA_MetaV2.xlsx",
+						"container": "migration"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "SI_NO",
+						"type": "String"
+					},
+					{
+						"name": "COV_SEQ",
+						"type": "String"
+					},
+					{
+						"name": "COVERAGE_CODE",
+						"type": "String"
+					},
+					{
+						"name": "COVERAGE_CODE_DES",
+						"type": "String"
+					},
+					{
+						"name": "COVERAGES",
+						"type": "String"
+					},
+					{
+						"name": "BPA_SEC_NAME",
+						"type": "String"
+					},
+					{
+						"name": "BPA_SECTION_CODE",
+						"type": "String"
+					},
+					{
+						"name": "BPA_COVERAGES",
+						"type": "String"
+					},
+					{
+						"name": "BPA_COVERAGE_CODES",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		}
+	]
+}

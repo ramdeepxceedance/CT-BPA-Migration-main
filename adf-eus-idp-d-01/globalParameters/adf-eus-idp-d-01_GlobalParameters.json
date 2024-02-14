@@ -1,0 +1,26 @@
+{
+	"policyPrefix": {
+		"type": "string",
+		"value": " "
+	},
+	"policies": {
+		"type": "string",
+		"value": " "
+	},
+	"baseURL": {
+		"type": "string",
+		"value": " "
+	},
+	"client_id": {
+		"type": "string",
+		"value": " "
+	},
+	"client_secret": {
+		"type": "string",
+		"value": " "
+	},
+	"tokenBaseURL": {
+		"type": "string",
+		"value": " "
+	}
+}
