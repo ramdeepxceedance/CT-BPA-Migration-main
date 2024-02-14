@@ -9,6 +9,10 @@
 			"policies": {
 				"type": "string",
 				"value": " "
+			},
+			"baseURL": {
+				"type": "string",
+				"value": " "
 			}
 		}
 	},
