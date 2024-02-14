@@ -12,12 +12,16 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
-			"transformations": [
+			"sinks": [
 				{
-					"name": "flatten1"
+					"dataset": {
+						"referenceName": "Json2",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
 				}
 			],
+			"transformations": [],
 			"scriptLines": [
 				"source(output(",
 				"          eventLogDTO as (trackingId as string, businessKey as string, parentEntityId as string, parentEntityType as string, entityId as string, entityType as string, event as string, eventDesc as string, status as string, actionBy as string, payload as string, notificationDTO as string[], tenantId as string),",
@@ -28,13 +32,13 @@
 				"     ignoreNoFilesFound: false,",
 				"     documentForm: 'arrayOfDocuments',",
 				"     unquotedColumnNames: true) ~> source1",
-				"source1 foldDown(unroll(),",
-				"     mapColumn(",
-				"          eventLogDTO,",
-				"          topic",
-				"     ),",
-				"     skipDuplicateMapInputs: false,",
-				"     skipDuplicateMapOutputs: false) ~> flatten1"
+				"source1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
