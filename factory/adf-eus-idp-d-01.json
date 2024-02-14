@@ -17,6 +17,10 @@
 			"client_id": {
 				"type": "string",
 				"value": " "
+			},
+			"client_secret": {
+				"type": "string",
+				"value": " "
 			}
 		}
 	},
