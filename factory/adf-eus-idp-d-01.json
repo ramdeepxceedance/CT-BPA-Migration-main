@@ -1,5 +1,13 @@
 {
 	"name": "adf-eus-idp-d-01",
+	"properties": {
+		"globalParameters": {
+			"policyPrefix": {
+				"type": "string",
+				"value": " "
+			}
+		}
+	},
 	"location": "eastus",
 	"identity": {
 		"type": "SystemAssigned",
