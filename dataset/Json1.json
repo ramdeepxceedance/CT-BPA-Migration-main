@@ -1,0 +1,70 @@
+{
+	"name": "Json1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dlseusidpd01",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "PartyEventLogDTO.txt",
+				"fileSystem": "bpa-policy-event"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"eventLogDTO": {
+					"type": "object",
+					"properties": {
+						"trackingId": {
+							"type": "string"
+						},
+						"businessKey": {
+							"type": "string"
+						},
+						"parentEntityId": {
+							"type": "string"
+						},
+						"parentEntityType": {
+							"type": "string"
+						},
+						"entityId": {
+							"type": "string"
+						},
+						"entityType": {
+							"type": "string"
+						},
+						"event": {
+							"type": "string"
+						},
+						"eventDesc": {
+							"type": "string"
+						},
+						"status": {
+							"type": "string"
+						},
+						"actionBy": {
+							"type": "string"
+						},
+						"payload": {
+							"type": "string"
+						},
+						"notificationDTO": {
+							"type": "array"
+						},
+						"tenantId": {
+							"type": "string"
+						}
+					}
+				},
+				"topic": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}
