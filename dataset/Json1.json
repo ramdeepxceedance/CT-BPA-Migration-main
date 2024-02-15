@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "PartyEventLogDTO.txt",
-				"fileSystem": "bpa-policy-event"
+				"fileName": "Policy_DO.txt",
+				"fileSystem": "policy-payload"
 			}
 		},
 		"schema": {
