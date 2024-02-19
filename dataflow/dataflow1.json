@@ -13,7 +13,11 @@
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "flatten1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          id as string,",
@@ -82,7 +86,15 @@
 				"     validateSchema: false,",
 				"     limit: 100,",
 				"     ignoreNoFilesFound: false,",
-				"     documentForm: 'arrayOfDocuments') ~> source1"
+				"     documentForm: 'arrayOfDocuments') ~> source1",
+				"source1 foldDown(unroll(clientParticipant),",
+				"     mapColumn(",
+				"          each(match(/* All input columns */ true()),",
+				"               /* Input name */ $$ = $$),",
+				"          clientParticipantid = clientParticipant.id",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1"
 			]
 		}
 	}
