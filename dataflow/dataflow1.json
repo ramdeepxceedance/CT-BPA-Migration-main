@@ -80,9 +80,9 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     limit: 100,",
 				"     ignoreNoFilesFound: false,",
-				"     documentForm: 'arrayOfDocuments',",
-				"     unquotedColumnNames: true) ~> source1"
+				"     documentForm: 'arrayOfDocuments') ~> source1"
 			]
 		}
 	}

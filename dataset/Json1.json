@@ -1,0 +1,890 @@
+{
+	"name": "Json1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dlseusidpd01",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Policy_DO.txt",
+				"fileSystem": "policy-payload"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"parentEntityId": {
+					"type": "string"
+				},
+				"statusCode": {
+					"type": "string"
+				},
+				"number": {
+					"type": "string"
+				},
+				"companyProductCode": {
+					"type": "string"
+				},
+				"lineofBusinessCode": {
+					"type": "string"
+				},
+				"effectiveDate": {
+					"type": "string"
+				},
+				"expirationDate": {
+					"type": "string"
+				},
+				"createdDate": {
+					"type": "string"
+				},
+				"createdBy": {
+					"type": "string"
+				},
+				"ratedPremium": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "string"
+						},
+						"parentEntityTypeName": {
+							"type": "string"
+						},
+						"parentEntityId": {
+							"type": "string"
+						},
+						"typeCode": {
+							"type": "string"
+						},
+						"value": {
+							"type": "string"
+						},
+						"currencyCode": {
+							"type": "string"
+						},
+						"levelCode": {
+							"type": "string"
+						},
+						"appliesToCode": {
+							"type": "string"
+						},
+						"occurrenceYear": {
+							"type": "integer"
+						},
+						"valueType": {
+							"type": "string"
+						},
+						"pricedValue": {
+							"type": "string"
+						},
+						"pricedAmount": {
+							"type": "string"
+						},
+						"originalAmount": {
+							"type": "string"
+						},
+						"editableOnTransaction": {
+							"type": "boolean"
+						}
+					}
+				},
+				"quotedPremium": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "string"
+						},
+						"parentEntityTypeName": {
+							"type": "string"
+						},
+						"parentEntityId": {
+							"type": "string"
+						},
+						"typeCode": {
+							"type": "string"
+						},
+						"value": {
+							"type": "string"
+						},
+						"currencyCode": {
+							"type": "string"
+						},
+						"levelCode": {
+							"type": "string"
+						},
+						"appliesToCode": {
+							"type": "string"
+						},
+						"occurrenceYear": {
+							"type": "integer"
+						},
+						"valueType": {
+							"type": "string"
+						},
+						"pricedValue": {
+							"type": "string"
+						},
+						"pricedAmount": {
+							"type": "string"
+						},
+						"originalAmount": {
+							"type": "string"
+						},
+						"editableOnTransaction": {
+							"type": "boolean"
+						}
+					}
+				},
+				"premiumDueDate": {
+					"type": "string"
+				},
+				"amountItem": {
+					"type": "array"
+				},
+				"tax": {
+					"type": "array"
+				},
+				"referenceNumber": {
+					"type": "string"
+				},
+				"stage": {
+					"type": "string"
+				},
+				"policyTerm": {
+					"type": "string"
+				},
+				"operatingCompanyCode": {
+					"type": "string"
+				},
+				"extendedAttributes": {
+					"type": "array"
+				},
+				"agent": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "string"
+						},
+						"typeCode": {
+							"type": "string"
+						},
+						"number": {
+							"type": "integer"
+						},
+						"parentEntityId": {
+							"type": "string"
+						},
+						"parentEntityTypeName": {
+							"type": "string"
+						},
+						"partyName": {
+							"type": "string"
+						},
+						"isCancelled": {
+							"type": "boolean"
+						},
+						"partyCode": {
+							"type": "string"
+						},
+						"partyIdentifiers": {
+							"type": "array"
+						}
+					}
+				},
+				"brokerBranch": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "string"
+						},
+						"parentEntityId": {
+							"type": "string"
+						},
+						"parentEntityTypeName": {
+							"type": "string"
+						},
+						"maintenanceAgency": {
+							"type": "string"
+						},
+						"partyName": {
+							"type": "string"
+						},
+						"isCancelled": {
+							"type": "boolean"
+						},
+						"agencyCode": {
+							"type": "string"
+						},
+						"partyCode": {
+							"type": "string"
+						},
+						"partyIdentifiers": {
+							"type": "array"
+						}
+					}
+				},
+				"coverage": {
+					"type": "array"
+				},
+				"coverageGroup": {
+					"type": "array"
+				},
+				"clientParticipant": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "string"
+							},
+							"roleCode": {
+								"type": "string"
+							},
+							"parentEntityId": {
+								"type": "string"
+							},
+							"parentEntityTypeName": {
+								"type": "string"
+							},
+							"partyCode": {
+								"type": "string"
+							},
+							"partyName": {
+								"type": "string"
+							},
+							"questionAnswer": {
+								"type": "array"
+							},
+							"effectiveDate": {
+								"type": "string"
+							},
+							"expirationDate": {
+								"type": "string"
+							},
+							"isCancelled": {
+								"type": "boolean"
+							},
+							"subRoleCode": {
+								"type": "string"
+							},
+							"originalPartyName": {
+								"type": "string"
+							},
+							"extendedAttributes": {
+								"type": "array"
+							}
+						}
+					}
+				},
+				"mgaParticipant": {
+					"type": "array"
+				},
+				"section": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "string"
+							},
+							"parentEntityTypeName": {
+								"type": "string"
+							},
+							"parentEntityId": {
+								"type": "string"
+							},
+							"lineOfBusinessCode": {
+								"type": "string"
+							},
+							"sequenceNumber": {
+								"type": "integer"
+							},
+							"declinedIndicator": {
+								"type": "boolean"
+							},
+							"description": {
+								"type": "string"
+							},
+							"coverTypeCode": {
+								"type": "string"
+							},
+							"underwritingYear": {
+								"type": "integer"
+							},
+							"coverage": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"typeCode": {
+											"type": "string"
+										},
+										"sequenceNumber": {
+											"type": "integer"
+										},
+										"parentEntityId": {
+											"type": "string"
+										},
+										"parentEntityTypeName": {
+											"type": "string"
+										},
+										"fullPremium": {
+											"type": "string"
+										},
+										"effectiveDate": {
+											"type": "string"
+										},
+										"expirationDate": {
+											"type": "string"
+										},
+										"limit": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"id": {
+														"type": "string"
+													},
+													"typeCode": {
+														"type": "string"
+													},
+													"sequenceNumber": {
+														"type": "string"
+													},
+													"parentEntityTypeName": {
+														"type": "string"
+													},
+													"parentEntityId": {
+														"type": "string"
+													},
+													"name": {
+														"type": "string"
+													},
+													"valueType": {
+														"type": "string"
+													},
+													"value": {
+														"type": "string"
+													},
+													"currencyCode": {
+														"type": "string"
+													},
+													"extendedAttributes": {
+														"type": "array"
+													}
+												}
+											}
+										},
+										"deductible": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"id": {
+														"type": "string"
+													},
+													"typeCode": {
+														"type": "string"
+													},
+													"sequenceNumber": {
+														"type": "string"
+													},
+													"parentEntityTypeName": {
+														"type": "string"
+													},
+													"parentEntityId": {
+														"type": "string"
+													},
+													"name": {
+														"type": "string"
+													},
+													"valueType": {
+														"type": "string"
+													},
+													"value": {
+														"type": "string"
+													},
+													"currencyCode": {
+														"type": "string"
+													},
+													"extendedAttributes": {
+														"type": "array"
+													}
+												}
+											}
+										},
+										"option": {
+											"type": "array"
+										},
+										"isCancelled": {
+											"type": "boolean"
+										},
+										"tax": {
+											"type": "array"
+										},
+										"amountItem": {
+											"type": "array"
+										},
+										"extendedAttributes": {
+											"type": "array"
+										},
+										"appliesToLevel": {
+											"type": "string"
+										}
+									}
+								}
+							},
+							"subjectivity": {
+								"type": "array"
+							},
+							"tax": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"parentEntityId": {
+											"type": "string"
+										},
+										"parentEntityTypeName": {
+											"type": "string"
+										},
+										"typeCode": {
+											"type": "string"
+										},
+										"baseAmount": {
+											"type": "string"
+										},
+										"percentage": {
+											"type": "integer"
+										},
+										"unitCount": {
+											"type": "integer"
+										},
+										"amount": {
+											"type": "string"
+										},
+										"value": {
+											"type": "integer"
+										},
+										"valueType": {
+											"type": "string"
+										},
+										"amountItem": {
+											"type": "object",
+											"properties": {
+												"id": {
+													"type": "string"
+												},
+												"parentEntityTypeName": {
+													"type": "string"
+												},
+												"parentEntityId": {
+													"type": "string"
+												},
+												"typeCode": {
+													"type": "string"
+												},
+												"value": {
+													"type": "string"
+												},
+												"currencyCode": {
+													"type": "string"
+												},
+												"levelCode": {
+													"type": "string"
+												},
+												"appliesToCode": {
+													"type": "string"
+												},
+												"occurrenceYear": {
+													"type": "integer"
+												},
+												"valueType": {
+													"type": "string"
+												},
+												"pricedValue": {
+													"type": "string"
+												},
+												"subTypeCode": {
+													"type": "string"
+												},
+												"pricedAmount": {
+													"type": "string"
+												},
+												"originalAmount": {
+													"type": "string"
+												},
+												"editableOnTransaction": {
+													"type": "boolean"
+												}
+											}
+										}
+									}
+								}
+							},
+							"sectionItem": {
+								"type": "array"
+							},
+							"location": {
+								"type": "array"
+							},
+							"questionAnswer": {
+								"type": "array"
+							},
+							"coverageGroup": {
+								"type": "array"
+							},
+							"effectiveDate": {
+								"type": "string"
+							},
+							"expirationDate": {
+								"type": "string"
+							},
+							"isCancelled": {
+								"type": "boolean"
+							},
+							"triaRate": {
+								"type": "integer"
+							},
+							"amountItem": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"parentEntityTypeName": {
+											"type": "string"
+										},
+										"parentEntityId": {
+											"type": "string"
+										},
+										"typeCode": {
+											"type": "string"
+										},
+										"value": {
+											"type": "string"
+										},
+										"currencyCode": {
+											"type": "string"
+										},
+										"levelCode": {
+											"type": "string"
+										},
+										"appliesToCode": {
+											"type": "string"
+										},
+										"occurrenceYear": {
+											"type": "integer"
+										},
+										"valueType": {
+											"type": "string"
+										},
+										"pricedValue": {
+											"type": "string"
+										},
+										"subTypeCode": {
+											"type": "string"
+										},
+										"pricedAmount": {
+											"type": "string"
+										},
+										"originalAmount": {
+											"type": "string"
+										},
+										"editableOnTransaction": {
+											"type": "boolean"
+										},
+										"description": {
+											"type": "string"
+										}
+									}
+								}
+							},
+							"extendedAttributes": {
+								"type": "array"
+							},
+							"insurableObject": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"parentEntityId": {
+											"type": "string"
+										},
+										"parentEntityTypeName": {
+											"type": "string"
+										},
+										"typeCode": {
+											"type": "string"
+										},
+										"extendedAttributes": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"name": {
+														"type": "string"
+													},
+													"value": {
+														"type": "string"
+													}
+												}
+											}
+										},
+										"isCancelled": {
+											"type": "boolean"
+										}
+									}
+								}
+							},
+							"carrierParticipant": {
+								"type": "array"
+							},
+							"pricedIndicator": {
+								"type": "boolean"
+							},
+							"isSharedCarrier": {
+								"type": "boolean"
+							},
+							"mappedLocations": {
+								"type": "array"
+							},
+							"insurableObjectParticipant": {
+								"type": "array"
+							},
+							"taxJurisdiction": {
+								"type": "array"
+							},
+							"pricingFactor": {
+								"type": "array"
+							},
+							"deductible": {
+								"type": "array"
+							}
+						}
+					}
+				},
+				"location": {
+					"type": "array"
+				},
+				"productVersion": {
+					"type": "string"
+				},
+				"questionAnswer": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "string"
+							},
+							"parentEntityId": {
+								"type": "string"
+							},
+							"parentEntityTypeName": {
+								"type": "string"
+							},
+							"questionText": {
+								"type": "string"
+							},
+							"value": {
+								"type": "integer"
+							},
+							"questionCode": {
+								"type": "string"
+							},
+							"isCancelled": {
+								"type": "boolean"
+							},
+							"extendedAttributes": {
+								"type": "array"
+							}
+						}
+					}
+				},
+				"claim": {
+					"type": "array"
+				},
+				"paymentInfo": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "string"
+						},
+						"parentEntityId": {
+							"type": "string"
+						},
+						"parentEntityTypeName": {
+							"type": "string"
+						},
+						"billingType": {
+							"type": "string"
+						},
+						"paymentPlan": {
+							"type": "string"
+						},
+						"commissionPlan": {
+							"type": "string"
+						},
+						"commissionReturnable": {
+							"type": "boolean"
+						}
+					}
+				},
+				"underwriterDecisionInfo": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "string"
+							},
+							"userName": {
+								"type": "string"
+							},
+							"firstName": {
+								"type": "string"
+							},
+							"lastName": {
+								"type": "string"
+							},
+							"roleCode": {
+								"type": "string"
+							},
+							"approvalStatus": {
+								"type": "boolean"
+							},
+							"decisionDate": {
+								"type": "string"
+							}
+						}
+					}
+				},
+				"minorVersion": {
+					"type": "integer"
+				},
+				"majorVersion": {
+					"type": "integer"
+				},
+				"businessPurposeTypeCode": {
+					"type": "string"
+				},
+				"businessPurposeType": {
+					"type": "string"
+				},
+				"statusCodeDisplayName": {
+					"type": "string"
+				},
+				"reasons": {
+					"type": "array"
+				},
+				"submissionCreationDate": {
+					"type": "string"
+				},
+				"quoteId": {
+					"type": "string"
+				},
+				"quoteNumber": {
+					"type": "string"
+				},
+				"bindingDate": {
+					"type": "string"
+				},
+				"issuanceDate": {
+					"type": "string"
+				},
+				"carrierProcessingType": {
+					"type": "string"
+				},
+				"endorsement": {
+					"type": "array"
+				},
+				"certificateNumber": {
+					"type": "string"
+				},
+				"currencyCode": {
+					"type": "string"
+				},
+				"productTimeZone": {
+					"type": "string"
+				},
+				"renewal": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "string"
+						},
+						"parentEntityId": {
+							"type": "string"
+						},
+						"parentEntityTypeName": {
+							"type": "string"
+						},
+						"renewedBy": {
+							"type": "string"
+						},
+						"typeCode": {
+							"type": "string"
+						},
+						"renewalTriggerInDays": {
+							"type": "integer"
+						},
+						"extendedAttributes": {
+							"type": "array"
+						}
+					}
+				},
+				"originalPolicyNumber": {
+					"type": "string"
+				},
+				"priorPolicy": {
+					"type": "array"
+				},
+				"sanctionCheckInfo": {
+					"type": "array"
+				},
+				"underlyingPolicies": {
+					"type": "array"
+				},
+				"forms": {
+					"type": "array"
+				},
+				"trackingNumber": {
+					"type": "string"
+				},
+				"masterContractIndicator": {
+					"type": "boolean"
+				},
+				"originalBusinessPurposeTypeCode": {
+					"type": "string"
+				},
+				"originalBusinessPurposeType": {
+					"type": "string"
+				},
+				"sectionWiseLocationAllocation": {
+					"type": "boolean"
+				},
+				"termDurationInDays": {
+					"type": "integer"
+				}
+			}
+		}
+	}
+}
